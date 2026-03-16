@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from flask_jwt_extended import get_jwt, verify_jwt_in_request
-from app import db, socketio
+from extensions import db, socketio
 from models import Order, OrderItem
 from utils import role_required
 
@@ -44,7 +44,7 @@ def get_chef_orders():
 
     return jsonify(response), 200
 
-@chef_bp.route('/chef/orders/<uuid:order_id>/status', methods=['PUT'])
+@chef_bp.route('/chef/orders/<order_id>/status', methods=['PUT'])
 @role_required('chef', 'owner')
 def update_order_status(order_id):
     data = request.json

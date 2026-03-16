@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app import db, socketio
+from extensions import db, socketio
 from models import Order, OrderItem, MenuItem
 import uuid
 
@@ -62,7 +62,7 @@ def create_order():
         db.session.rollback()
         return jsonify(msg=str(e)), 500
 
-@orders_bp.route('/orders/<uuid:order_id>/status', methods=['GET'])
+@orders_bp.route('/orders/<order_id>/status', methods=['GET'])
 def get_order_status(order_id):
     order = Order.query.get(order_id)
     if not order:

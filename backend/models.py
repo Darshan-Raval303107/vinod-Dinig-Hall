@@ -1,23 +1,25 @@
 import uuid
 from datetime import datetime
-from app import db
-from sqlalchemy.dialects.postgresql import UUID
+from extensions import db
+
+def generate_uuid():
+    return str(uuid.uuid4())
 
 class User(db.Model):
     __tablename__ = 'users'
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
     name = db.Column(db.String(255), nullable=False)
     email = db.Column(db.String(255), unique=True, nullable=False)
     password_hash = db.Column(db.String(255), nullable=False)
     role = db.Column(db.String(50), nullable=False) # admin/owner/chef
-    restaurant_id = db.Column(UUID(as_uuid=True), db.ForeignKey('restaurants.id'), nullable=True)
+    restaurant_id = db.Column(db.String(36), db.ForeignKey('restaurants.id'), nullable=True)
 
 class Restaurant(db.Model):
     __tablename__ = 'restaurants'
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
     name = db.Column(db.String(255), nullable=False)
     slug = db.Column(db.String(100), unique=True, nullable=False)
-    owner_id = db.Column(UUID(as_uuid=True), db.ForeignKey('users.id', use_alter=True, name='fk_restaurant_owner'), nullable=True)
+    owner_id = db.Column(db.String(36), db.ForeignKey('users.id', use_alter=True, name='fk_restaurant_owner'), nullable=True)
     
     # Relationships
     tables = db.relationship('RestaurantTable', backref='restaurant', lazy=True)
@@ -27,15 +29,15 @@ class Restaurant(db.Model):
 
 class RestaurantTable(db.Model):
     __tablename__ = 'restaurant_tables'
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    restaurant_id = db.Column(UUID(as_uuid=True), db.ForeignKey('restaurants.id'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    restaurant_id = db.Column(db.String(36), db.ForeignKey('restaurants.id'), nullable=False)
     table_number = db.Column(db.Integer, nullable=False)
     qr_code_url = db.Column(db.Text, nullable=True)
 
 class MenuCategory(db.Model):
     __tablename__ = 'menu_categories'
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    restaurant_id = db.Column(UUID(as_uuid=True), db.ForeignKey('restaurants.id'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    restaurant_id = db.Column(db.String(36), db.ForeignKey('restaurants.id'), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     icon = db.Column(db.String(255), nullable=True)
     sort_order = db.Column(db.Integer, default=0)
@@ -44,8 +46,8 @@ class MenuCategory(db.Model):
 
 class MenuItem(db.Model):
     __tablename__ = 'menu_items'
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    category_id = db.Column(UUID(as_uuid=True), db.ForeignKey('menu_categories.id'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    category_id = db.Column(db.String(36), db.ForeignKey('menu_categories.id'), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
     price = db.Column(db.Numeric(10, 2), nullable=False)
@@ -55,8 +57,8 @@ class MenuItem(db.Model):
 
 class Order(db.Model):
     __tablename__ = 'orders'
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    restaurant_id = db.Column(UUID(as_uuid=True), db.ForeignKey('restaurants.id'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    restaurant_id = db.Column(db.String(36), db.ForeignKey('restaurants.id'), nullable=False)
     table_number = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(50), nullable=False, default='pending') # states: pending, accepted, cooking, ready, served, cancelled, paid
     total_price = db.Column(db.Numeric(10, 2), nullable=False, default=0.0)
@@ -68,9 +70,9 @@ class Order(db.Model):
 
 class OrderItem(db.Model):
     __tablename__ = 'order_items'
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    order_id = db.Column(UUID(as_uuid=True), db.ForeignKey('orders.id'), nullable=False)
-    menu_item_id = db.Column(UUID(as_uuid=True), db.ForeignKey('menu_items.id'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    order_id = db.Column(db.String(36), db.ForeignKey('orders.id'), nullable=False)
+    menu_item_id = db.Column(db.String(36), db.ForeignKey('menu_items.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     unit_price = db.Column(db.Numeric(10, 2), nullable=False)
 
@@ -78,8 +80,8 @@ class OrderItem(db.Model):
 
 class Payment(db.Model):
     __tablename__ = 'payments'
-    id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    order_id = db.Column(UUID(as_uuid=True), db.ForeignKey('orders.id'), nullable=False)
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    order_id = db.Column(db.String(36), db.ForeignKey('orders.id'), nullable=False)
     amount = db.Column(db.Numeric(10, 2), nullable=False)
     payment_method = db.Column(db.String(50), nullable=False) # razorpay/upi/cash
     status = db.Column(db.String(50), nullable=False, default='pending') # pending/success/failed

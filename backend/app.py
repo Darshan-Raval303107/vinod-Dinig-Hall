@@ -1,15 +1,7 @@
 from flask import Flask, jsonify
-from flask_sqlalchemy import SQLAlchemy
-from flask_migrate import Migrate
-from flask_jwt_extended import JWTManager
-from flask_socketio import SocketIO
 from flask_cors import CORS
 from config import Config
-
-db = SQLAlchemy()
-migrate = Migrate()
-jwt = JWTManager()
-socketio = SocketIO(cors_allowed_origins="*")
+from extensions import db, migrate, jwt, socketio
 
 def create_app(config_class=Config):
     # Setup static folder explicitly to serve our QR codes

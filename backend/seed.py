@@ -1,5 +1,6 @@
 import os
-from app import create_app, db
+from app import create_app
+from extensions import db
 from models import User, Restaurant, RestaurantTable, MenuCategory, MenuItem
 from utils import hash_password
 

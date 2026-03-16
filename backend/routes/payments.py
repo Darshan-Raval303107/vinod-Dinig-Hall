@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from app import db
+from extensions import db
 from models import Order, Payment
 
 payments_bp = Blueprint('payments_bp', __name__)
@@ -14,7 +14,7 @@ def create_payment():
         return jsonify(msg="Order not found"), 404
 
     # Dummy Razorpay Order ID for Phase 2
-    mock_razorpay_order_id = f"order_mock_{order.id.hex[:8]}"
+    mock_razorpay_order_id = f"order_mock_{str(order.id)[:8]}"
 
     # Check if pending payment exists
     payment = Payment.query.filter_by(order_id=order.id).first()
