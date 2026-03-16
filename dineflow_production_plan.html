@@ -1,0 +1,579 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-sans);color:var(--color-text-primary)}
+.plan{padding:1.5rem 0;max-width:860px}
+h1{font-size:22px;font-weight:500;margin-bottom:4px}
+.subtitle{font-size:14px;color:var(--color-text-secondary);margin-bottom:2rem}
+.section{margin-bottom:2.5rem}
+.section-title{font-size:16px;font-weight:500;margin-bottom:1rem;display:flex;align-items:center;gap:8px}
+.badge{font-size:11px;font-weight:500;padding:2px 8px;border-radius:20px;background:var(--color-background-secondary);color:var(--color-text-secondary);border:0.5px solid var(--color-border-tertiary)}
+.card{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-lg);padding:1rem 1.25rem;margin-bottom:12px}
+.card-sm{background:var(--color-background-primary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:.75rem 1rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.row{display:flex;gap:8px;align-items:flex-start}
+.label{font-size:12px;color:var(--color-text-secondary);margin-bottom:4px}
+.val{font-size:14px;font-weight:500}
+.tag{display:inline-block;font-size:11px;padding:2px 8px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);margin:2px;color:var(--color-text-secondary)}
+.phase-row{display:flex;gap:0;margin-bottom:2px}
+.phase-block{flex:1;height:36px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;border-right:2px solid var(--color-background-secondary)}
+.phase-block:last-child{border-right:none}
+.ph1{background:var(--color-background-info);color:var(--color-text-info)}
+.ph2{background:var(--color-background-success);color:var(--color-text-success)}
+.ph3{background:var(--color-background-warning);color:var(--color-text-warning)}
+.ph4{background:var(--color-background-danger);color:var(--color-text-danger)}
+.ph5{background:var(--color-background-secondary);color:var(--color-text-secondary)}
+.week-label{font-size:11px;color:var(--color-text-secondary);display:flex;gap:0;margin-bottom:4px}
+.week-label span{flex:1;text-align:center}
+.flow-row{display:flex;align-items:center;gap:0;margin-bottom:1rem;flex-wrap:wrap}
+.flow-node{background:var(--color-background-secondary);border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);padding:6px 12px;font-size:13px;font-weight:500;white-space:nowrap}
+.flow-arrow{color:var(--color-text-tertiary);padding:0 6px;font-size:16px}
+.api-row{display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:0.5px solid var(--color-border-tertiary);font-size:13px}
+.api-row:last-child{border-bottom:none}
+.method{font-size:11px;font-weight:500;padding:2px 7px;border-radius:4px;min-width:40px;text-align:center}
+.get{background:var(--color-background-success);color:var(--color-text-success)}
+.post{background:var(--color-background-info);color:var(--color-text-info)}
+.put{background:var(--color-background-warning);color:var(--color-text-warning)}
+.del{background:var(--color-background-danger);color:var(--color-text-danger)}
+.endpoint{font-family:var(--font-mono);font-size:12px;color:var(--color-text-secondary)}
+.check{color:var(--color-text-success);margin-right:6px}
+.todo-item{font-size:13px;padding:4px 0;display:flex;align-items:flex-start;gap:6px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.todo-item:last-child{border-bottom:none}
+.todo-circle{width:14px;height:14px;border-radius:50%;border:0.5px solid var(--color-border-secondary);flex-shrink:0;margin-top:2px}
+.swatch{width:28px;height:28px;border-radius:6px;flex-shrink:0;border:0.5px solid var(--color-border-tertiary)}
+.design-role{border-left:3px solid;padding-left:12px;margin-bottom:12px}
+.dr-customer{border-color:#C85C1A}
+.dr-chef{border-color:#22c55e}
+.dr-owner{border-color:#818CF8}
+.pill{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 8px;border-radius:20px;border:0.5px solid var(--color-border-tertiary);margin:2px}
+.tab-bar{display:flex;gap:4px;margin-bottom:1rem;border-bottom:0.5px solid var(--color-border-tertiary);padding-bottom:0}
+.tab{padding:6px 14px;font-size:13px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;color:var(--color-text-secondary);transition:color .15s}
+.tab.active{color:var(--color-text-primary);border-bottom-color:var(--color-text-primary);font-weight:500}
+.tab-content{display:none}.tab-content.active{display:block}
+.db-table{border:0.5px solid var(--color-border-tertiary);border-radius:var(--border-radius-md);overflow:hidden;margin-bottom:10px}
+.db-table-head{background:var(--color-background-secondary);padding:6px 12px;font-size:12px;font-weight:500;border-bottom:0.5px solid var(--color-border-tertiary)}
+.db-col{display:flex;gap:8px;padding:5px 12px;font-size:12px;border-bottom:0.5px solid var(--color-border-tertiary)}
+.db-col:last-child{border-bottom:none}
+.db-col-name{font-family:var(--font-mono);flex:1;color:var(--color-text-primary)}
+.db-col-type{color:var(--color-text-info);font-family:var(--font-mono);width:100px}
+.db-col-note{color:var(--color-text-tertiary);font-size:11px}
+.pk{color:var(--color-text-warning);font-size:10px;font-weight:500;border:0.5px solid var(--color-border-warning);padding:1px 4px;border-radius:3px}
+.fk{color:var(--color-text-secondary);font-size:10px;border:0.5px solid var(--color-border-tertiary);padding:1px 4px;border-radius:3px}
+.stack-row{display:grid;grid-template-columns:110px 1fr 1fr;gap:0;font-size:13px;border-bottom:0.5px solid var(--color-border-tertiary);padding:8px 0;align-items:center}
+.stack-row:last-child{border-bottom:none}
+.stack-layer{font-size:11px;color:var(--color-text-secondary)}
+.warning-box{background:var(--color-background-warning);border:0.5px solid var(--color-border-warning);border-radius:var(--border-radius-md);padding:8px 12px;font-size:13px;color:var(--color-text-warning);margin-bottom:10px}
+.info-box{background:var(--color-background-info);border:0.5px solid var(--color-border-info);border-radius:var(--border-radius-md);padding:8px 12px;font-size:13px;color:var(--color-text-info);margin-bottom:10px}
+.checklist{list-style:none}
+.checklist li{padding:5px 0;font-size:13px;border-bottom:0.5px solid var(--color-border-tertiary);display:flex;align-items:flex-start;gap:8px}
+.checklist li:last-child{border-bottom:none}
+.checklist li::before{content:"○";color:var(--color-text-tertiary);flex-shrink:0}
+</style>
+<div class="plan">
+
+<h1>DineFlow — Production Plan</h1>
+<p class="subtitle">QR-based restaurant ordering, chef workflow & analytics platform · Full-stack specification</p>
+
+<!-- TIMELINE -->
+<div class="section">
+  <div class="section-title">Timeline <span class="badge">5 phases · ~5 weeks</span></div>
+  <div class="week-label">
+    <span>Week 1</span><span>Week 2</span><span>Week 3</span><span>Week 4</span><span>Week 5</span>
+  </div>
+  <div class="phase-row" style="border-radius:var(--border-radius-md);overflow:hidden">
+    <div class="phase-block ph1" style="flex:1">Phase 1<br><span style="font-weight:400;font-size:10px">Foundation</span></div>
+    <div class="phase-block ph2" style="flex:1.2">Phase 2<br><span style="font-weight:400;font-size:10px">Customer Flow</span></div>
+    <div class="phase-block ph3" style="flex:1">Phase 3<br><span style="font-weight:400;font-size:10px">Chef Dashboard</span></div>
+    <div class="phase-block ph4" style="flex:1">Phase 4<br><span style="font-weight:400;font-size:10px">Owner Dashboard</span></div>
+    <div class="phase-block ph5" style="flex:.8">Phase 5<br><span style="font-weight:400;font-size:10px">Admin + Polish</span></div>
+  </div>
+</div>
+
+<!-- ARCHITECTURE -->
+<div class="section">
+  <div class="section-title">System Architecture <span class="badge">Request flow</span></div>
+  <div class="card">
+    <div class="flow-row">
+      <div class="flow-node" style="background:var(--color-background-info);border-color:var(--color-border-info);color:var(--color-text-info)">📱 Customer scans QR</div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">React Frontend<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">Vite + Tailwind</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Flask REST API<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">+ Socket.io</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">PostgreSQL<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">via Supabase</span></div>
+    </div>
+    <div class="flow-row" style="margin-bottom:0">
+      <div class="flow-node" style="background:var(--color-background-success);border-color:var(--color-border-success);color:var(--color-text-success)">Chef Dashboard<br><span style="font-size:11px;font-weight:400">Live WS feed</span></div>
+      <div class="flow-arrow">←</div>
+      <div class="flow-node" style="background:var(--color-background-warning);border-color:var(--color-border-warning);color:var(--color-text-warning)">Owner Dashboard<br><span style="font-size:11px;font-weight:400">Analytics + CRUD</span></div>
+      <div class="flow-arrow">←</div>
+      <div class="flow-node">Razorpay<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">Payments</span></div>
+      <div class="flow-arrow">←</div>
+      <div class="flow-node">Redis<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">Cache + Sessions</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- TECH STACK -->
+<div class="section">
+  <div class="section-title">Tech Stack</div>
+  <div class="card" style="padding:0">
+    <div class="stack-row" style="padding:8px 1.25rem;background:var(--color-background-secondary);font-weight:500;font-size:12px;color:var(--color-text-secondary)">
+      <span>Layer</span><span>Technology</span><span>Reason</span>
+    </div>
+    <div style="padding:0 1.25rem">
+      <div class="stack-row"><span class="stack-layer">Frontend</span><span><strong>React 18</strong> + Vite</span><span style="color:var(--color-text-secondary);font-size:12px">Fast HMR, ecosystem</span></div>
+      <div class="stack-row"><span class="stack-layer">Styling</span><span><strong>TailwindCSS</strong></span><span style="color:var(--color-text-secondary);font-size:12px">Utility-first, consistent tokens</span></div>
+      <div class="stack-row"><span class="stack-layer">State</span><span><strong>Zustand</strong></span><span style="color:var(--color-text-secondary);font-size:12px">Lightweight, no boilerplate</span></div>
+      <div class="stack-row"><span class="stack-layer">Routing</span><span><strong>React Router v6</strong></span><span style="color:var(--color-text-secondary);font-size:12px">Nested routes, lazy loading</span></div>
+      <div class="stack-row"><span class="stack-layer">HTTP</span><span><strong>Axios</strong></span><span style="color:var(--color-text-secondary);font-size:12px">Interceptors + error handling</span></div>
+      <div class="stack-row"><span class="stack-layer">Realtime</span><span><strong>Socket.io-client</strong></span><span style="color:var(--color-text-secondary);font-size:12px">Live order updates</span></div>
+      <div class="stack-row"><span class="stack-layer">Backend</span><span><strong>Flask</strong> + Blueprints</span><span style="color:var(--color-text-secondary);font-size:12px">Modular Python API</span></div>
+      <div class="stack-row"><span class="stack-layer">Auth</span><span><strong>Flask-JWT-Extended</strong></span><span style="color:var(--color-text-secondary);font-size:12px">Stateless, role claims</span></div>
+      <div class="stack-row"><span class="stack-layer">ORM</span><span><strong>SQLAlchemy</strong></span><span style="color:var(--color-text-secondary);font-size:12px">Type-safe, migrations</span></div>
+      <div class="stack-row"><span class="stack-layer">Database</span><span><strong>PostgreSQL</strong> (Supabase)</span><span style="color:var(--color-text-secondary);font-size:12px">ACID, UUID, JSON</span></div>
+      <div class="stack-row"><span class="stack-layer">Cache</span><span><strong>Redis</strong></span><span style="color:var(--color-text-secondary);font-size:12px">Sessions, rate limiting</span></div>
+      <div class="stack-row"><span class="stack-layer">Payments</span><span><strong>Razorpay</strong></span><span style="color:var(--color-text-secondary);font-size:12px">India-first, UPI + cards</span></div>
+      <div class="stack-row"><span class="stack-layer">QR Gen</span><span><strong>qrcode (Python)</strong></span><span style="color:var(--color-text-secondary);font-size:12px">Per-table QR generation</span></div>
+      <div class="stack-row"><span class="stack-layer">Deploy FE</span><span><strong>Vercel</strong></span><span style="color:var(--color-text-secondary);font-size:12px">CDN, instant deploys</span></div>
+      <div class="stack-row"><span class="stack-layer">Deploy BE</span><span><strong>Render</strong></span><span style="color:var(--color-text-secondary);font-size:12px">Python + Docker support</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- DESIGN SYSTEM -->
+<div class="section">
+  <div class="section-title">Design System <span class="badge">3 distinct archetypes</span></div>
+  <div class="info-box">No Inter, no Roboto, no pure #FFFFFF + #3B82F6 combos. Each user role gets a distinct visual language.</div>
+
+  <div class="design-role dr-customer">
+    <div style="font-size:14px;font-weight:500;margin-bottom:6px">Customer Pages — Luxury / Warm Editorial</div>
+    <div class="label" style="margin-bottom:8px">Menu, Cart, Order Status, Payment</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+      <div class="swatch" style="background:#FBF7F0"></div>
+      <div class="swatch" style="background:#C85C1A"></div>
+      <div class="swatch" style="background:#1C1917"></div>
+      <div class="swatch" style="background:#E8D5C4"></div>
+      <span style="font-size:12px;color:var(--color-text-secondary)">#FBF7F0 cream · #C85C1A amber · #1C1917 charcoal · #E8D5C4 blush</span>
+    </div>
+    <div style="font-size:13px;color:var(--color-text-secondary)">Fonts: <strong style="color:var(--color-text-primary)">Fraunces</strong> (display headlines) + <strong style="color:var(--color-text-primary)">Plus Jakarta Sans</strong> (UI body) · Feel: premium restaurant, warm & appetising · Scroll-reveal animations 300–500ms ease-out</div>
+  </div>
+
+  <div class="design-role dr-chef">
+    <div style="font-size:14px;font-weight:500;margin-bottom:6px">Chef Dashboard — Dark Brutalist Utility</div>
+    <div class="label" style="margin-bottom:8px">Chef Login, Orders Kanban, Kitchen Timer</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+      <div class="swatch" style="background:#0C0C0C;border-color:#333"></div>
+      <div class="swatch" style="background:#22C55E"></div>
+      <div class="swatch" style="background:#F59E0B"></div>
+      <div class="swatch" style="background:#3B82F6"></div>
+      <span style="font-size:12px;color:var(--color-text-secondary)">#0C0C0C bg · #22C55E accepted · #F59E0B cooking · #3B82F6 ready</span>
+    </div>
+    <div style="font-size:13px;color:var(--color-text-secondary)">Fonts: <strong style="color:var(--color-text-primary)">JetBrains Mono</strong> (order IDs / numbers) + <strong style="color:var(--color-text-primary)">Geist</strong> (UI labels) · Snappy 150ms micro-interactions · Status encoded purely in color · Kanban card layout</div>
+  </div>
+
+  <div class="design-role dr-owner">
+    <div style="font-size:14px;font-weight:500;margin-bottom:6px">Owner / Admin — SaaS Analytics Dark</div>
+    <div class="label" style="margin-bottom:8px">Analytics, Menu Manager, User Management</div>
+    <div style="display:flex;gap:8px;align-items:center;margin-bottom:6px">
+      <div class="swatch" style="background:#0F172A;border-color:#334155"></div>
+      <div class="swatch" style="background:#818CF8"></div>
+      <div class="swatch" style="background:#334155"></div>
+      <div class="swatch" style="background:#F8FAFC"></div>
+      <span style="font-size:12px;color:var(--color-text-secondary)">#0F172A bg · #818CF8 indigo accent · #334155 surface · #F8FAFC text</span>
+    </div>
+    <div style="font-size:13px;color:var(--color-text-secondary)">Fonts: <strong style="color:var(--color-text-primary)">Syne</strong> (dashboard headers) + <strong style="color:var(--color-text-primary)">Source Sans 3</strong> (data / body) · Vercel-inspired density · recharts for line/bar/donut charts</div>
+  </div>
+</div>
+
+<!-- DATABASE -->
+<div class="section">
+  <div class="section-title">Database Schema <span class="badge">PostgreSQL · 8 tables</span></div>
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab(event,'db')">Core Tables</div>
+    <div class="tab" onclick="switchTab(event,'api')">API Endpoints</div>
+    <div class="tab" onclick="switchTab(event,'ws')">WebSocket Events</div>
+    <div class="tab" onclick="switchTab(event,'routes')">Frontend Routes</div>
+  </div>
+
+  <div id="tab-db" class="tab-content active">
+    <div class="grid2">
+      <div>
+        <div class="db-table">
+          <div class="db-table-head">restaurants</div>
+          <div class="db-col"><span class="pk">PK</span><span class="db-col-name">id</span><span class="db-col-type">UUID</span></div>
+          <div class="db-col"><span class="db-col-name">name</span><span class="db-col-type">VARCHAR(255)</span></div>
+          <div class="db-col"><span class="db-col-name">slug</span><span class="db-col-type">VARCHAR(100)</span><span class="db-col-note">UNIQUE</span></div>
+          <div class="db-col"><span class="db-col-name">owner_id</span><span class="db-col-type">UUID FK</span></div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-head">users</div>
+          <div class="db-col"><span class="pk">PK</span><span class="db-col-name">id</span><span class="db-col-type">UUID</span></div>
+          <div class="db-col"><span class="db-col-name">name, email</span><span class="db-col-type">VARCHAR</span></div>
+          <div class="db-col"><span class="db-col-name">password_hash</span><span class="db-col-type">VARCHAR</span><span class="db-col-note">bcrypt 12</span></div>
+          <div class="db-col"><span class="db-col-name">role</span><span class="db-col-type">ENUM</span><span class="db-col-note">admin/owner/chef</span></div>
+          <div class="db-col"><span class="fk">FK</span><span class="db-col-name">restaurant_id</span><span class="db-col-type">UUID</span></div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-head">restaurant_tables</div>
+          <div class="db-col"><span class="pk">PK</span><span class="db-col-name">id</span><span class="db-col-type">UUID</span></div>
+          <div class="db-col"><span class="fk">FK</span><span class="db-col-name">restaurant_id</span><span class="db-col-type">UUID</span></div>
+          <div class="db-col"><span class="db-col-name">table_number</span><span class="db-col-type">INTEGER</span></div>
+          <div class="db-col"><span class="db-col-name">qr_code_url</span><span class="db-col-type">TEXT</span></div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-head">menu_categories</div>
+          <div class="db-col"><span class="pk">PK</span><span class="db-col-name">id</span><span class="db-col-type">UUID</span></div>
+          <div class="db-col"><span class="db-col-name">name, icon</span><span class="db-col-type">VARCHAR</span></div>
+          <div class="db-col"><span class="db-col-name">sort_order</span><span class="db-col-type">INTEGER</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="db-table">
+          <div class="db-table-head">menu_items</div>
+          <div class="db-col"><span class="pk">PK</span><span class="db-col-name">id</span><span class="db-col-type">UUID</span></div>
+          <div class="db-col"><span class="fk">FK</span><span class="db-col-name">category_id</span><span class="db-col-type">UUID</span></div>
+          <div class="db-col"><span class="db-col-name">name, description</span><span class="db-col-type">VARCHAR/TEXT</span></div>
+          <div class="db-col"><span class="db-col-name">price</span><span class="db-col-type">DECIMAL(10,2)</span></div>
+          <div class="db-col"><span class="db-col-name">is_available, is_veg</span><span class="db-col-type">BOOLEAN</span></div>
+          <div class="db-col"><span class="db-col-name">prep_time</span><span class="db-col-type">INTEGER</span><span class="db-col-note">minutes</span></div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-head">orders</div>
+          <div class="db-col"><span class="pk">PK</span><span class="db-col-name">id</span><span class="db-col-type">UUID</span></div>
+          <div class="db-col"><span class="db-col-name">table_number</span><span class="db-col-type">INTEGER</span></div>
+          <div class="db-col"><span class="db-col-name">status</span><span class="db-col-type">ENUM</span><span class="db-col-note">7 states</span></div>
+          <div class="db-col"><span class="db-col-name">total_price</span><span class="db-col-type">DECIMAL(10,2)</span></div>
+          <div class="db-col"><span class="db-col-name">created_at, updated_at</span><span class="db-col-type">TIMESTAMP</span></div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-head">order_items</div>
+          <div class="db-col"><span class="fk">FK</span><span class="db-col-name">order_id</span><span class="db-col-type">UUID</span></div>
+          <div class="db-col"><span class="fk">FK</span><span class="db-col-name">menu_item_id</span><span class="db-col-type">UUID</span></div>
+          <div class="db-col"><span class="db-col-name">quantity</span><span class="db-col-type">INTEGER</span><span class="db-col-note">CHECK > 0</span></div>
+          <div class="db-col"><span class="db-col-name">unit_price</span><span class="db-col-type">DECIMAL</span><span class="db-col-note">snapshot</span></div>
+        </div>
+        <div class="db-table">
+          <div class="db-table-head">payments</div>
+          <div class="db-col"><span class="fk">FK</span><span class="db-col-name">order_id</span><span class="db-col-type">UUID</span></div>
+          <div class="db-col"><span class="db-col-name">amount</span><span class="db-col-type">DECIMAL(10,2)</span></div>
+          <div class="db-col"><span class="db-col-name">payment_method</span><span class="db-col-type">ENUM</span><span class="db-col-note">razorpay/upi/cash</span></div>
+          <div class="db-col"><span class="db-col-name">status</span><span class="db-col-type">ENUM</span><span class="db-col-note">pending/success/failed</span></div>
+          <div class="db-col"><span class="db-col-name">razorpay_order_id</span><span class="db-col-type">VARCHAR</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-api" class="tab-content">
+    <div class="card-sm" style="margin-bottom:10px">
+      <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">PUBLIC — No auth required</div>
+      <div class="api-row"><span class="method get">GET</span><span class="endpoint">/api/menu?restaurant=&table=5</span></div>
+      <div class="api-row"><span class="method post">POST</span><span class="endpoint">/api/orders</span></div>
+      <div class="api-row"><span class="method get">GET</span><span class="endpoint">/api/orders/:id/status</span></div>
+      <div class="api-row"><span class="method post">POST</span><span class="endpoint">/api/payments/create</span></div>
+      <div class="api-row"><span class="method post">POST</span><span class="endpoint">/api/payments/verify</span></div>
+    </div>
+    <div class="card-sm" style="margin-bottom:10px">
+      <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">CHEF — JWT role=chef/owner/admin</div>
+      <div class="api-row"><span class="method get">GET</span><span class="endpoint">/api/chef/orders</span></div>
+      <div class="api-row"><span class="method put">PUT</span><span class="endpoint">/api/chef/orders/:id/status</span></div>
+      <div class="api-row"><span class="method get">GET</span><span class="endpoint">/api/chef/orders/history</span></div>
+    </div>
+    <div class="card-sm" style="margin-bottom:10px">
+      <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">OWNER — JWT role=owner/admin</div>
+      <div class="api-row"><span class="method get">GET</span><span class="endpoint">/api/owner/analytics/today</span></div>
+      <div class="api-row"><span class="method get">GET</span><span class="endpoint">/api/owner/analytics/range?from=&to=</span></div>
+      <div class="api-row"><span class="method get">GET</span><span class="endpoint">/api/owner/menu</span></div>
+      <div class="api-row"><span class="method post">POST</span><span class="endpoint">/api/owner/menu/items</span></div>
+      <div class="api-row"><span class="method put">PUT</span><span class="endpoint">/api/owner/menu/items/:id</span></div>
+      <div class="api-row"><span class="method del">DEL</span><span class="endpoint">/api/owner/menu/items/:id</span></div>
+      <div class="api-row"><span class="method post">POST</span><span class="endpoint">/api/owner/tables/generate-qr/:id</span></div>
+    </div>
+    <div class="card-sm">
+      <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">ADMIN — JWT role=admin</div>
+      <div class="api-row"><span class="method get">GET</span><span class="endpoint">/api/admin/restaurants</span></div>
+      <div class="api-row"><span class="method post">POST</span><span class="endpoint">/api/admin/restaurants</span></div>
+      <div class="api-row"><span class="method post">POST</span><span class="endpoint">/api/admin/users</span></div>
+      <div class="api-row"><span class="method get">GET</span><span class="endpoint">/api/admin/stats</span></div>
+    </div>
+  </div>
+
+  <div id="tab-ws" class="tab-content">
+    <div class="card-sm" style="margin-bottom:10px">
+      <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">SERVER → CLIENT</div>
+      <div class="api-row"><span style="font-family:var(--font-mono);font-size:12px;color:var(--color-text-success)">order:new</span><span class="endpoint" style="margin-left:12px">{ order } — chef room gets new order</span></div>
+      <div class="api-row"><span style="font-family:var(--font-mono);font-size:12px;color:var(--color-text-info)">order:status_update</span><span class="endpoint" style="margin-left:12px">{ orderId, status } — customer tracks</span></div>
+      <div class="api-row"><span style="font-family:var(--font-mono);font-size:12px;color:var(--color-text-warning)">order:accepted</span><span class="endpoint" style="margin-left:12px">{ orderId, eta } — customer gets ETA</span></div>
+    </div>
+    <div class="card-sm">
+      <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">CLIENT → SERVER</div>
+      <div class="api-row"><span style="font-family:var(--font-mono);font-size:12px;color:var(--color-text-secondary)">chef:join</span><span class="endpoint" style="margin-left:12px">{ restaurantId } — chef subscribes</span></div>
+      <div class="api-row"><span style="font-family:var(--font-mono);font-size:12px;color:var(--color-text-secondary)">customer:join</span><span class="endpoint" style="margin-left:12px">{ orderId } — customer subscribes to order</span></div>
+    </div>
+    <div class="info-box" style="margin-top:10px">Fallback: Socket.io auto-degrades to long-polling for environments where WebSocket is blocked.</div>
+  </div>
+
+  <div id="tab-routes" class="tab-content">
+    <div class="grid2">
+      <div>
+        <div class="card-sm" style="margin-bottom:10px">
+          <div style="font-size:12px;font-weight:500;color:#C85C1A;margin-bottom:8px">Customer (no auth)</div>
+          <div class="api-row"><span class="endpoint">/menu?table=5</span></div>
+          <div class="api-row"><span class="endpoint">/cart</span></div>
+          <div class="api-row"><span class="endpoint">/order-status/:orderId</span></div>
+          <div class="api-row"><span class="endpoint">/payment/:orderId</span></div>
+        </div>
+        <div class="card-sm">
+          <div style="font-size:12px;font-weight:500;color:#22c55e;margin-bottom:8px">Chef (JWT protected)</div>
+          <div class="api-row"><span class="endpoint">/chef/login</span></div>
+          <div class="api-row"><span class="endpoint">/chef/dashboard</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="card-sm" style="margin-bottom:10px">
+          <div style="font-size:12px;font-weight:500;color:#818CF8;margin-bottom:8px">Owner (JWT protected)</div>
+          <div class="api-row"><span class="endpoint">/owner/login</span></div>
+          <div class="api-row"><span class="endpoint">/owner/dashboard</span></div>
+          <div class="api-row"><span class="endpoint">/owner/analytics</span></div>
+          <div class="api-row"><span class="endpoint">/owner/menu</span></div>
+          <div class="api-row"><span class="endpoint">/owner/tables</span></div>
+        </div>
+        <div class="card-sm">
+          <div style="font-size:12px;font-weight:500;color:var(--color-text-secondary);margin-bottom:8px">Admin (JWT protected)</div>
+          <div class="api-row"><span class="endpoint">/admin/dashboard</span></div>
+          <div class="api-row"><span class="endpoint">/admin/restaurants</span></div>
+          <div class="api-row"><span class="endpoint">/admin/users</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PHASES DETAIL -->
+<div class="section">
+  <div class="section-title">Phase Breakdown — Task Checklist</div>
+  <div class="tab-bar">
+    <div class="tab active" onclick="switchTab(event,'ph1t')">P1 Foundation</div>
+    <div class="tab" onclick="switchTab(event,'ph2t')">P2 Customer</div>
+    <div class="tab" onclick="switchTab(event,'ph3t')">P3 Chef</div>
+    <div class="tab" onclick="switchTab(event,'ph4t')">P4 Owner</div>
+    <div class="tab" onclick="switchTab(event,'ph5t')">P5 Polish</div>
+  </div>
+
+  <div id="tab-ph1t" class="tab-content active">
+    <div class="grid2">
+      <div>
+        <div class="label" style="margin-bottom:8px">Backend</div>
+        <ul class="checklist">
+          <li>Vite + React project scaffold</li>
+          <li>Tailwind config with custom tokens (colors, fonts)</li>
+          <li>React Router v6 setup with protected route HOC</li>
+          <li>Zustand store structure (cart, auth, socket)</li>
+          <li>Axios instance with JWT interceptors</li>
+          <li>Socket.io client setup</li>
+        </ul>
+      </div>
+      <div>
+        <div class="label" style="margin-bottom:8px">Frontend</div>
+        <ul class="checklist">
+          <li>Flask app factory + Blueprint structure</li>
+          <li>SQLAlchemy models (all 8 tables)</li>
+          <li>Flask-Migrate init + initial migration</li>
+          <li>JWT auth middleware + role decorator</li>
+          <li>bcrypt password hashing utility</li>
+          <li>Docker Compose (Postgres + Redis + Flask)</li>
+          <li>Seed data (restaurant, tables, menu)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-ph2t" class="tab-content">
+    <div class="grid2">
+      <div>
+        <div class="label" style="margin-bottom:8px">Customer Pages</div>
+        <ul class="checklist">
+          <li>Menu page — categories + item cards (Fraunces/Jakarta)</li>
+          <li>Veg/non-veg filter + category scroll nav</li>
+          <li>Cart page — add/remove/quantity/notes</li>
+          <li>Order placement — POST /api/orders</li>
+          <li>Order status page — live Socket.io updates</li>
+          <li>Status progress stepper UI (7 states)</li>
+          <li>Payment page — Razorpay integration</li>
+          <li>Payment success/failure handling</li>
+        </ul>
+      </div>
+      <div>
+        <div class="label" style="margin-bottom:8px">Backend</div>
+        <ul class="checklist">
+          <li>GET /api/menu endpoint</li>
+          <li>POST /api/orders with validation</li>
+          <li>Socket.io emit on new order</li>
+          <li>GET /api/orders/:id/status</li>
+          <li>POST /api/payments/create (Razorpay order)</li>
+          <li>POST /api/payments/verify (signature check)</li>
+          <li>Update order status to paid</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-ph3t" class="tab-content">
+    <div class="grid2">
+      <div>
+        <div class="label" style="margin-bottom:8px">Chef Dashboard</div>
+        <ul class="checklist">
+          <li>Chef login page (JetBrains Mono / Geist)</li>
+          <li>Kanban board — columns per status</li>
+          <li>Order card — table no., items, timestamp</li>
+          <li>Status action buttons (Accept / Cooking / Ready)</li>
+          <li>Real-time new order via Socket.io (sound ping)</li>
+          <li>Kitchen timer per order (auto-starts on accept)</li>
+          <li>Order history tab</li>
+        </ul>
+      </div>
+      <div>
+        <div class="label" style="margin-bottom:8px">Backend</div>
+        <ul class="checklist">
+          <li>GET /api/chef/orders (active only)</li>
+          <li>PUT /api/chef/orders/:id/status</li>
+          <li>Socket.io broadcast on status change</li>
+          <li>Role middleware (chef / owner / admin)</li>
+          <li>Chef login endpoint (POST /api/auth/login)</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-ph4t" class="tab-content">
+    <div class="grid2">
+      <div>
+        <div class="label" style="margin-bottom:8px">Owner Dashboard</div>
+        <ul class="checklist">
+          <li>Owner login (Syne + Source Sans 3)</li>
+          <li>Analytics dashboard — metric cards (revenue, orders)</li>
+          <li>Orders-per-hour bar chart (recharts)</li>
+          <li>Revenue-per-day line chart (7-day)</li>
+          <li>Top dishes donut chart</li>
+          <li>Menu manager — CRUD items + toggle availability</li>
+          <li>QR code download per table</li>
+          <li>Staff list (add/deactivate chef)</li>
+        </ul>
+      </div>
+      <div>
+        <div class="label" style="margin-bottom:8px">Backend</div>
+        <ul class="checklist">
+          <li>GET /api/owner/analytics/today</li>
+          <li>GET /api/owner/analytics/range</li>
+          <li>Full menu CRUD endpoints</li>
+          <li>POST /api/owner/tables/generate-qr/:id</li>
+          <li>qrcode Python library — URL per table</li>
+          <li>Staff management endpoints</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="tab-ph5t" class="tab-content">
+    <div class="grid2">
+      <div>
+        <div class="label" style="margin-bottom:8px">Admin + Hardening</div>
+        <ul class="checklist">
+          <li>Admin dashboard — restaurant list + stats</li>
+          <li>Create restaurant flow</li>
+          <li>User management (add owner, add chef)</li>
+          <li>Error boundaries on every page</li>
+          <li>Loading skeletons (not spinners)</li>
+          <li>Toast notification system</li>
+          <li>Mobile responsiveness audit (breakpoints)</li>
+          <li>Dark mode toggle (owner / chef dashboards)</li>
+        </ul>
+      </div>
+      <div>
+        <div class="label" style="margin-bottom:8px">Security + Deploy</div>
+        <ul class="checklist">
+          <li>Flask-Limiter rate limiting (all endpoints)</li>
+          <li>CORS locked to Vercel domain</li>
+          <li>Razorpay webhook signature verification</li>
+          <li>Input validation (Marshmallow schemas)</li>
+          <li>JWT refresh token flow</li>
+          <li>Vercel deployment (frontend)</li>
+          <li>Render deployment (backend + Docker)</li>
+          <li>Supabase production database + backups</li>
+          <li>Environment variable audit</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- QR LOGIC -->
+<div class="section">
+  <div class="section-title">QR Code Logic <span class="badge">Critical path</span></div>
+  <div class="card">
+    <div class="flow-row" style="margin-bottom:12px">
+      <div class="flow-node" style="background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)">Owner generates QR<br><span style="font-size:11px;font-weight:400">via dashboard</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node">Python qrcode lib<br><span style="font-size:11px;font-weight:400;color:var(--color-text-secondary)">URL per table</span></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-node" style="font-family:var(--font-mono);font-size:12px">https://app.com/menu<br>?restaurant=slug&table=5</div>
+    </div>
+    <div style="font-size:13px;color:var(--color-text-secondary)">When customer scans: table number auto-set in React state → all subsequent orders tagged with table 5 → no manual selection needed · QR images stored in object storage (S3/Supabase Storage)</div>
+  </div>
+</div>
+
+<!-- SECURITY -->
+<div class="section">
+  <div class="section-title">Security Checklist</div>
+  <div class="grid2">
+    <ul class="checklist">
+      <li>JWT 24h expiry + refresh tokens</li>
+      <li>bcrypt cost factor 12</li>
+      <li>CORS restricted to known origins</li>
+      <li>Rate limiting (Flask-Limiter)</li>
+      <li>SQL injection prevented (SQLAlchemy ORM)</li>
+    </ul>
+    <ul class="checklist">
+      <li>XSS — React default escaping</li>
+      <li>HTTPS enforced in production</li>
+      <li>Razorpay webhook signature check</li>
+      <li>Input validation (Marshmallow)</li>
+      <li>No secrets committed — .env only</li>
+    </ul>
+  </div>
+</div>
+
+<!-- BONUS FEATURES -->
+<div class="section">
+  <div class="section-title">Bonus Features <span class="badge">Advanced marks</span></div>
+  <div style="display:flex;flex-wrap:wrap;gap:6px">
+    <span class="pill" style="background:var(--color-background-success);color:var(--color-text-success);border-color:var(--color-border-success)">Live order updates (Socket.io)</span>
+    <span class="pill" style="background:var(--color-background-info);color:var(--color-text-info);border-color:var(--color-border-info)">Kitchen timer per order</span>
+    <span class="pill">Sound ping on new order</span>
+    <span class="pill">Prep time estimation</span>
+    <span class="pill">Dark mode on dashboards</span>
+    <span class="pill">QR code PDF download</span>
+    <span class="pill">Revenue date-range picker</span>
+    <span class="pill">Item availability toggle</span>
+    <span class="pill">Order notes per item</span>
+    <span class="pill">Veg/non-veg filter</span>
+    <span class="pill">UPI QR fallback payment</span>
+  </div>
+</div>
+
+</div>
+<script>
+function switchTab(e, id){
+  const bar = e.target.closest('.tab-bar');
+  const section = bar.nextElementSibling;
+  bar.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  e.target.classList.add('active');
+  const prefix = id.replace(/\d.*/, '');
+  section.querySelectorAll('.tab-content').forEach(c=>{
+    c.classList.toggle('active', c.id==='tab-'+id);
+  });
+}
+</script>

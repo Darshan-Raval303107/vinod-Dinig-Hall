@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+/* ===== Custom Theme Tokens ===== */
+@theme {
+  /* Customer Theme */
+  --color-customer-bg: #FBF7F0;
+  --color-customer-accent: #C85C1A;
+  --color-customer-text: #1C1917;
+  --color-customer-surface: #E8D5C4;
+
+  /* Chef Theme */
+  --color-chef-bg: #0C0C0C;
+  --color-chef-surface: #111111;
+  --color-chef-accepted: #22C55E;
+  --color-chef-cooking: #F59E0B;
+  --color-chef-ready: #3B82F6;
+
+  /* Owner Theme */
+  --color-owner-bg: #0F172A;
+  --color-owner-accent: #818CF8;
+  --color-owner-surface: #334155;
+  --color-owner-text: #F8FAFC;
+
+  /* Fonts */
+  --font-fraunces: 'Fraunces', serif;
+  --font-jakarta: 'Plus Jakarta Sans', sans-serif;
+  --font-jetbrains: 'JetBrains Mono', monospace;
+  --font-geist: 'Geist', sans-serif;
+  --font-syne: 'Syne', sans-serif;
+  --font-source: 'Source Sans 3', sans-serif;
+}
+
+/* ===== Role-Based Theme Classes ===== */
+.theme-customer {
+  background-color: var(--color-customer-bg);
+  color: var(--color-customer-text);
+  font-family: var(--font-jakarta);
+}
+
+.theme-chef {
+  background-color: var(--color-chef-bg);
+  color: #FFFFFF;
+  font-family: var(--font-geist);
+}
+
+.theme-owner {
+  background-color: var(--color-owner-bg);
+  color: var(--color-owner-text);
+  font-family: var(--font-source);
+}
+
+/* ===== Global Reset ===== */
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
