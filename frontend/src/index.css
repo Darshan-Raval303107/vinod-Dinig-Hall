@@ -2,24 +2,27 @@
 
 /* ===== Custom Theme Tokens ===== */
 @theme {
-  /* Customer Theme */
+  /* Customer Theme: Warm, Elegant, Modern */
   --color-customer-bg: #FBF7F0;
   --color-customer-accent: #C85C1A;
   --color-customer-text: #1C1917;
   --color-customer-surface: #E8D5C4;
 
-  /* Chef Theme */
-  --color-chef-bg: #0C0C0C;
-  --color-chef-surface: #111111;
-  --color-chef-accepted: #22C55E;
+  /* Chef Theme: Dark, Professional, High-Contrast */
+  --color-chef-bg: #09090B;
+  --color-chef-surface: #18181B;
+  --color-chef-accepted: #10B981;
   --color-chef-cooking: #F59E0B;
   --color-chef-ready: #3B82F6;
 
-  /* Owner Theme */
+  /* Owner Theme: Corporate, Sleek, Trustworthy */
   --color-owner-bg: #0F172A;
-  --color-owner-accent: #818CF8;
-  --color-owner-surface: #334155;
+  --color-owner-accent: #6366F1;
+  --color-owner-surface: #1E293B;
   --color-owner-text: #F8FAFC;
+
+  /* Global Accent */
+  --color-primary: #C85C1A;
 
   /* Fonts */
   --font-fraunces: 'Fraunces', serif;
@@ -28,6 +31,36 @@
   --font-geist: 'Geist', sans-serif;
   --font-syne: 'Syne', sans-serif;
   --font-source: 'Source Sans 3', sans-serif;
+}
+
+/* ===== Global Reset & Base Styles ===== */
+@layer base {
+  body {
+    @apply antialiased;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  /* Custom Scrollbar for a premium feel */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    @apply bg-transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-gray-300 rounded-full hover:bg-gray-400 transition-colors;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
 
 /* ===== Role-Based Theme Classes ===== */
@@ -49,9 +82,30 @@
   font-family: var(--font-source);
 }
 
-/* ===== Global Reset ===== */
-body {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+/* ===== Premium UI Components & Utils ===== */
+.glass-panel {
+  @apply backdrop-blur-md bg-white/70 border border-white/20 shadow-xl;
+}
+
+.glass-dark {
+  @apply backdrop-blur-md bg-black/40 border border-white/10 shadow-2xl;
+}
+
+.premium-card {
+  @apply transition-all duration-300 hover:shadow-2xl hover:-translate-y-1;
+}
+
+.text-gradient {
+  @apply bg-clip-text text-transparent bg-gradient-to-r from-customer-accent to-[#E85C1A];
+}
+
+/* Page Transitions */
+.page-enter {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.page-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 300ms, transform 300ms;
 }

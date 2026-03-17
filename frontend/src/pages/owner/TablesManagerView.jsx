@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import api, { API_ORIGIN } from '../../api/axios';
-import { QrCode, Download, AlertCircle, Plus, X } from 'lucide-react';
+import { QrCode, Download, AlertCircle, Plus, X, Globe, Zap, Printer, Monitor, Server, Trash2 } from 'lucide-react';
 
 const TablesManagerView = () => {
   const [tables, setTables] = useState([]);
@@ -18,7 +18,7 @@ const TablesManagerView = () => {
         setLoading(false);
       })
       .catch(err => {
-        setError('Failed to fetch tables');
+        setError('Network telemetry failed. Reconnecting...');
         setLoading(false);
       });
   };
@@ -31,11 +31,11 @@ const TablesManagerView = () => {
     setGenerating(tableId);
     api.post(`/owner/tables/${tableId}/qr`)
       .then(res => {
-        fetchTables(); // Refresh to get the new URL
+        fetchTables();
         setGenerating(null);
       })
       .catch(err => {
-        alert("Failed to generate QR code");
+        setError("Failed to encrypt node access.");
         setGenerating(null);
       });
   };
@@ -50,7 +50,7 @@ const TablesManagerView = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `table-${tableNumber}-qr.png`;
+    a.download = `NODE-T${tableNumber}-ACCESS.png`;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -76,75 +76,108 @@ const TablesManagerView = () => {
       setIsAddOpen(false);
       fetchTables();
     } catch (err) {
-      setError(err?.response?.data?.msg || 'Failed to create table');
+      setError(err?.response?.data?.msg || 'Failed to initialize table node');
     } finally {
       setCreating(false);
     }
   };
 
-  if (loading) return <div className="p-8 text-gray-400">Loading tables...</div>;
+  if (loading) return (
+    <div className="p-12 h-[60vh] flex flex-col items-center justify-center">
+      <div className="w-10 h-10 border-4 border-white/10 border-t-indigo-500 rounded-full animate-spin"></div>
+      <p className="mt-4 text-[10px] uppercase font-black tracking-widest text-slate-500">Mapping Node Topology</p>
+    </div>
+  );
 
   return (
-    <div className="p-8">
-      <div className="flex justify-between items-center mb-8">
+    <div className="p-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+      <header className="flex justify-between items-end mb-12">
         <div>
-          <h2 className="text-2xl font-bold font-syne text-white mb-2">Tables & QR Codes</h2>
-          <p className="text-gray-400">Generate and print unique QR codes for each table.</p>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="w-2 h-2 rounded-full bg-sky-500 shadow-[0_0_10px_rgba(14,165,233,0.5)]"></div>
+            <span className="text-[10px] font-black text-sky-400 uppercase tracking-[0.3em]">Network Topology</span>
+          </div>
+          <h2 className="text-5xl font-extrabold font-syne text-white tracking-tighter italic leading-none">Access Points</h2>
+          <p className="text-slate-500 font-medium mt-3">Manage physical-to-digital bridge for restaurant tables.</p>
         </div>
         
         <button
           onClick={openAdd}
-          className="px-4 py-2 bg-owner-accent text-white font-medium rounded-lg hover:bg-indigo-500 transition-colors shadow-sm flex items-center gap-2"
+          className="flex items-center gap-3 px-8 h-14 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20 active:scale-95"
         >
-          <Plus size={16} /> Add New Table
+          <Plus size={18} /> Deploy New Station
         </button>
-      </div>
+      </header>
 
       {error && (
-        <div className="mb-6 p-4 bg-red-900/20 border border-red-900/50 text-red-300 rounded-xl flex items-center gap-3">
-          <AlertCircle size={18} /> {error}
+        <div className="mb-6 p-5 bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-black tracking-widest uppercase rounded-2xl flex items-center gap-3 animate-pulse italic">
+          <AlertCircle size={16} /> Telemetry Error: {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {/* NODE GRID */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {tables.map(table => (
-          <div key={table.id} className="bg-owner-surface/30 border border-owner-surface hover:border-owner-surface/80 rounded-2xl p-6 transition-colors group">
-            <div className="flex justify-between items-start mb-6">
-              <div className="w-12 h-12 rounded-xl bg-owner-surface flex items-center justify-center font-bold text-xl text-white font-syne shadow-inner">
-                {table.table_number}
+          <div key={table.id} className="group relative bg-[#1E293B]/40 border border-[#334155]/50 rounded-[2.5rem] p-8 transition-all duration-500 hover:shadow-[0_25px_60px_-15px_rgba(0,0,0,0.5)] overflow-hidden">
+            {/* Design Accents */}
+            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-indigo-500/10 transition-colors"></div>
+            
+            <header className="flex justify-between items-start mb-10 relative z-10">
+              <div className="flex items-center gap-4">
+                 <div className="w-16 h-16 rounded-[1.5rem] bg-[#0F172A] border border-[#334155] flex flex-col items-center justify-center transition-all duration-500 group-hover:border-indigo-500 group-hover:shadow-[0_0_20px_rgba(79,70,229,0.2)]">
+                    <span className="text-xs font-black text-slate-500 uppercase tracking-tighter leading-none mb-1">NODE</span>
+                    <span className="text-2xl font-black text-white italic tracking-tighter">T{table.table_number}</span>
+                 </div>
+                 <div className="flex flex-col">
+                    <span className="text-[9px] font-black text-slate-500 uppercase tracking-[0.2em]">Operational Status</span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className={`w-1.5 h-1.5 rounded-full ${table.qr_code_url ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)] animate-pulse' : 'bg-rose-500'}`}></div>
+                      <span className={`text-[10px] font-black ${table.qr_code_url ? 'text-emerald-400' : 'text-rose-500'} uppercase tracking-widest`}>
+                        {table.qr_code_url ? 'LIVE-ENCRYPTED' : 'OFFLINE-VOID'}
+                      </span>
+                    </div>
+                 </div>
               </div>
               
+              <button className="p-3 bg-white/5 border border-white/5 rounded-xl text-slate-600 hover:text-rose-400 transition-colors opacity-0 group-hover:opacity-100 translate-x-4 group-hover:translate-x-0">
+                 <Trash2 size={16} />
+              </button>
+            </header>
+
+            <div className="relative mb-10 h-64 bg-[#0F172A]/80 border border-[#334155]/30 rounded-[2rem] p-8 flex items-center justify-center group/qr shadow-inner overflow-hidden">
+              {/* Scanline animation */}
+              {table.qr_code_url && <div className="absolute top-0 left-0 w-full h-0.5 bg-indigo-500/40 shadow-[0_0_10px_rgba(99,102,241,0.5)] animate-[scanline_3s_ease-in-out_infinite] z-20"></div>}
+              
               {table.qr_code_url ? (
-                <div className="px-3 py-1 bg-green-500/10 text-green-400 text-xs font-semibold rounded-full border border-green-500/20">
-                  Active Setup
+                <div className="relative z-10 transition-transform duration-500 group-hover/qr:scale-110 group-hover/qr:rotate-3 p-3 bg-white rounded-2xl shadow-2xl">
+                  <img
+                    src={getQrFullUrl(table.qr_code_url)}
+                    alt={`Node T${table.table_number}`}
+                    className="w-32 h-32 object-contain grayscale-[0.5] group-hover/qr:grayscale-0 transition-all"
+                  />
+                  <div className="absolute inset-0 border-2 border-indigo-500/0 group-hover/qr:border-indigo-500/10 rounded-2xl transition-all"></div>
                 </div>
               ) : (
-                <div className="px-3 py-1 bg-yellow-500/10 text-yellow-400 text-xs font-semibold rounded-full border border-yellow-500/20">
-                  Needs QR
+                <div className="flex flex-col items-center justify-center opacity-20">
+                  <Zap size={48} className="text-slate-400 mb-4" />
+                  <p className="text-[10px] font-black tracking-widest uppercase">Encryption Required</p>
                 </div>
               )}
             </div>
-
-            {table.qr_code_url && (
-              <div className="mb-4 bg-owner-surface/20 border border-owner-surface rounded-2xl p-4 flex items-center justify-center">
-                <img
-                  src={getQrFullUrl(table.qr_code_url)}
-                  alt={`Table ${table.table_number} QR`}
-                  className="w-40 h-40 object-contain"
-                />
-              </div>
-            )}
             
-            <div className="space-y-3">
+            <footer className="flex gap-4 relative z-10">
               <button 
                 onClick={() => handleGenerateQR(table.id)}
                 disabled={generating === table.id}
-                className="w-full flex items-center justify-center gap-2 py-2.5 bg-owner-surface hover:bg-owner-surface/80 text-white rounded-xl text-sm font-medium transition-colors"
+                className={`flex-1 flex items-center justify-center gap-3 h-14 rounded-2xl text-[9px] font-black uppercase tracking-widest italic transition-all active:scale-95
+                  ${table.qr_code_url 
+                    ? 'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10 hover:text-white' 
+                    : 'bg-indigo-600 text-white shadow-xl shadow-indigo-600/20 hover:bg-indigo-500'}`}
               >
-                {generating === table.id ? 'Generating...' : (
+                {generating === table.id ? 'SYNCHRONIZING...' : (
                   <>
                     <QrCode size={16} /> 
-                    {table.qr_code_url ? 'Regenerate QR Code' : 'Generate QR Code'}
+                    {table.qr_code_url ? 'ROTATE KEYS' : 'GENERATE ACCESS'}
                   </>
                 )}
               </button>
@@ -152,60 +185,103 @@ const TablesManagerView = () => {
               <button 
                 onClick={() => handleDownloadQR(table.qr_code_url, table.table_number)}
                 disabled={!table.qr_code_url}
-                className="w-full flex items-center justify-center gap-2 py-2.5 bg-transparent border border-owner-surface text-gray-300 hover:text-white hover:border-gray-500 rounded-xl text-sm font-medium transition-colors disabled:opacity-50 disabled:hover:border-owner-surface disabled:hover:text-gray-300"
+                className="w-14 h-14 flex items-center justify-center bg-white/5 border border-white/10 text-slate-500 hover:text-white hover:bg-white/10 rounded-2xl transition-all active:scale-95 disabled:opacity-20 shadow-sm"
+                title="Download Print Asset"
               >
-                <Download size={16} /> Download Print File
+                <Printer size={18} />
               </button>
-            </div>
+            </footer>
           </div>
         ))}
+        
+        {/* ADD NODE PLACEHOLDER */}
+        <button 
+          onClick={openAdd}
+          className="group h-full min-h-[400px] border-4 border-dashed border-[#334155]/30 rounded-[2.5rem] flex flex-col items-center justify-center gap-4 transition-all hover:bg-indigo-600/5 hover:border-indigo-500/30 grayscale hover:grayscale-0"
+        >
+           <div className="w-20 h-20 rounded-full bg-slate-900 border-2 border-slate-800 flex items-center justify-center text-slate-600 group-hover:text-indigo-400 group-hover:border-indigo-500/50 group-hover:shadow-[0_0_30px_rgba(79,70,229,0.2)] transition-all">
+              <Plus size={32} />
+           </div>
+           <span className="text-[10px] font-black text-slate-600 group-hover:text-indigo-400 uppercase tracking-[0.5em] italic">Deploy New Interface</span>
+        </button>
       </div>
 
+      {/* MODAL SYSTEM */}
       {isAddOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6">
-          <div className="w-full max-w-md rounded-2xl border border-owner-surface bg-owner-bg shadow-2xl">
-            <div className="flex items-center justify-between p-5 border-b border-owner-surface">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#09090B]/90 backdrop-blur-xl p-8 animate-in fade-in duration-300">
+          <div className="w-full max-w-lg bg-[#1E293B] border border-[#334155] rounded-[2.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.6)] overflow-hidden">
+            <header className="px-10 py-8 border-b border-[#334155]/50 flex justify-between items-center bg-white/5">
               <div>
-                <h3 className="text-lg font-semibold text-white font-syne">Add Table</h3>
-                <p className="text-sm text-gray-400">Leave empty to auto-pick next number (max + 1).</p>
+                <h3 className="text-2xl font-extrabold text-white font-syne tracking-tighter italic">Initialize Node</h3>
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mt-1">Station Deployment Protocol</p>
               </div>
-              <button onClick={closeAdd} className="p-2 rounded-lg hover:bg-owner-surface/50 text-gray-300">
-                <X size={18} />
+              <button onClick={closeAdd} className="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 text-slate-500 hover:text-white transition-all">
+                <X size={20} />
               </button>
-            </div>
-            <form onSubmit={createTable} className="p-5 space-y-4">
-              <div>
-                <label className="block text-xs font-semibold text-gray-400 mb-2">Table Number (optional)</label>
-                <input
-                  value={newTableNumber}
-                  onChange={(e) => setNewTableNumber(e.target.value)}
-                  type="number"
-                  min="1"
-                  step="1"
-                  className="w-full px-4 py-3 rounded-xl bg-[#0F172A] border border-owner-surface text-white focus:outline-none focus:border-owner-accent"
-                  placeholder="6"
-                />
+            </header>
+
+            <form onSubmit={createTable} className="p-10 space-y-8">
+              <div className="relative group">
+                <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-4 block italic">Designate Node Identifier</label>
+                <div className="relative">
+                  <input
+                    value={newTableNumber}
+                    onChange={(e) => setNewTableNumber(e.target.value)}
+                    type="number"
+                    min="1"
+                    className="w-full pl-14 pr-6 h-16 bg-[#0F172A] border border-[#334155] rounded-2xl text-[12px] font-black uppercase tracking-widest text-white focus:outline-none focus:border-indigo-500 shadow-inner placeholder:text-slate-800"
+                    placeholder="Auto-increment if null"
+                  />
+                  <Monitor size={20} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-800 group-focus-within:text-indigo-600 transition-colors" />
+                </div>
               </div>
-              <div className="flex justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={closeAdd}
-                  className="px-4 py-2.5 rounded-xl border border-owner-surface text-gray-300 hover:text-white hover:border-gray-500"
-                >
-                  Cancel
-                </button>
+
+              <div className="bg-white/5 border border-white/5 rounded-2xl p-6 flex gap-4">
+                 <Server size={24} className="text-slate-700 flex-shrink-0" />
+                 <p className="text-[9px] font-medium text-slate-500 leading-relaxed uppercase tracking-widest">
+                   The system will automatically allocate the next available frequency in the grid if no explicit ID is provided.
+                 </p>
+              </div>
+
+              <div className="flex flex-col gap-4 mt-4">
                 <button
                   type="submit"
                   disabled={creating}
-                  className="px-5 py-2.5 rounded-xl bg-owner-accent text-white font-semibold hover:bg-indigo-500 disabled:opacity-60"
+                  className="w-full h-16 rounded-2xl bg-white text-black text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all shadow-2xl disabled:opacity-30 active:scale-95 flex items-center justify-center gap-3"
                 >
-                  {creating ? 'Creating…' : 'Create'}
+                  {creating ? 'COMMITTING...' : 'AUTHORIZE DEPLOYMENT'}
+                  {!creating && <Zap size={16} fill="currentColor" />}
+                </button>
+                <button
+                  type="button"
+                  onClick={closeAdd}
+                  className="text-[10px] font-black text-slate-700 uppercase tracking-widest hover:text-slate-400 transition-all italic underline underline-offset-8"
+                >
+                  Abort Protocol
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* FOOTER STATS */}
+      <footer className="mt-20 pt-10 border-t border-slate-800/20 flex flex-wrap gap-12">
+         <div className="flex flex-col">
+            <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.3em] mb-2">Network Capacity</span>
+            <div className="flex items-end gap-1">
+               <span className="text-3xl font-black text-white italic">{tables.length}</span>
+               <span className="text-[10px] font-bold text-slate-500 uppercase pb-1.5">Nodes</span>
+            </div>
+         </div>
+         <div className="flex flex-col">
+            <span className="text-[9px] font-black text-slate-600 uppercase tracking-[0.3em] mb-2">Encrypted Broadcast</span>
+            <div className="flex items-end gap-1">
+               <span className="text-3xl font-black text-emerald-500 italic">{tables.filter(t => t.qr_code_url).length}</span>
+               <span className="text-[10px] font-bold text-slate-500 uppercase pb-1.5">Active Linkups</span>
+            </div>
+         </div>
+      </footer>
     </div>
   );
 };

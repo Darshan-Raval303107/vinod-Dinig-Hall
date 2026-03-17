@@ -20,7 +20,9 @@ class Restaurant(db.Model):
     name = db.Column(db.String(255), nullable=False)
     slug = db.Column(db.String(100), unique=True, nullable=False)
     owner_id = db.Column(db.String(36), db.ForeignKey('users.id', use_alter=True, name='fk_restaurant_owner'), nullable=True)
-    
+    # Owner-controlled toggle: when False, customers cannot log in or browse the menu
+    user_login_enabled = db.Column(db.Boolean, nullable=False, default=True)
+
     # Relationships
     tables = db.relationship('RestaurantTable', backref='restaurant', lazy=True)
     users = db.relationship('User', backref='restaurant', lazy=True, foreign_keys=[User.restaurant_id])

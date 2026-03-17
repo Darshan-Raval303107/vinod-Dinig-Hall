@@ -371,3 +371,41 @@ def generate_qr(table_id):
     db.session.commit()
     
     return jsonify(msg="QR Code generated successfully", url=qr_image_url), 200
+
+
+# ─── User-Login toggle (owner control) ──────────────────────────────────────
+
+@owner_bp.route('/owner/settings/user-login', methods=['GET'])
+@role_required('owner', 'admin')
+def get_user_login_setting():
+    """Return the current user_login_enabled flag for this restaurant."""
+    restaurant_id = _get_claim_restaurant_id()
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+    return jsonify({
+        "user_login_enabled": bool(restaurant.user_login_enabled),
+        "restaurant_name": restaurant.name
+    }), 200
+
+
+@owner_bp.route('/owner/settings/user-login', methods=['PUT'])
+@role_required('owner', 'admin')
+def set_user_login_setting():
+    """
+    Toggle whether customers can log in / access the menu.
+    Body: { "enabled": true | false }
+    """
+    restaurant_id = _get_claim_restaurant_id()
+    restaurant = Restaurant.query.get_or_404(restaurant_id)
+
+    data = request.get_json(silent=True) or {}
+    if 'enabled' not in data:
+        return jsonify(msg="'enabled' field is required (true/false)"), 400
+
+    restaurant.user_login_enabled = bool(data['enabled'])
+    db.session.commit()
+
+    state = "enabled" if restaurant.user_login_enabled else "disabled"
+    return jsonify(
+        msg=f"User login {state} successfully.",
+        user_login_enabled=restaurant.user_login_enabled
+    ), 200

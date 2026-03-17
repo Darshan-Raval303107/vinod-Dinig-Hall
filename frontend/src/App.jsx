@@ -8,6 +8,7 @@ import OrderStatus from './pages/customer/OrderStatus';
 import Payment from './pages/customer/Payment';
 
 import Login from './pages/auth/Login';
+import Unauthorized from './pages/auth/Unauthorized';
 import ChefDashboard from './pages/chef/Dashboard';
 import OwnerDashboard from './pages/owner/Dashboard';
 
@@ -22,6 +23,7 @@ function App() {
         <Route path="/payment/:orderId" element={<Payment />} />
 
         <Route path="/login" element={<Login />} />
+        <Route path="/unauthorized" element={<Unauthorized />} />
 
         {/* Chef Routes */}
         <Route element={<ProtectedRoute allowedRoles={['chef', 'admin']} />}>

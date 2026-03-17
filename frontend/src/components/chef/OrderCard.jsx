@@ -1,14 +1,11 @@
 import { useEffect, useState } from 'react';
-import { ChefHat } from 'lucide-react';
+import { ChefHat, Clock, CheckCircle2, Flame, AlertCircle } from 'lucide-react';
 
 const KitchenTimer = ({ createdAt, status }) => {
   const [elapsed, setElapsed] = useState('');
   
   useEffect(() => {
-    // Only tick if not served/cancelled
-    if (status === 'served' || status === 'cancelled' || status === 'paid') {
-      return; 
-    }
+    if (status === 'served' || status === 'cancelled' || status === 'paid') return; 
 
     const start = new Date(createdAt).getTime();
 
@@ -17,7 +14,6 @@ const KitchenTimer = ({ createdAt, status }) => {
       const diff = now - start;
       const minutes = Math.floor(diff / 60000);
       const seconds = Math.floor((diff % 60000) / 1000);
-      
       setElapsed(`${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`);
     };
 
@@ -26,82 +22,98 @@ const KitchenTimer = ({ createdAt, status }) => {
     return () => clearInterval(interval);
   }, [createdAt, status]);
 
-  const isOverdue = parseInt(elapsed.split(':')[0]) > 15 && status !== 'ready';
+  const minutesPassed = parseInt(elapsed.split(':')[0]) || 0;
+  const isOverdue = minutesPassed >= 15 && status !== 'ready';
+  const isCritical = minutesPassed >= 25 && status !== 'ready';
 
   return (
-    <div className={`flex items-center gap-1.5 text-xs font-mono px-2 py-1 rounded bg-black/20 ${isOverdue ? 'text-red-400 font-bold bg-red-900/30' : 'text-gray-400'}`}>
-      <ChefHat size={12} />
-      {status === 'ready' ? 'Ready' : elapsed || '00:00'}
+    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono font-bold transition-all ${
+      isCritical ? 'bg-red-500 text-white animate-pulse' : 
+      isOverdue ? 'bg-orange-500/20 text-orange-400 border border-orange-500/30' : 
+      'bg-zinc-800 text-zinc-400 border border-zinc-700'
+    }`}>
+      <Clock size={14} />
+      {status === 'ready' ? 'READY' : elapsed || '00:00'}
     </div>
   );
 };
 
 const OrderCard = ({ order, onUpdateStatus }) => {
+  const isPending = order.status === 'pending';
   const isCooking = order.status === 'cooking' || order.status === 'accepted';
   const isReady = order.status === 'ready';
 
   return (
-    <div className={`bg-chef-surface border rounded-xl p-4 shadow-sm transition-all
-      ${order.status === 'pending' ? 'border-dashed border-gray-600' : ''}
-      ${isCooking ? 'border-chef-cooking shadow-[0_0_15px_rgba(245,158,11,0.1)]' : ''}
-      ${isReady ? 'border-chef-ready shadow-[0_0_15px_rgba(59,130,246,0.1)]' : ''}
-    `}>
-      <div className="flex justify-between items-start border-b border-gray-800 pb-3 mb-3">
-        <div>
-          <h3 className="text-xl font-bold text-white mb-1">Table {order.table_number}</h3>
-          <p className="text-xs text-gray-500 font-mono">#{order.order_id.substring(0,6).toUpperCase()}</p>
-        </div>
-        <KitchenTimer createdAt={order.created_at} status={order.status} />
-      </div>
+    <div className={`group relative bg-zinc-900 border overflow-hidden rounded-[2rem] transition-all duration-500 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.5)] ${
+      isPending ? 'border-dashed border-zinc-700 bg-zinc-900/40' : 
+      isCooking ? 'border-orange-500/30' : 
+      isReady ? 'border-blue-500/30' : 
+      'border-zinc-800'
+    }`}>
+      {/* Visual Indicator Line */}
+      <div className={`absolute top-0 left-0 w-1 h-full ${
+        isPending ? 'bg-zinc-600' : 
+        isCooking ? 'bg-orange-500' : 
+        isReady ? 'bg-blue-500' : 
+        'bg-zinc-800'
+      }`} />
 
-      <div className="space-y-2 mb-4">
-        {order.items.map((item, idx) => (
-          <div key={idx} className="flex justify-between text-sm">
-            <span className="text-gray-300">
-              <span className="text-gray-500 mr-2">{item.quantity}x</span> 
-              {item.name}
-            </span>
+      <div className="p-6">
+        <header className="flex justify-between items-start mb-6">
+          <div>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-3xl font-black text-white tracking-tighter">T{order.table_number}</span>
+              {isPending && <span className="flex h-2 w-2 rounded-full bg-orange-500 animate-ping"></span>}
+            </div>
+            <p className="text-[10px] font-black text-zinc-500 tracking-[0.2em] uppercase">Order #{order.order_id.substring(0,6)}</p>
           </div>
-        ))}
-      </div>
+          <KitchenTimer createdAt={order.created_at} status={order.status} />
+        </header>
 
-      <div className="flex gap-2 mt-auto">
-        {order.status === 'pending' && (
-          <button 
-            onClick={() => onUpdateStatus(order.order_id, 'accepted')}
-            className="flex-1 bg-chef-accepted text-black py-2 rounded-lg text-sm font-bold hover:bg-green-400 transition-colors"
-          >
-            ACCEPT
-          </button>
-        )}
-        
-        {(order.status === 'accepted' || order.status === 'cooking') && (
-          <>
-            {order.status === 'accepted' && (
-              <button 
-                onClick={() => onUpdateStatus(order.order_id, 'cooking')}
-                className="flex-1 bg-chef-surface border border-chef-cooking text-chef-cooking py-2 rounded-lg text-sm font-bold hover:bg-chef-cooking hover:text-black transition-colors"
-              >
-                COOKING
-              </button>
-            )}
+        <div className="space-y-4 mb-8">
+          {order.items.map((item, idx) => (
+            <div key={idx} className="flex items-center gap-4 group/item">
+              <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10 flex items-center justify-center text-xs font-black text-zinc-400 group-hover/item:bg-white/10 transition-colors">
+                {item.quantity}
+              </div>
+              <div className="flex-1">
+                <span className="text-md font-bold text-zinc-200 block leading-tight">{item.name}</span>
+                <span className="text-[10px] text-zinc-600 font-bold uppercase tracking-widest leading-none">Standard Prep</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="grid grid-cols-1 gap-2">
+          {isPending && (
             <button 
-              onClick={() => onUpdateStatus(order.order_id, 'ready')}
-              className="flex-1 bg-chef-ready text-white py-2 rounded-lg text-sm font-bold hover:bg-blue-400 hover:text-black transition-colors"
+              onClick={() => onUpdateStatus(order.order_id, 'accepted')}
+              className="w-full bg-white text-black py-4 rounded-2xl text-xs font-black tracking-widest uppercase hover:bg-zinc-200 transition-all transform active:scale-95 flex items-center justify-center gap-2"
             >
-              READY
+              <ChefHat size={16} /> START ORDER
             </button>
-          </>
-        )}
+          )}
+          
+          {isCooking && (
+            <div className="flex gap-2">
+              <button 
+                onClick={() => onUpdateStatus(order.order_id, 'ready')}
+                className="flex-[2] bg-orange-500 text-white py-4 rounded-2xl text-xs font-black tracking-widest uppercase hover:bg-orange-400 transition-all transform active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20"
+              >
+                <Flame size={16} /> MARK READY
+              </button>
+            </div>
+          )}
 
-        {order.status === 'ready' && (
-          <button 
-            onClick={() => onUpdateStatus(order.order_id, 'served')}
-            className="flex-1 bg-gray-700 text-white border border-gray-600 py-2 rounded-lg text-sm font-bold hover:bg-gray-600 transition-colors"
-          >
-            SERVE
-          </button>
-        )}
+          {isReady && (
+            <button 
+              onClick={() => onUpdateStatus(order.order_id, 'served')}
+              className="w-full bg-zinc-800 text-zinc-400 border border-zinc-700 py-4 rounded-2xl text-xs font-black tracking-widest uppercase hover:bg-blue-500 hover:text-white hover:border-blue-400 transition-all transform active:scale-95 flex items-center justify-center gap-2"
+            >
+              <CheckCircle2 size={16} /> COMPLETE & SERVE
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );
