@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vinnod Dining Hall</title>
+    <meta name="description" content="Vinnod Dining Hall — premium dining experience." />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="nav">
+      <div class="container nav__inner">
+        <a class="brand" href="#top" aria-label="Vinnod Dining Hall home">
+          <span class="brand__mark" aria-hidden="true"></span>
+          <span class="brand__text">Vinnod</span>
+        </a>
+        <nav class="nav__links" aria-label="Primary navigation">
+          <a href="#experience">Experience</a>
+          <a href="#menu">Menu</a>
+          <a href="#gallery">Gallery</a>
+          <a class="btn btn--sm" href="#reserve">Reserve</a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <!-- Scroll-driven image sequence hero -->
+      <section class="hero" aria-label="Hero">
+        <div class="hero__scroll" id="heroScroll">
+          <div class="hero__sticky">
+            <canvas class="hero__canvas" id="heroCanvas"></canvas>
+
+            <div class="hero__overlay" aria-hidden="true"></div>
+
+            <div class="container hero__content">
+              <div class="hero__kicker">Vinnod Dining Hall</div>
+              <h1 class="hero__title">A modern dining experience, crafted with care.</h1>
+              <p class="hero__subtitle">
+                Scroll to explore the space in a smooth, cinematic 3D reveal—then book your table in seconds.
+              </p>
+              <div class="hero__cta">
+                <a class="btn" href="#reserve">Reserve a table</a>
+                <a class="btn btn--ghost" href="#experience">Explore</a>
+              </div>
+            </div>
+
+            <div class="hero__progress" id="heroProgress" aria-hidden="true">
+              <div class="hero__progressBar"></div>
+            </div>
+
+            <div class="hero__hint" aria-hidden="true">
+              <span class="hero__hintDot"></span>
+              <span>Scroll</span>
+            </div>
+
+            <div class="hero__loading" id="heroLoading" aria-live="polite">
+              <div class="hero__loadingCard">
+                <div class="hero__loadingTitle">Loading experience</div>
+                <div class="hero__loadingBar">
+                  <div class="hero__loadingFill" id="heroLoadingFill"></div>
+                </div>
+                <div class="hero__loadingPct" id="heroLoadingPct">0%</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="experience">
+        <div class="container">
+          <div class="grid">
+            <div>
+              <h2 class="section__title">Designed for comfort, built for moments.</h2>
+              <p class="section__copy">
+                From warm lighting to thoughtful seating and a calm, airy layout—every detail is tuned for
+                conversation, celebration, and quiet meals alike.
+              </p>
+              <div class="stats">
+                <div class="stat">
+                  <div class="stat__num">4.8</div>
+                  <div class="stat__label">Average rating</div>
+                </div>
+                <div class="stat">
+                  <div class="stat__num">120+</div>
+                  <div class="stat__label">Seats</div>
+                </div>
+                <div class="stat">
+                  <div class="stat__num">7</div>
+                  <div class="stat__label">Days open</div>
+                </div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card__eyebrow">Today’s highlights</div>
+              <ul class="list">
+                <li><strong>Chef’s special</strong>: seasonal comfort bowl</li>
+                <li><strong>Fresh</strong>: baked daily</li>
+                <li><strong>Fast</strong>: queue-friendly service flow</li>
+              </ul>
+              <div class="card__footnote">*Replace this content with your real menu copy anytime.</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section section--alt" id="menu">
+        <div class="container">
+          <h2 class="section__title">Menu built around taste + consistency.</h2>
+          <p class="section__copy section__copy--wide">
+            Balanced options, vegetarian friendly, and always served fresh. Add your real menu items and pricing here.
+          </p>
+          <div class="pillRow">
+            <span class="pill">Breakfast</span>
+            <span class="pill">Lunch</span>
+            <span class="pill">Dinner</span>
+            <span class="pill">Snacks</span>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="gallery">
+        <div class="container">
+          <h2 class="section__title">Gallery</h2>
+          <p class="section__copy">Your hero sequence already doubles as a gallery—scroll back up anytime.</p>
+        </div>
+      </section>
+
+      <section class="section section--alt" id="reserve">
+        <div class="container">
+          <div class="reserve">
+            <div>
+              <h2 class="section__title">Reserve in seconds.</h2>
+              <p class="section__copy">
+                Hook this up to WhatsApp / Google Forms / any booking system later—this is a polished placeholder.
+              </p>
+            </div>
+            <form class="form" onsubmit="event.preventDefault(); alert('Reservation request sent (demo).');">
+              <label class="field">
+                <span>Name</span>
+                <input required placeholder="Your name" />
+              </label>
+              <label class="field">
+                <span>Phone</span>
+                <input required placeholder="+91 XXXXX XXXXX" />
+              </label>
+              <button class="btn" type="submit">Request reservation</button>
+            </form>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="container footer__inner">
+        <div class="footer__left">
+          <div class="brand brand--muted">
+            <span class="brand__mark" aria-hidden="true"></span>
+            <span class="brand__text">Vinnod Dining Hall</span>
+          </div>
+          <div class="footer__copy">© <span id="year"></span> Vinnod. All rights reserved.</div>
+        </div>
+        <div class="footer__right">
+          <a href="#top">Back to top</a>
+        </div>
+      </div>
+    </footer>
+
+    <script src="./main.js" defer></script>
+  </body>
+</html>
+
+
