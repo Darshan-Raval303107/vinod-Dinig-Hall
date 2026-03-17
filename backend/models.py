@@ -50,6 +50,7 @@ class MenuItem(db.Model):
     category_id = db.Column(db.String(36), db.ForeignKey('menu_categories.id'), nullable=False)
     name = db.Column(db.String(255), nullable=False)
     description = db.Column(db.Text, nullable=True)
+    image_url = db.Column(db.Text, nullable=True)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     is_available = db.Column(db.Boolean, default=True)
     is_veg = db.Column(db.Boolean, nullable=False)
