@@ -3,7 +3,7 @@ import qrcode
 from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, url_for, current_app
 from flask_jwt_extended import get_jwt, verify_jwt_in_request
-from app import db
+from extensions import db
 from models import Order, MenuItem, MenuCategory, RestaurantTable, Restaurant
 from sqlalchemy import func
 from utils import role_required
@@ -70,7 +70,7 @@ def get_owner_menu():
         })
     return jsonify(res), 200
 
-@owner_bp.route('/owner/menu/items/<uuid:item_id>', methods=['PUT', 'DELETE'])
+@owner_bp.route('/owner/menu/items/<item_id>', methods=['PUT', 'DELETE'])
 @role_required('owner', 'admin')
 def update_menu_item(item_id):
     item = MenuItem.query.get_or_404(item_id)
@@ -105,7 +105,7 @@ def get_tables():
         "qr_code_url": t.qr_code_url
     } for t in tables]), 200
 
-@owner_bp.route('/owner/tables/<uuid:table_id>/qr', methods=['POST'])
+@owner_bp.route('/owner/tables/<table_id>/qr', methods=['POST'])
 @role_required('owner', 'admin')
 def generate_qr(table_id):
     table = RestaurantTable.query.get_or_404(table_id)
