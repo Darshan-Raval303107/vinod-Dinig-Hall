@@ -21,8 +21,10 @@ const MobileNav = () => {
   };
 
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] px-4 pb-6 pt-2 pointer-events-none">
-      <nav className="glass-panel rounded-[2.5rem] h-20 w-full flex items-center justify-around px-4 pointer-events-auto shadow-[0_20px_50px_rgba(0,0,0,0.15)] border-white/40">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] px-4 pt-2 pointer-events-none" 
+         style={{ paddingBottom: 'calc(var(--safe-bottom) + 1.5rem)' }}>
+      <nav className="glass-panel rounded-[2.2rem] h-20 w-full flex items-center justify-around px-4 pointer-events-auto shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border-white/40 bg-white/90 backdrop-blur-xl">
+
         <Link to="/" className={getLinkClass('/')}>
           <Home size={22} strokeWidth={isActive('/') ? 2.5 : 2} />
           <span className="text-[10px] font-black uppercase tracking-widest">Home</span>

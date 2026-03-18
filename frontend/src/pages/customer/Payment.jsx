@@ -1,47 +1,69 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
-import { ShieldCheck, CreditCard, ArrowLeft, ArrowRight, Loader2, Lock, Smartphone, Globe, Info } from 'lucide-react';
+import { ShieldCheck, CreditCard, ArrowLeft, ArrowRight, Loader2, Lock, Smartphone, Globe, Info, CheckCircle2 } from 'lucide-react';
 
 const Payment = () => {
   const { orderId } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [processing, setProcessing] = useState(false);
   const [error, setError] = useState('');
   const [paymentData, setPaymentData] = useState(null);
+  const [paymentSuccess, setPaymentSuccess] = useState(false);
 
   useEffect(() => {
+    // Initialize payment node
     api.post('/payments/create', { order_id: orderId })
       .then(res => {
         setPaymentData(res.data);
         setLoading(false);
       })
       .catch(err => {
-        setError(err.response?.data?.msg || 'Payment node initialization failed.');
+        setError(err.response?.data?.msg || 'Payment initialization failed. Please retry.');
         setLoading(false);
       });
   }, [orderId]);
 
-  const handleMockPayment = () => {
-    setLoading(true);
-    api.post('/payments/verify', {
-      razorpay_order_id: paymentData.razorpay_order_id,
-      razorpay_payment_id: "pay_mock123",
-      razorpay_signature: "mock_sig_321"
-    })
-    .then(() => {
-      navigate(`/order-status/${orderId}`);
-    })
-    .catch(err => {
-      setError('Transaction validation failure.');
-      setLoading(false);
-    });
+  const handleConfirmSettlement = () => {
+    if (!paymentData) return;
+    
+    setProcessing(true);
+    setError('');
+
+    // Mock settlement logic as previously requested
+    setTimeout(async () => {
+        try {
+          await api.post('/payments/verify', {
+            razorpay_order_id: paymentData.razorpay_order_id,
+            razorpay_payment_id: "pay_mock_direct",
+            razorpay_signature: "sig_mock_direct"
+          });
+          setPaymentSuccess(true);
+          setTimeout(() => {
+            navigate(`/order-status/${orderId}`);
+          }, 2000);
+        } catch (err) {
+          setError('Mock verification failed. System error.');
+          setProcessing(false);
+        }
+    }, 1500);
   };
 
-  if (loading && !paymentData) return (
+  if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#FBF7F0] p-8">
-      <div className="w-12 h-12 border-4 border-customer-accent border-t-transparent rounded-full animate-spin"></div>
+      <Loader2 className="w-12 h-12 text-customer-accent animate-spin" />
       <p className="mt-6 text-[10px] font-black text-customer-accent uppercase tracking-widest animate-pulse">Establishing Secure Transaction</p>
+    </div>
+  );
+
+  if (paymentSuccess) return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#FBF7F0] p-8 text-center animate-in zoom-in-95 duration-500">
+       <div className="w-24 h-24 bg-emerald-500/10 border-2 border-emerald-500 rounded-full flex items-center justify-center mb-8 text-emerald-500 animate-bounce">
+          <CheckCircle2 size={48} />
+       </div>
+       <h1 className="font-fraunces text-4xl font-black italic text-customer-text mb-4">Payment Success</h1>
+       <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest italic">Redirecting to status matrix...</p>
     </div>
   );
 
@@ -51,105 +73,110 @@ const Payment = () => {
           <Lock size={32} />
        </div>
        <h1 className="font-fraunces text-3xl font-black italic text-customer-text mb-2">Access Restricted</h1>
-       <p className="text-[10px] font-black text-red-500 uppercase tracking-widest italic">{error}</p>
+       <p className="text-[11px] font-bold text-red-500 uppercase tracking-widest italic px-4 leading-relaxed">{error}</p>
        <button 
-         onClick={() => navigate(-1)}
-         className="mt-12 text-[10px] font-black text-customer-text uppercase tracking-widest underline underline-offset-8 italic"
+         onClick={() => window.location.reload()}
+         className="mt-12 px-8 py-4 bg-customer-text text-white rounded-2xl text-[10px] font-black uppercase tracking-widest italic"
        >
-         Return to Status Matrix
+         Retry Initialization
        </button>
     </div>
   );
 
   return (
-    <div className="theme-customer min-h-screen bg-[#FBF7F0] font-jakarta pb-32 animate-in fade-in duration-1000">
-      <header className="px-8 pt-16 pb-12 flex items-center gap-4">
-        <button 
-          onClick={() => navigate(-1)} 
-          className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white border border-customer-surface/30 text-customer-text/40 hover:text-customer-accent transition-all active:scale-90 shadow-sm"
-        >
-          <ArrowLeft size={24} />
-        </button>
-        <div>
-           <h1 className="font-fraunces text-4xl font-black text-customer-text italic tracking-tighter leading-none">Settlement</h1>
-           <p className="text-[10px] font-black text-customer-text/30 uppercase tracking-[0.2em] mt-2">Secure Payment Interface v1.0</p>
+    <div className="theme-customer min-h-screen bg-white font-jakarta pb-40 animate-in fade-in duration-500">
+      {/* Mobile-First Header */}
+      <header className="px-6 pt-12 pb-8 flex items-center justify-between sticky top-0 backdrop-blur-xl bg-white/90 z-50 border-b border-zinc-100">
+        <div className="flex items-center gap-4">
+          <button 
+            onClick={() => navigate(-1)} 
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-50 border border-zinc-200 text-customer-text/60 active:scale-90 transition-all"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <div>
+            <h1 className="font-fraunces text-2xl font-black text-customer-text italic leading-none">Settlement</h1>
+            <p className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.2em] mt-1.5 flex items-center gap-1.5">
+               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Virtual Protocol
+            </p>
+          </div>
         </div>
       </header>
 
-      <div className="px-8 space-y-8 max-w-lg mx-auto">
-        {/* SUMMARY CARD */}
-        <div className="bg-white rounded-[3rem] p-10 shadow-[0_40px_100px_-20px_rgba(0,0,0,0.06)] border border-customer-surface/20 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-customer-accent/5 rounded-full blur-3xl -mr-16 -mt-16 group-hover:bg-customer-accent/10 transition-colors duration-700"></div>
-          
-          <div className="flex items-center gap-3 mb-8">
-             <div className="w-10 h-10 rounded-xl bg-customer-accent/5 flex items-center justify-center text-customer-accent">
-                <Smartphone size={20} />
-             </div>
-             <span className="text-[10px] font-black text-customer-text/30 uppercase tracking-[0.3em]">Transaction Summary</span>
+      <div className="px-6 mt-8 space-y-6 max-w-md mx-auto">
+        {/* ORDER SUMMARY CARD - Refined for Mobile */}
+        <div className="bg-zinc-50 rounded-[2.5rem] p-8 border border-zinc-100 relative overflow-hidden">
+          <div className="flex items-center gap-3 mb-8 opacity-40">
+             <Smartphone size={16} />
+             <span className="text-[9px] font-black uppercase tracking-[0.3em]">Billing Component</span>
           </div>
 
           <div className="space-y-6">
              <div className="flex justify-between items-end">
                 <div className="flex flex-col">
-                   <h2 className="text-sm font-black text-customer-text uppercase tracking-widest italic leading-none">Order Valuation</h2>
-                   <span className="text-[9px] font-bold text-customer-text/20 uppercase tracking-[0.2em] mt-1.5">Inc. taxes & service provision</span>
+                   <h2 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest italic leading-none">Payable Amount</h2>
+                   <span className="text-[8px] font-bold text-zinc-300 uppercase tracking-[0.2em] mt-1.5">Inclusive of GST</span>
                 </div>
                 <div className="flex items-baseline gap-1">
-                   <span className="font-fraunces text-5xl font-black text-customer-text italic">₹{paymentData.amount.toFixed(0)}</span>
+                   <span className="font-fraunces text-5xl font-black text-customer-text italic tracking-tighter">₹{paymentData.amount.toFixed(0)}</span>
                 </div>
              </div>
 
-             <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-customer-surface/40 to-transparent"></div>
-
-             <div className="flex justify-between items-center text-[9px] font-black uppercase tracking-widest text-customer-text/40 italic">
-                <span>Network Reference</span>
-                <span className="font-mono text-zinc-400">{paymentData.razorpay_order_id.toUpperCase()}</span>
+             <div className="pt-6 border-t border-zinc-200/50 flex justify-between items-center">
+                <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 italic">Reference ID</span>
+                <span className="font-mono text-[9px] text-zinc-400 bg-white px-3 py-1 rounded-full border border-zinc-100">{paymentData.razorpay_order_id.slice(-12).toUpperCase()}</span>
              </div>
           </div>
         </div>
 
-        {/* MOCK ALERT */}
-        <div className="p-6 bg-customer-accent/5 border border-customer-accent/10 rounded-[2rem] flex items-start gap-4">
-           <Info size={20} className="text-customer-accent flex-shrink-0" />
-           <p className="text-[10px] text-zinc-500 font-bold leading-relaxed uppercase tracking-widest italic">
-             The system is currently in <span className="text-customer-accent">MOCK-BYPASS</span> mode. No real credit will be deducted. Verification is instant via local loopback.
+        {/* MOCK MODE ALERT */}
+        <div className="p-6 bg-amber-50 border border-amber-100 rounded-[2rem] flex items-center gap-4">
+           <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-amber-500 shadow-sm shrink-0">
+              <Info size={20} />
+           </div>
+           <div>
+              <h4 className="text-[10px] font-black uppercase tracking-widest text-amber-800">Mock Experience Active</h4>
+              <p className="text-[9px] text-amber-600/70 font-medium leading-relaxed uppercase tracking-wider mt-0.5">
+                Front-end only demonstration. No real currency will be used.
+              </p>
+           </div>
+        </div>
+
+        {/* INFO TIP */}
+        <div className="flex gap-3 px-2">
+           <Info size={14} className="text-zinc-300 shrink-0 mt-0.5" />
+           <p className="text-[9px] text-zinc-400 font-medium leading-relaxed uppercase tracking-widest">
+             This interface is optimized for mobile touch interaction and safe-area compatibility.
            </p>
         </div>
+      </div>
 
-        {/* PAYMENT OPTIONS AREA */}
-        <div className="space-y-4 pt-4">
-           <button 
-            onClick={handleMockPayment}
-            disabled={loading}
-            className="group relative w-full h-20 bg-customer-text text-white rounded-[2.5rem] shadow-2xl flex items-center justify-between px-3 overflow-hidden transition-all active:scale-[0.98] border border-white/5 disabled:opacity-50"
-          >
-             <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000"></div>
-
-             <div className="h-14 bg-[#3395FF] text-white rounded-[2rem] px-8 flex items-center gap-3">
-                {loading ? <Loader2 size={18} className="animate-spin" /> : <CreditCard size={18} />}
-                <span className="text-xs font-black uppercase tracking-[0.2em] italic">{loading ? 'Processing...' : 'Pay with Razorpay'}</span>
-             </div>
-             
-             <div className="flex items-center gap-2 font-fraunces italic text-xl pr-6 transition-all group-hover:translate-x-1">
-                EXECUTE <ArrowRight size={22} />
-             </div>
-          </button>
-
+      {/* STICKY ACTION FOOTER - Mobile-First */}
+      <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent z-[100] pb-[calc(1.5rem + var(--safe-bottom))]">
+        <div className="max-w-md mx-auto">
           <button 
-            onClick={() => navigate(-1)}
-            className="w-full h-16 rounded-[2rem] bg-white border border-customer-surface/30 text-[10px] font-black uppercase tracking-widest text-customer-text/40 hover:bg-zinc-50 transition-all font-jakarta shadow-sm"
+            onClick={handleConfirmSettlement}
+            disabled={processing}
+            className={`group relative w-full h-20 rounded-[2.2rem] shadow-[0_25px_50px_-12px_rgba(200,92,26,0.25)] flex items-center justify-between px-3 overflow-hidden transition-all active:scale-[0.98] active:shadow-none bg-customer-text text-white ${processing ? 'opacity-50 select-none' : ''}`}
           >
-            Return to Tracker
-          </button>
-        </div>
+            {/* Loading state indicator */}
+            <div className={`absolute inset-0 bg-emerald-500 transition-transform duration-700 ${processing ? 'translate-y-0' : 'translate-y-full'}`}></div>
 
-        <div className="flex flex-col items-center gap-6 pt-12">
-           <div className="flex items-center gap-3 opacity-20">
-              <ShieldCheck size={16} />
-              <span className="text-[9px] font-black uppercase tracking-[0.3em]">PCI-DSS ENCRYPTED NODE</span>
-              <Globe size={16} />
-           </div>
-           <p className="text-[8px] text-zinc-300 font-medium uppercase tracking-[0.4em]">Integrated Settlement Engine v4.11</p>
+            <div className="h-14 bg-white/10 rounded-[1.8rem] px-8 flex items-center gap-3 relative z-10">
+               {processing ? (
+                 <Loader2 size={20} className="animate-spin" />
+               ) : (
+                 <div className="flex items-center gap-2">
+                    <CreditCard size={18} />
+                 </div>
+               )}
+               <span className="text-xs font-black uppercase tracking-[0.2em]">{processing ? 'Settling...' : 'Confirm Payment'}</span>
+            </div>
+
+            <div className={`flex items-center gap-2 font-fraunces italic text-xl pr-6 transition-all relative z-10 ${processing ? 'translate-x-4 opacity-0' : 'group-hover:translate-x-1'}`}>
+               DONE {paymentData.amount.toFixed(0)} <ArrowRight size={22} className="text-customer-accent" />
+            </div>
+          </button>
         </div>
       </div>
     </div>

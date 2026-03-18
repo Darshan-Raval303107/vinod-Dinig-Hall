@@ -26,6 +26,17 @@
   /* Global Accent */
   --color-primary: #C85C1A;
 
+  /* Mobile Safe Areas */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  
+  /* Layout Spacing */
+  --mobile-padding: 1.5rem;
+  --header-height: calc(5rem + var(--safe-top));
+  --nav-height: calc(5rem + var(--safe-bottom));
+
   /* Fonts */
   --font-fraunces: 'Fraunces', serif;
   --font-jakarta: 'Plus Jakarta Sans', sans-serif;

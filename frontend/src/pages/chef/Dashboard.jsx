@@ -4,7 +4,7 @@ import { useAuthStore } from '../../store';
 import api from '../../api/axios';
 import { socket } from '../../api/socket';
 import OrderCard from '../../components/chef/OrderCard';
-import { LogOut, Bell, Timer, ChefHat, Activity, Coffee, Terminal, Cpu, Clock, AlertCircle } from 'lucide-react';
+import { LogOut, Bell, Timer, ChefHat, Activity, Coffee, Clock, AlertCircle, ChevronDown } from 'lucide-react';
 
 const ChefDashboard = () => {
   const { user, logout } = useAuthStore();
@@ -13,6 +13,7 @@ const ChefDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [activeTab, setActiveTab] = useState('pending'); // 'pending', 'active', 'ready'
 
   const fetchOrders = () => {
     api.get('/chef/orders')
@@ -35,7 +36,7 @@ const ChefDashboard = () => {
     socket.on('order:new', (data) => {
       try {
         const audio = new Audio('/notification.mp3'); 
-        audio.play().catch(e => console.log('Haptic audio feedback blocked', e));
+        audio.play().catch(e => console.log('Haptic sound blocked', e));
       } catch (e) {}
       fetchOrders(); 
     });
@@ -68,172 +69,141 @@ const ChefDashboard = () => {
   };
 
   if (loading) return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-chef-bg text-chef-text">
-      <div className="w-12 h-12 border-4 border-zinc-200 border-t-orange-500 rounded-full animate-spin mb-6"></div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 text-slate-900">
+      <div className="w-12 h-12 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-6"></div>
       <p className="font-syne text-[10px] tracking-[0.5em] font-black uppercase opacity-40 italic animate-pulse">Syncing Kitchen Matrix</p>
     </div>
   );
 
   const activeOrders = orders.filter(o => o.status !== 'served' && o.status !== 'cancelled' && o.status !== 'paid');
-  const pendingCount = activeOrders.filter(o => o.status === 'pending').length;
-  const cookingCount = activeOrders.filter(o => o.status === 'accepted' || o.status === 'cooking').length;
-  const readyCount   = activeOrders.filter(o => o.status === 'ready').length;
+  const pendingOrders = activeOrders.filter(o => o.status === 'pending');
+  const cookingOrders = activeOrders.filter(o => o.status === 'accepted' || o.status === 'cooking');
+  const readyOrders   = activeOrders.filter(o => o.status === 'ready');
 
   return (
-    <div className="theme-chef min-h-screen bg-chef-bg flex flex-col h-screen overflow-hidden selection:bg-orange-500/20 selection:text-orange-500">
+    <div className="theme-chef min-h-screen bg-white flex flex-col font-jakarta selection:bg-slate-900 selection:text-white pb-32">
       
-      {/* KITCHEN COMMAND OVERLAY (HEADER) */}
-      <header className="px-12 py-8 border-b border-zinc-200 flex justify-between items-center bg-white/80 backdrop-blur-3xl z-[100] relative">
-        <div className="absolute inset-0 bg-gradient-to-r from-orange-500/5 via-transparent to-transparent pointer-events-none"></div>
-        
-        <div className="flex items-center gap-14 relative z-10">
-          <div className="group cursor-default">
-            <div className="flex items-center gap-3 mb-2">
-              <div className="w-2 h-2 rounded-full bg-orange-500 animate-[ping_2s_infinite] shadow-[0_0_15px_rgba(249,115,22,0.6)]"></div>
-              <h1 className="text-2xl font-black text-chef-text tracking-widest uppercase italic font-syne group-hover:text-orange-500 transition-colors">Node: Alpha-Kitchen</h1>
-            </div>
-            <div className="text-[9px] font-black text-zinc-400 tracking-[0.4em] uppercase flex items-center gap-5 italic">
-              <span className="flex items-center gap-2 text-zinc-500 group-hover:text-chef-text transition-colors"><Cpu size={12} /> {user?.name.toUpperCase()}</span>
-              <span className="w-1 h-1 bg-zinc-200 rounded-full"></span>
-              <span className="flex items-center gap-2 text-emerald-600/80"><Activity size={12} /> Live Telemetry Running</span>
-            </div>
+      {/* MOBILE HEADER - Optimized for Kitchen Workflow */}
+      <header className="sticky top-0 z-[100] bg-white/80 backdrop-blur-3xl border-b border-zinc-100 px-6 py-6"
+              style={{ paddingTop: 'calc(var(--safe-top) + 1.5rem)' }}>
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+             <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg">
+                <ChefHat size={20} />
+             </div>
+             <div>
+                <h1 className="font-syne text-xl font-black italic tracking-tighter text-slate-900 leading-none">ALPHA KITCHEN</h1>
+                <p className="text-[9px] font-black text-zinc-300 uppercase tracking-widest mt-1.5 flex items-center gap-1.5 leading-none italic">
+                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> {user?.name.toUpperCase()} / LIVE
+                </p>
+             </div>
           </div>
 
-          <div className="hidden xl:flex items-center gap-12 border-l border-zinc-200 pl-12 h-14">
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2 text-chef-text font-black text-2xl font-mono italic">
-                 <Clock size={18} className="text-zinc-400" />
-                 {currentTime.toLocaleTimeString([], { hour12: false })}
-              </div>
-              <span className="text-[9px] font-black text-zinc-400 uppercase tracking-[0.3em] mt-1 ml-6">Global Sync Frequency</span>
-            </div>
-            
-            <div className="flex items-center gap-4">
-               <div className="group/stat px-6 py-2.5 rounded-2xl bg-zinc-50 border border-zinc-200 hover:border-zinc-300 transition-all flex flex-col items-center min-w-[100px] shadow-sm">
-                 <span className="text-2xl font-black text-zinc-400 group-hover/stat:text-chef-text transition-colors">{pendingCount}</span>
-                 <span className="text-[8px] font-black text-zinc-400 uppercase tracking-[0.2em] mt-1">Pending Buffer</span>
-               </div>
-               <div className="group/stat px-6 py-2.5 rounded-2xl bg-orange-50 border border-orange-200 hover:bg-orange-100 transition-all flex flex-col items-center min-w-[100px] shadow-sm">
-                 <span className="text-2xl font-black text-orange-500 animate-pulse">{cookingCount}</span>
-                 <span className="text-[8px] font-black text-orange-500/60 uppercase tracking-[0.2em] mt-1">Active Thermal</span>
-               </div>
-               <div className="group/stat px-6 py-2.5 rounded-2xl bg-sky-50 border border-sky-200 hover:bg-sky-100 transition-all flex flex-col items-center min-w-[100px] shadow-sm">
-                 <span className="text-2xl font-black text-sky-500">{readyCount}</span>
-                 <span className="text-[8px] font-black text-sky-500/60 uppercase tracking-[0.2em] mt-1">Handoff Ready</span>
-               </div>
-            </div>
-          </div>
+          <button onClick={handleLogout} className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 border border-red-100 active:scale-95 transition-all">
+             <LogOut size={18} />
+          </button>
         </div>
 
-        <div className="flex items-center gap-4 relative z-10">
-          <button className="w-14 h-14 rounded-2xl bg-zinc-50 border border-zinc-200 flex items-center justify-center text-zinc-400 hover:text-chef-text hover:bg-zinc-100 transition-all active:scale-95">
-            <Terminal size={20} />
-          </button>
-          <div className="h-10 w-[1px] bg-zinc-200 mx-2"></div>
-          <button 
-            onClick={handleLogout}
-            className="group relative flex items-center gap-4 bg-zinc-900 h-14 px-8 rounded-2xl text-[10px] font-black tracking-[0.3em] text-white hover:bg-rose-600 hover:text-white transition-all shadow-xl active:scale-95 overflow-hidden"
-          >
-            <div className="absolute inset-x-0 bottom-0 h-0.5 bg-rose-500 scale-x-0 group-hover:scale-x-100 transition-transform origin-left"></div>
-            <LogOut size={16} className="group-hover:-translate-x-1 transition-transform" /> TERMINATE SESSION
-          </button>
+        {/* QUICK STATS - Horizontal Scroll */}
+        <div className="flex overflow-x-auto hide-scrollbar gap-3 pb-2 -mx-2 px-2">
+           <TabButton 
+             id="pending" 
+             label="Pending" 
+             count={pendingOrders.length} 
+             active={activeTab === 'pending'} 
+             onClick={setActiveTab} 
+             icon={<Bell size={14} />}
+           />
+           <TabButton 
+             id="active" 
+             label="Cooking" 
+             count={cookingOrders.length} 
+             active={activeTab === 'active'} 
+             onClick={setActiveTab}
+             icon={<Timer size={14} />}
+             isAlert={cookingOrders.length > 5}
+           />
+           <TabButton 
+             id="ready" 
+             label="Ready" 
+             count={readyOrders.length} 
+             active={activeTab === 'ready'} 
+             onClick={setActiveTab}
+             icon={<Coffee size={14} />}
+           />
         </div>
       </header>
 
-      {/* COMPONENT BOARD — Side-Scrolling Station Layout */}
-      <main className="flex-1 overflow-x-auto p-12 flex gap-16 hide-scrollbar bg-gradient-to-br from-chef-bg via-white to-zinc-50">
-        {/* PENDING STATION */}
-        <section className="w-[480px] flex-shrink-0 flex flex-col gap-10 animate-in slide-in-from-left-8 duration-700">
-          <header className="flex justify-between items-end mb-4 px-6 border-l-4 border-zinc-300">
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                <ChefHat size={18} className="text-zinc-400" />
-                <h2 className="text-lg font-extrabold text-chef-text/40 tracking-tight font-syne italic">Pending Inflow</h2>
-              </div>
-              <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest leading-none">Awaiting Station Assignment</p>
+      {/* ORDERS LIST CONTAINER */}
+      <main className="px-6 mt-8 animate-in fade-in duration-500">
+         <div className="flex items-center justify-between mb-8">
+            <h2 className="font-fraunces text-2xl font-black italic text-slate-900 capitalize">
+               {activeTab} Queue
+            </h2>
+            <div className="flex items-center gap-2 text-[10px] font-black text-zinc-300 uppercase tracking-widest italic leading-none">
+               <Clock size={12} strokeWidth={3} />
+               {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
             </div>
-            {pendingCount > 0 && <span className="text-[9px] font-bold text-zinc-400 animate-pulse uppercase tracking-[0.2em]">Live Input...</span>}
-          </header>
-          
-          <div className="flex-1 overflow-y-auto pr-6 space-y-8 custom-scrollbar pb-10">
-            {activeOrders.filter(o => o.status === 'pending').map(order => (
-              <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />
-            ))}
-            {activeOrders.filter(o => o.status === 'pending').length === 0 && (
-              <div className="py-24 flex flex-col items-center justify-center opacity-40 border-2 border-dashed border-zinc-200 rounded-[4rem] group hover:border-zinc-300 transition-colors">
-                <Activity size={48} className="text-zinc-300 group-hover:rotate-180 transition-transform duration-1000" />
-                <span className="text-[10px] uppercase tracking-[0.5em] font-black mt-6 text-zinc-400 italic">Inflow Quiet</span>
-              </div>
-            )}
-          </div>
-        </section>
+         </div>
 
-        {/* ACTIVE STATION */}
-        <section className="w-[480px] flex-shrink-0 flex flex-col gap-10 animate-in slide-in-from-bottom-8 duration-1000 delay-100">
-          <header className="flex justify-between items-end mb-4 px-6 border-l-4 border-orange-500">
-            <div>
-               <div className="flex items-center gap-3 mb-1 text-orange-500">
-                <Timer size={18} />
-                <h2 className="text-lg font-extrabold text-orange-500 tracking-tight font-syne italic">Active Thermal</h2>
-              </div>
-              <p className="text-[9px] font-black text-orange-500/60 uppercase tracking-widest leading-none">Formulation In Progress</p>
-            </div>
-            {cookingCount > 0 && <div className="bg-orange-500 px-4 py-1 rounded-[12px] text-[10px] font-black text-white shadow-xl shadow-orange-500/20 italic tracking-tighter">PEAK OPS</div>}
-          </header>
-          
-          <div className="flex-1 overflow-y-auto pr-6 space-y-8 custom-scrollbar pb-10">
-            {activeOrders.filter(o => o.status === 'accepted' || o.status === 'cooking').map(order => (
-              <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />
-            ))}
-            {activeOrders.filter(o => o.status === 'accepted' || o.status === 'cooking').length === 0 && (
-              <div className="py-24 flex flex-col items-center justify-center opacity-40 border-2 border-dashed border-orange-100 rounded-[4rem] text-orange-400">
-                <Coffee size={48} className="animate-bounce" />
-                <span className="text-[10px] uppercase tracking-[0.5em] font-black mt-6 italic">Cool State</span>
-              </div>
+         <div className="space-y-6">
+            {activeTab === 'pending' && (
+               pendingOrders.length > 0 ? (
+                  pendingOrders.map(order => <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />)
+               ) : <EmptyState icon={<Bell size={48} />} text="No Incoming Orders" />
             )}
-          </div>
-        </section>
-
-        {/* COMPLETION STATION */}
-        <section className="w-[480px] flex-shrink-0 flex flex-col gap-10 animate-in slide-in-from-right-8 duration-700 delay-200">
-          <header className="flex justify-between items-end mb-4 px-6 border-l-4 border-sky-500">
-            <div>
-               <div className="flex items-center gap-3 mb-1 text-sky-500">
-                <Bell size={18} />
-                <h2 className="text-lg font-extrabold text-sky-500 tracking-tight font-syne italic">Dispatch Queue</h2>
-              </div>
-              <p className="text-[9px] font-black text-sky-500/60 uppercase tracking-widest leading-none">Validated & Awaiting Server</p>
-            </div>
-          </header>
-          
-          <div className="flex-1 overflow-y-auto pr-6 space-y-8 custom-scrollbar pb-10">
-            {activeOrders.filter(o => o.status === 'ready').map(order => (
-              <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />
-            ))}
-            {activeOrders.filter(o => o.status === 'ready').length === 0 && (
-              <div className="py-24 flex flex-col items-center justify-center opacity-40 border-2 border-dashed border-zinc-200 rounded-[4rem]">
-                <Activity size={48} className="text-zinc-300" />
-                <span className="text-[10px] uppercase tracking-[0.5em] font-black mt-6 italic">Vault Empty</span>
-              </div>
+            {activeTab === 'active' && (
+               cookingOrders.length > 0 ? (
+                  cookingOrders.map(order => <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />)
+               ) : <EmptyState icon={<Timer size={48} />} text="Stations Are Clear" />
             )}
-          </div>
-        </section>
+            {activeTab === 'ready' && (
+               readyOrders.length > 0 ? (
+                  readyOrders.map(order => <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />)
+               ) : <EmptyState icon={<Coffee size={48} />} text="No Orders Ready" />
+            )}
+         </div>
       </main>
 
-      {/* ERROR / TELEMETRY OVERLAY */}
+      {/* ERROR CONSOLE */}
       {error && (
-        <div className="fixed bottom-12 left-12 p-6 rounded-[2rem] bg-rose-600 text-white shadow-2xl animate-in slide-in-from-left-4 duration-500 z-[200] border border-white/20">
-          <div className="flex items-center gap-4">
-             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center"><AlertCircle size={24} /></div>
-             <div className="flex flex-col">
-                <span className="text-xs font-black uppercase tracking-widest mb-1 italic">Matrix Alert</span>
-                <span className="text-[10px] font-medium opacity-80 uppercase tracking-widest">{error}</span>
-             </div>
+        <div className="fixed bottom-[calc(var(--safe-bottom)+2rem)] left-6 right-6 p-4 rounded-2xl bg-red-600 text-white shadow-2xl z-[200] border border-white/20 animate-in slide-in-from-bottom-5">
+          <div className="flex items-center gap-3">
+             <AlertCircle size={18} />
+             <span className="text-[10px] font-black uppercase tracking-widest italic">{error}</span>
           </div>
         </div>
       )}
     </div>
   );
 };
+
+const TabButton = ({ id, label, count, active, onClick, icon, isAlert }) => (
+  <button 
+    onClick={() => onClick(id)}
+    className={`flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all shrink-0 active:scale-95 ${
+      active 
+      ? 'bg-slate-900 border-slate-900 text-white shadow-xl -translate-y-1' 
+      : 'bg-zinc-50 border-zinc-100 text-zinc-400'
+    }`}
+  >
+    <div className={`${active ? 'text-white' : 'text-zinc-300'} ${isAlert && !active ? 'text-orange-500 animate-pulse' : ''}`}>
+       {icon}
+    </div>
+    <span className="text-[10px] font-black uppercase tracking-widest italic">{label}</span>
+    <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black ${
+      active ? 'bg-white/10 text-white' : 'bg-zinc-100 text-zinc-400'
+    }`}>
+      {count}
+    </span>
+  </button>
+);
+
+const EmptyState = ({ icon, text }) => (
+  <div className="py-24 flex flex-col items-center justify-center opacity-10 border-2 border-dashed border-slate-900 rounded-[3rem]">
+    {icon}
+    <span className="text-[10px] uppercase tracking-[0.4em] font-black mt-6 italic">{text}</span>
+  </div>
+);
 
 export default ChefDashboard;

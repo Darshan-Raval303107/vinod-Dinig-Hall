@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChefHat, Clock, CheckCircle2, Flame, AlertCircle } from 'lucide-react';
+import { ChefHat, Clock, CheckCircle2, Flame, User } from 'lucide-react';
 
 const KitchenTimer = ({ createdAt, status }) => {
   const [elapsed, setElapsed] = useState('');
@@ -27,12 +27,12 @@ const KitchenTimer = ({ createdAt, status }) => {
   const isCritical = minutesPassed >= 25 && status !== 'ready';
 
   return (
-    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-mono font-bold transition-all ${
+    <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black tracking-widest transition-all ${
       isCritical ? 'bg-red-500 text-white animate-pulse' : 
-      isOverdue ? 'bg-orange-100 text-orange-600 border border-orange-200' : 
-      'bg-zinc-100 text-zinc-500 border border-zinc-200'
+      isOverdue ? 'bg-orange-500 text-white' : 
+      'bg-zinc-100 text-zinc-400'
     }`}>
-      <Clock size={14} />
+      <Clock size={12} strokeWidth={3} />
       {status === 'ready' ? 'READY' : elapsed || '00:00'}
     </div>
   );
@@ -44,73 +44,65 @@ const OrderCard = ({ order, onUpdateStatus }) => {
   const isReady = order.status === 'ready';
 
   return (
-    <div className={`group relative bg-white border overflow-hidden rounded-[2rem] transition-all duration-500 hover:shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] ${
-      isPending ? 'border-dashed border-zinc-200 bg-zinc-50/50' : 
-      isCooking ? 'border-orange-500/20 shadow-lg shadow-orange-500/5' : 
-      isReady ? 'border-blue-500/20 shadow-lg shadow-blue-500/5' : 
-      'border-zinc-200'
-    }`}>
-      {/* Visual Indicator Line */}
-      <div className={`absolute top-0 left-0 w-1.5 h-full ${
-        isPending ? 'bg-zinc-300' : 
-        isCooking ? 'bg-orange-500' : 
-        isReady ? 'bg-blue-500' : 
-        'bg-zinc-200'
+    <div className="group relative bg-white border border-zinc-100 overflow-hidden rounded-[2.5rem] transition-all duration-300 active:scale-[0.98] shadow-sm">
+      {/* Status Bar */}
+      <div className={`h-2 ${
+        isPending ? 'bg-zinc-200' : 
+        isCooking ? 'bg-emerald-500' : 
+        isReady ? 'bg-sky-500' : 
+        'bg-zinc-100'
       }`} />
 
       <div className="p-6">
         <header className="flex justify-between items-start mb-6">
-          <div>
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-3xl font-black text-zinc-900 tracking-tighter">T{order.table_number}</span>
-              {isPending && <span className="flex h-2 w-2 rounded-full bg-orange-500 animate-ping"></span>}
-            </div>
-            <p className="text-[10px] font-black text-zinc-400 tracking-[0.2em] uppercase">Order #{order.order_id.substring(0,6)}</p>
+          <div className="flex flex-col">
+            <span className="text-4xl font-black text-slate-900 tracking-tighter italic">T{order.table_number}</span>
+            <span className="text-[8px] font-black text-zinc-300 uppercase tracking-widest mt-1">REF: {order.order_id.substring(0,8).toUpperCase()}</span>
           </div>
           <KitchenTimer createdAt={order.created_at} status={order.status} />
         </header>
 
-        <div className="space-y-4 mb-8">
+        {/* ITEMS LIST - High Density */}
+        <div className="space-y-3 mb-8">
           {order.items.map((item, idx) => (
-            <div key={idx} className="flex items-center gap-4 group/item">
-              <div className="w-8 h-8 rounded-full bg-zinc-50 border border-zinc-100 flex items-center justify-center text-xs font-black text-zinc-500 group-hover/item:bg-zinc-100 transition-colors">
+            <div key={idx} className="flex items-center gap-3 p-3 bg-zinc-50 rounded-2xl border border-zinc-100">
+              <div className="w-8 h-8 rounded-xl bg-slate-900 text-white flex items-center justify-center text-[10px] font-black">
                 {item.quantity}
               </div>
-              <div className="flex-1">
-                <span className="text-md font-bold text-zinc-800 block leading-tight">{item.name}</span>
-                <span className="text-[10px] text-zinc-400 font-bold uppercase tracking-widest leading-none">Standard Prep</span>
+              <div className="flex-1 min-w-0">
+                <span className="text-sm font-bold text-slate-900 truncate block">{item.name}</span>
+                <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">KITCHEN PROTOCOL</span>
               </div>
             </div>
           ))}
         </div>
 
+        {/* DYNAMIC ACTION BUTTONS */}
         <div className="grid grid-cols-1 gap-2">
           {isPending && (
             <button 
               onClick={() => onUpdateStatus(order.order_id, 'accepted')}
-              className="w-full bg-zinc-900 text-white py-4 rounded-2xl text-xs font-black tracking-widest uppercase hover:bg-black transition-all transform active:scale-95 flex items-center justify-center gap-2"
+              className="w-full h-16 bg-slate-900 text-white rounded-2xl text-[10px] font-black tracking-widest uppercase flex items-center justify-center gap-3 shadow-xl active:scale-95 transition-all"
             >
-              <ChefHat size={16} /> START ORDER
+              <ChefHat size={18} /> START PREP
             </button>
           )}
           
           {isCooking && (
-            <div className="flex gap-2">
-              <button 
-                onClick={() => onUpdateStatus(order.order_id, 'ready')}
-                className="flex-[2] bg-orange-500 text-white py-4 rounded-2xl text-xs font-black tracking-widest uppercase hover:bg-orange-400 transition-all transform active:scale-95 flex items-center justify-center gap-2 shadow-lg shadow-orange-500/20"
-              >
-                <Flame size={16} /> MARK READY
-              </button>
-            </div>
+            <button 
+              onClick={() => onUpdateStatus(order.order_id, 'ready')}
+              className="w-full h-16 bg-emerald-500 text-white rounded-2xl text-[10px] font-black tracking-widest uppercase flex items-center justify-center gap-3 shadow-lg shadow-emerald-500/10 active:scale-95 transition-all"
+            >
+              <Flame size={18} /> DISPATCH TO QUEUE
+            </button>
           )}
 
           {isReady && (
             <button 
               onClick={() => onUpdateStatus(order.order_id, 'served')}
-              className="w-full bg-zinc-100 text-zinc-600 border border-zinc-200 py-4 rounded-2xl text-xs font-black tracking-widest uppercase hover:bg-blue-600 hover:text-white hover:border-blue-500 transition-all transform active:scale-95 flex items-center justify-center gap-2"
+              className="w-full h-16 bg-white text-slate-900 border-2 border-slate-900 rounded-2xl text-[10px] font-black tracking-widest uppercase flex items-center justify-center gap-3 active:scale-95 transition-all"
             >
-              <CheckCircle2 size={16} /> COMPLETE & SERVE
+              <CheckCircle2 size={18} /> CONFIRM SERVICE
             </button>
           )}
         </div>

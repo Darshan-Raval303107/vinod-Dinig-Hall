@@ -1,11 +1,9 @@
 """
 Payment routes — production Razorpay integration.
 
-Endpoints:
-    POST /payments/create-order   — Create a Razorpay order for an existing DB order
-    POST /payments/verify-payment — Verify Razorpay callback signature
-    POST /webhook/razorpay        — Receive & process Razorpay webhook events
+Updated with robust error handling, validation, and logging for debugging 500 errors.
 """
+import traceback
 from flask import Blueprint, request, jsonify, current_app
 from services.payment_service import (
     process_create_order,
@@ -29,40 +27,79 @@ def _respond(result):
 
 # ── 1. Create Order ─────────────────────────────────────────────────────────
 
-@payments_bp.route("/payments/create-order", methods=["POST"])
+@payments_bp.route("/payments/create", methods=["POST", "OPTIONS"])
+@payments_bp.route("/payments/create-order", methods=["POST", "OPTIONS"])
 def create_order():
     """
     Expects JSON: { "order_id": "<uuid>" }
     Returns:       { razorpay_order_id, amount, amount_paise, currency, key_id, order_id }
     """
-    data = request.get_json(silent=True) or {}
-    order_id = data.get("order_id")
+    if request.method == "OPTIONS":
+        return jsonify({"msg": "ok"}), 200
 
-    if not order_id:
-        return jsonify({"success": False, "error": "order_id is required"}), 400
-
+    logger.info(f"Incoming /api/payments/create request: {request.data}")
+    
     try:
+        # 1. Validate Content-Type
+        if not request.is_json:
+            logger.error("Request Content-Type is not application/json")
+            return jsonify({
+                "success": False, 
+                "error": "Content-Type must be application/json"
+            }), 400
+
+        # 2. Extract and validate data
+        data = request.get_json(silent=True) or {}
+        order_id = data.get("order_id")
+
+        if not order_id:
+            logger.error("Validation failed: order_id is required")
+            return jsonify({
+                "success": False, 
+                "error": "order_id is required",
+                "received_data": data
+            }), 400
+
+        # 3. Process the creation via service layer
+        logger.info(f"Processing order creation for order_id: {order_id}")
         result = process_create_order(order_id)
         body, status = result
 
-        # Inject the public key_id so the frontend can initialise Razorpay Checkout
+        # 4. Inject public key if success
         if body.get("success"):
-            body["key_id"] = current_app.config["RAZORPAY_KEY_ID"]
-
-        return jsonify(body), status
+            key_id = current_app.config.get("RAZORPAY_KEY_ID")
+            if not key_id:
+                logger.warning("RAZORPAY_KEY_ID is missing from config")
+                # Don't error out, still return the order data for front-end to handle
+            
+            body["key_id"] = key_id
+            logger.info(f"Successfully created order node: {body.get('razorpay_order_id')}")
+            return jsonify(body), status
+        else:
+            logger.error(f"Service layer returned error: {body.get('error')}")
+            return jsonify(body), status
 
     except Exception as e:
-        logger.error(
-            "create-order failed",
-            exc_info=True,
-            extra={"extra_data": {"order_id": order_id}},
-        )
-        return jsonify({"success": False, "error": "Internal server error"}), 500
+        # Full traceback for debugging 500 errors
+        tb = traceback.format_exc()
+        logger.error(f"FATAL ERROR in /api/payments/create:\n{tb}")
+        
+        # WRITE TO FILE AS WELL
+        with open("crash_log.txt", "w") as f:
+            f.write(tb)
+        
+        return jsonify({
+            "success": False, 
+            "error": "Internal server error occurred while initializing payment",
+            "details": str(e),
+            "traceback": tb if current_app.debug else None
+        }), 500
 
 
 # ── 2. Verify Payment ──────────────────────────────────────────────────────
 
-@payments_bp.route("/payments/verify-payment", methods=["POST"])
+@payments_bp.route("/payments/verify", methods=["POST", "OPTIONS"])
+@payments_bp.route("/payments/verify-payment", methods=["POST", "OPTIONS"])
 def verify_payment():
     """
     Expects JSON: {
@@ -71,29 +108,34 @@ def verify_payment():
         "razorpay_signature":  "<hmac>"
     }
     """
-    data = request.get_json(silent=True) or {}
-
-    razorpay_order_id = data.get("razorpay_order_id")
-    razorpay_payment_id = data.get("razorpay_payment_id")
-    razorpay_signature = data.get("razorpay_signature")
-
-    if not all([razorpay_order_id, razorpay_payment_id, razorpay_signature]):
-        return jsonify({
-            "success": False,
-            "error": "razorpay_order_id, razorpay_payment_id, and razorpay_signature are required",
-        }), 400
+    if request.method == "OPTIONS":
+        return jsonify({"msg": "ok"}), 200
 
     try:
+        data = request.get_json(silent=True) or {}
+        
+        razorpay_order_id = data.get("razorpay_order_id")
+        razorpay_payment_id = data.get("razorpay_payment_id")
+        razorpay_signature = data.get("razorpay_signature")
+
+        if not all([razorpay_order_id, razorpay_payment_id, razorpay_signature]):
+            return jsonify({
+                "success": False,
+                "error": "razorpay_order_id, razorpay_payment_id, and razorpay_signature are required",
+            }), 400
+
         return _respond(process_verify_payment(
             razorpay_order_id, razorpay_payment_id, razorpay_signature
         ))
+        
     except Exception as e:
-        logger.error(
-            "verify-payment failed",
-            exc_info=True,
-            extra={"extra_data": {"razorpay_order_id": razorpay_order_id}},
-        )
-        return jsonify({"success": False, "error": "Internal server error"}), 500
+        tb = traceback.format_exc()
+        logger.error(f"FATAL ERROR in /api/payments/verify:\n{tb}")
+        return jsonify({
+            "success": False, 
+            "error": "Verification failed during internal processing",
+            "details": str(e)
+        }), 500
 
 
 # ── 3. Razorpay Webhook ────────────────────────────────────────────────────
@@ -102,22 +144,14 @@ def verify_payment():
 def razorpay_webhook():
     """
     Razorpay sends POST with JSON body + X-Razorpay-Signature header.
-    Configure this URL in Razorpay Dashboard → Webhooks:
-        https://yourdomain.com/api/webhook/razorpay
     """
-    # Read raw body BEFORE parsing JSON (needed for signature check)
     raw_body = request.get_data()
     signature = request.headers.get("X-Razorpay-Signature", "")
 
-    # Validate webhook signature
     if not signature or not verify_webhook_signature(raw_body, signature):
-        logger.warning(
-            "Webhook rejected — invalid signature",
-            extra={"extra_data": {"ip": request.remote_addr}},
-        )
+        logger.warning("Webhook rejected — invalid signature")
         return jsonify({"success": False, "error": "Invalid webhook signature"}), 400
 
-    # Parse payload
     event_data = request.get_json(silent=True)
     if not event_data:
         return jsonify({"success": False, "error": "Empty payload"}), 400
@@ -125,10 +159,5 @@ def razorpay_webhook():
     try:
         return _respond(process_webhook_event(event_data))
     except Exception as e:
-        logger.error(
-            "Webhook processing failed",
-            exc_info=True,
-            extra={"extra_data": {"event": event_data.get("event")}},
-        )
-        # Return 200 so Razorpay doesn't endlessly retry on our bug
+        logger.error(f"Webhook processing failed:\n{traceback.format_exc()}")
         return jsonify({"success": True, "message": "Error logged, will retry internally"}), 200

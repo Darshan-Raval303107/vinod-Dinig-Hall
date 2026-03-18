@@ -14,8 +14,8 @@ def seed_data():
         db.create_all()
 
         print("Creating admin and owner...")
-        admin = User(name="Admin", email="admin@dineflow.com", password_hash=hash_password("admin123"), role="admin")
-        owner = User(name="Vinnod Owner", email="owner@dineflow.com", password_hash=hash_password("owner123"), role="owner")
+        admin = User(name="Admin", email="admin@vinnod.core", password_hash=hash_password("admin123"), role="admin")
+        owner = User(name="Vinnod Owner", email="owner@vinnod.core", password_hash=hash_password("owner123"), role="owner")
 
         db.session.add(admin)
         db.session.add(owner)
@@ -38,7 +38,7 @@ def seed_data():
         print("Creating chef...")
         chef = User(
             name="Chef Gordon",
-            email="chef@dineflow.com",
+            email="chef@vinnod.core",
             password_hash=hash_password("chef123"),
             role="chef",
             restaurant_id=restaurant.id
@@ -50,7 +50,7 @@ def seed_data():
         print("Creating test customer user...")
         test_user = User(
             name="Test Customer",
-            email="user@dineflow.com",
+            email="user@vinnod.core",
             password_hash=hash_password("user123"),
             role="user",
             restaurant_id=restaurant.id
@@ -89,10 +89,10 @@ def seed_data():
         print("\n✅ Database seeded successfully!")
         print("─────────────────────────────────────────")
         print("  Test accounts:")
-        print("  Customer : user@dineflow.com  / user123")
-        print("  Chef     : chef@dineflow.com  / chef123")
-        print("  Owner    : owner@dineflow.com / owner123")
-        print("  Admin    : admin@dineflow.com / admin123")
+        print("  Customer : user@vinnod.core  / user123")
+        print("  Chef     : chef@vinnod.core  / chef123")
+        print("  Owner    : owner@vinnod.core / owner123")
+        print("  Admin    : admin@vinnod.core / admin123")
         print("─────────────────────────────────────────")
 
 if __name__ == '__main__':

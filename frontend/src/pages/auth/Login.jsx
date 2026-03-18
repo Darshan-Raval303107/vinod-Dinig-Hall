@@ -39,132 +39,150 @@ const Login = () => {
         }
       }
     } catch (err) {
-      setError(err.response?.status === 403 ? "Customer login is currently restricted." : (err.response?.data?.msg || 'Authentication failed. Check access keys.'));
+      setError(err.response?.status === 403 ? "Customer login is currently restricted." : (err.response?.data?.msg || 'Authentication failed.'));
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-white flex font-jakarta selection:bg-indigo-500 selection:text-white overflow-hidden">
-      {/* LEFT SIDE — Visual Branding / Cinematic Section */}
-      <div className="hidden lg:flex w-1/2 relative overflow-hidden bg-[#FBF7F0]">
-        <div className="absolute inset-0 z-0">
-           {/* Animated geometric background */}
-           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(79,70,229,0.05),transparent_50%)]"></div>
-           <div className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[80%] bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.03),transparent_50%)]"></div>
+    <div className="min-h-screen bg-[#FBF7F0] flex flex-col lg:flex-row font-jakarta selection:bg-indigo-500 selection:text-white overflow-x-hidden">
+      
+      {/* MOBILE HEADER (Visible only on mobile) */}
+      <div className="lg:hidden flex items-center justify-between p-6 pt-[calc(var(--safe-top)+1rem)] bg-white border-b border-zinc-100">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center text-white">
+               <Globe size={18} />
+            </div>
+            <span className="font-syne font-black tracking-tighter text-xl italic">Vinnod</span>
+          </div>
+          <Link to="/" className="text-[10px] font-black uppercase tracking-widest text-zinc-300">Exit</Link>
+      </div>
+
+      {/* LEFT SIDE — Visual Branding / Cinematic Section (Hidden on small mobile, shown on Tablet/Desktop) */}
+      <div className="hidden md:flex lg:w-1/2 relative overflow-hidden bg-slate-900 text-white min-h-[30vh] lg:min-h-screen">
+        <div className="absolute inset-0 z-0 opacity-20">
+           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(99,102,241,0.2),transparent_70%)]"></div>
         </div>
         
-        <div className="relative z-10 w-full flex flex-col justify-between p-20">
-          <header>
+        <div className="relative z-10 w-full flex flex-col justify-between p-12 lg:p-20">
+          <header className="hidden lg:block">
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
+              <div className="w-12 h-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl flex items-center justify-center text-white shadow-2xl">
                  <Globe size={28} />
               </div>
-              <h1 className="font-syne text-4xl font-black text-slate-900 italic tracking-tighter">Vinnod</h1>
+              <h1 className="font-syne text-4xl font-black text-white italic tracking-tighter">Vinnod</h1>
             </div>
           </header>
 
           <main>
-             <h2 className="font-fraunces text-7xl font-black text-slate-900 leading-none italic tracking-tighter mb-8">
-               Digital <br/> <span className="text-indigo-600/30">Hospitality</span> <br/> Redefined.
+             <h2 className="font-fraunces text-5xl lg:text-7xl font-black text-white leading-[1.1] italic tracking-tighter mb-8">
+               Digital <br/> <span className="text-customer-accent">Hospitality</span> <br/> Redefined.
              </h2>
-             <p className="max-w-md text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px] leading-loose">
-               Connecting physical dining spaces with advanced digital matrix controls. Experience the evolution of order management.
+             <p className="max-w-md text-white/40 font-bold uppercase tracking-[0.3em] text-[10px] leading-loose">
+               Connecting physical dining spaces with advanced digital matrix controls.
              </p>
           </main>
 
-          <footer className="flex items-center gap-8 border-t border-slate-200/50 pt-10">
+          <footer className="hidden lg:flex items-center gap-8 border-t border-white/5 pt-10">
              <div className="flex flex-col">
-                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Infrastructure Status</span>
+                <span className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Infrastructure</span>
                 <div className="flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"></div>
-                   <span className="text-[10px] font-black text-slate-900 italic">OPERATIONAL NODE-01</span>
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                   <span className="text-[10px] font-black text-white italic">NODE-01 LIVE</span>
                 </div>
              </div>
-             <div className="h-10 w-[1px] bg-slate-200"></div>
-             <p className="text-[10px] font-bold text-slate-400 italic">© {new Date().getFullYear()} Vinnod Network Systems.</p>
+             <div className="h-10 w-[1px] bg-white/10"></div>
+             <p className="text-[10px] font-bold text-white/20 italic tracking-widest uppercase">System Core v4.2</p>
           </footer>
         </div>
       </div>
 
       {/* RIGHT SIDE — Precision Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
-        <div className="w-full max-w-lg p-12 bg-white shadow-[0_50px_100px_-20px_rgba(0,0,0,0.05)] border border-slate-100 rounded-[3rem] animate-in slide-in-from-right-10 duration-1000">
-          <header className="mb-12">
+      <div className="flex-1 flex items-center justify-center p-6 lg:p-20 bg-[#FBF7F0]">
+        <div className="w-full max-w-lg p-8 lg:p-14 bg-white shadow-[0_40px_80px_-15px_rgba(0,0,0,0.05)] border border-white rounded-[3rem] animate-in slide-in-from-bottom-6 lg:slide-in-from-right-10 duration-700">
+          <header className="mb-10">
             <div className="flex items-center gap-2 mb-4">
-              <ShieldCheck className="text-indigo-600" size={24} />
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Auth Protocol</span>
+              <ShieldCheck className="text-slate-900" size={20} />
+              <span className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.4em]">Security Interface</span>
             </div>
-            <h3 className="text-3xl font-extrabold text-slate-900 font-syne tracking-tighter italic">Establish Connection</h3>
-            <p className="text-slate-400 font-medium text-sm mt-2">Enter your designated access keys to synchronize.</p>
+            <h3 className="text-2xl lg:text-3xl font-black text-slate-900 font-syne tracking-tighter italic">Staff Login</h3>
+            <p className="text-zinc-400 font-bold text-[10px] uppercase tracking-widest mt-2 italic">Authentication Required for Node Access.</p>
           </header>
 
           {error && (
-            <div className="mb-8 p-5 bg-rose-50 border border-rose-100 text-rose-600 text-[10px] font-black uppercase tracking-widest rounded-2xl flex items-center gap-3 italic animate-pulse">
-               <Lock size={16} /> Access Denied: {error}
+            <div className="mb-8 p-4 bg-red-50 border border-red-100 text-red-500 text-[9px] font-black uppercase tracking-widest rounded-2xl flex items-center gap-3 italic">
+               <Lock size={14} /> Failed: {error}
             </div>
           )}
 
-          <form onSubmit={handleLogin} className="space-y-8">
-            <div className="relative group">
-               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block italic">Credential ID (Email)</label>
-               <div className="relative">
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div className="space-y-2">
+               <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Credential ID</label>
+               <div className="relative group">
                  <input 
                    type="email" 
                    value={email}
                    onChange={(e) => setEmail(e.target.value)}
-                   className="w-full pl-14 pr-6 h-16 bg-slate-50 border border-slate-200 rounded-2xl text-[12px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:border-indigo-600 focus:bg-white transition-all placeholder:text-slate-200"
-                   placeholder="IDENTITY@VINNOD.CORE"
+                   className="w-full pl-12 pr-6 h-14 bg-zinc-50 border border-zinc-100 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-slate-900 focus:outline-none focus:border-slate-900 focus:bg-white transition-all placeholder:text-zinc-200 shadow-inner"
+                   placeholder="chef@vinnod.core"
                    required 
                  />
-                 <Mail size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
+                 <Mail size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-200 group-focus-within:text-slate-900 transition-colors" />
                </div>
             </div>
 
-            <div className="relative group">
-               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block italic">Access Key (Password)</label>
-               <div className="relative">
+            <div className="space-y-2">
+               <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Access Key</label>
+               <div className="relative group">
                  <input 
                    type="password" 
                    value={password}
                    onChange={(e) => setPassword(e.target.value)}
-                   className="w-full pl-14 pr-6 h-16 bg-slate-50 border border-slate-200 rounded-2xl text-[12px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:border-indigo-600 focus:bg-white transition-all placeholder:text-slate-200"
-                   placeholder="••••••••••••"
+                   className="w-full pl-12 pr-6 h-14 bg-zinc-50 border border-zinc-100 rounded-2xl text-[11px] font-bold uppercase tracking-widest text-slate-900 focus:outline-none focus:border-slate-900 focus:bg-white transition-all placeholder:text-zinc-200 shadow-inner"
+                   placeholder="••••••••"
                    required 
                  />
-                 <Lock size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
+                 <Lock size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-200 group-focus-within:text-slate-900 transition-colors" />
                </div>
             </div>
 
             <button 
               type="submit" 
               disabled={isLoading}
-              className="group relative w-full h-20 bg-slate-900 text-white rounded-[2rem] shadow-xl shadow-slate-900/10 flex items-center justify-between px-3 overflow-hidden transition-all active:scale-[0.98] disabled:opacity-30"
+              className="group relative w-full h-16 bg-slate-900 text-white rounded-2xl shadow-xl flex items-center justify-center gap-3 overflow-hidden transition-all active:scale-[0.98] disabled:opacity-30"
             >
-              <div className="h-14 bg-indigo-600 text-white rounded-[1.5rem] px-8 flex items-center gap-3 group-hover:bg-indigo-500 transition-all">
-                {isLoading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={18} />}
-                <span className="text-[10px] font-black uppercase tracking-[0.3em] italic">{isLoading ? 'Syncing...' : 'Authenticate'}</span>
-              </div>
-              <div className="flex items-center gap-2 font-fraunces italic font-black text-xl pr-6 transition-all group-hover:translate-x-1">
-                ENTER <ArrowRight size={22} />
+              <div className={`absolute inset-0 bg-emerald-500 transition-transform duration-700 ${isLoading ? 'translate-y-0' : 'translate-y-full'}`}></div>
+              <div className="relative z-10 flex items-center justify-center gap-3">
+                 {isLoading ? (
+                    <Loader2 size={16} className="animate-spin text-white" />
+                 ) : (
+                    <ShieldCheck size={18} className="text-emerald-500 group-hover:scale-110 transition-transform" />
+                 )}
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em] italic">{isLoading ? 'Syncing...' : 'Enter Dashboard'}</span>
               </div>
             </button>
           </form>
           
-          <div className="mt-12 flex flex-col items-center gap-6">
-            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-slate-100 to-transparent"></div>
-            <div className="grid grid-cols-2 gap-4 w-full text-[9px] font-black uppercase tracking-widest text-center italic">
-               <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                  <p className="text-slate-400 mb-1">CHEF NODE</p>
-                  <p className="text-slate-900">chef@dineflow.com</p>
+          <div className="mt-10 flex flex-col items-center gap-6">
+            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-zinc-100 to-transparent"></div>
+            <div className="flex flex-col gap-3 w-full">
+               <div className="flex justify-between items-center text-[8px] font-black text-zinc-300 uppercase tracking-widest px-2 italic">
+                  <span>Demo Accounts</span>
+                  <span className="opacity-50">v4.1</span>
                </div>
-               <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
-                  <p className="text-slate-400 mb-1">OWNER NODE</p>
-                  <p className="text-slate-900">owner@dineflow.com</p>
+               <div className="grid grid-cols-2 gap-3">
+                  <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-100">
+                     <p className="text-[8px] font-black text-zinc-400 mb-1 uppercase tracking-widest">Chef</p>
+                     <p className="text-[9px] font-bold text-slate-900 truncate">chef@vinnod.core</p>
+                  </div>
+                  <div className="p-4 rounded-2xl bg-zinc-50 border border-zinc-100">
+                     <p className="text-[8px] font-black text-zinc-400 mb-1 uppercase tracking-widest">Owner</p>
+                     <p className="text-[9px] font-bold text-slate-900 truncate">owner@vinnod.core</p>
+                  </div>
                </div>
             </div>
-            <Link to="/" className="text-[10px] font-black text-slate-300 uppercase tracking-widest hover:text-indigo-600 transition-all">
-               Return to Landing Node
+            <Link to="/" className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.3em] hover:text-slate-900 transition-all italic underline underline-offset-8 decoration-zinc-100">
+               Return Home
             </Link>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import api from '../../api/axios';
-import { Plus, Edit2, Trash2, Search, X, Image as ImageIcon, Check, Ban, Clock, ChefHat } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, X, Image as ImageIcon, Check, Ban, Clock, ChefHat, Filter, ArrowRight } from 'lucide-react';
 
 const emptyForm = {
   id: null,
@@ -44,7 +44,6 @@ const MenuManagerView = () => {
   }, []);
 
   const toggleAvailability = (itemId, currentStatus) => {
-    // Optimistic UI update for immediate feedback
     const originalCategories = [...categories];
     setCategories(prev => prev.map(cat => ({
       ...cat,
@@ -137,12 +136,9 @@ const MenuManagerView = () => {
       setIsSaving(false);
       return;
     }
-
     setIsSaving(false);
   };
 
-  const confirmDelete = (item) => setDeletingItem(item);
-  const cancelDelete = () => setDeletingItem(null);
   const doDelete = async () => {
     if (!deletingItem?.id) return;
     try {
@@ -155,303 +151,260 @@ const MenuManagerView = () => {
   };
 
   if (loading) return (
-    <div className="p-12 h-[60vh] flex flex-col items-center justify-center">
-      <div className="w-10 h-10 border-4 border-slate-100 border-t-indigo-500 rounded-full animate-spin"></div>
-      <p className="mt-4 text-[10px] uppercase font-black tracking-widest text-slate-400">Inventory Syncing</p>
+    <div className="flex flex-col items-center justify-center min-h-[50vh]">
+      <div className="w-10 h-10 border-4 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
+      <p className="mt-6 text-[10px] font-black text-zinc-300 uppercase tracking-widest italic animate-pulse">Inventory Syncing</p>
     </div>
   );
 
   return (
-    <div className="p-12 animate-in fade-in slide-in-from-bottom-4 duration-1000">
-      <header className="flex justify-between items-end mb-12">
+    <div className="animate-in fade-in slide-in-from-bottom-6 duration-700 pb-20">
+      <header className="mb-10 lg:flex lg:justify-between lg:items-end p-2 lg:p-0">
         <div>
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.2)]"></div>
-            <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em]">Inventory Core</span>
+            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+            <span className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.4em]">Inventory Hub</span>
           </div>
-          <h2 className="text-5xl font-extrabold font-syne text-slate-900 tracking-tighter italic">Cuisine Vault</h2>
-          <p className="text-slate-400 font-medium mt-2">Precision management for your culinary offerings.</p>
+          <h2 className="text-4xl lg:text-5xl font-black font-syne text-slate-900 tracking-tighter italic">Cuisine Vault</h2>
+          <p className="text-[10px] font-black text-zinc-300 uppercase tracking-widest mt-2 italic">Maintain the culinary matrix.</p>
         </div>
         
         <button
           onClick={openCreateModal}
-          className="flex items-center gap-3 px-8 h-14 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest rounded-2xl hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20 active:scale-95"
+          className="mt-8 lg:mt-0 w-full lg:w-auto h-16 px-10 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-3"
         >
-          <Plus size={18} /> Add New Formulation
+          <Plus size={18} /> New Formulation
         </button>
       </header>
 
       {error && (
-        <div className="mb-6 p-5 bg-rose-50 border border-rose-100 text-rose-600 text-xs font-black tracking-widest uppercase rounded-2xl flex items-center gap-3 animate-pulse">
-          <Ban size={16} /> Error Alert: {error}
+        <div className="mb-8 p-4 bg-red-50 border border-red-100 text-red-500 text-[9px] font-black tracking-widest uppercase rounded-2xl flex items-center gap-3 animate-pulse italic">
+          <Ban size={14} /> System Alert: {error}
         </div>
       )}
 
-      {/* Modern Table System */}
-      <div className="bg-white border border-slate-100 rounded-[2.5rem] overflow-hidden shadow-sm">
-        <div className="px-10 py-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-          <div className="relative w-80 group">
-            <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
-            <input 
-              type="text" 
-              placeholder="Query Inventory..." 
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-12 pr-6 h-12 bg-white border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:border-indigo-600 transition-all placeholder:text-slate-300"
-            />
-          </div>
-          <div className="flex gap-6">
-            <div className="flex items-center gap-3 px-4 py-2 bg-emerald-50 rounded-xl border border-emerald-100">
-              <div className="w-2 h-2 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"></div>
-              <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">In Stock</span>
-            </div>
-            <div className="flex items-center gap-3 px-4 py-2 bg-rose-50 rounded-xl border border-rose-100">
-              <div className="w-2 h-2 rounded-full bg-rose-500 shadow-[0_0_8px_rgba(244,63,94,0.2)]"></div>
-              <span className="text-[10px] font-black text-rose-600 uppercase tracking-widest">Out of Stock</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm border-separate border-spacing-0">
-            <thead className="bg-slate-50 text-slate-400">
-              <tr>
-                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em]">Formation</th>
-                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em]">Visual</th>
-                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em]">Unit Class</th>
-                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em]">Valuation</th>
-                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-center">Status</th>
-                <th className="px-10 py-6 text-[10px] font-black uppercase tracking-[0.2em] text-right">Ops</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-100">
-              {filteredRows.map(item => (
-                <tr key={item.id} className="group hover:bg-slate-50/50 transition-all">
-                  <td className="px-10 py-6">
-                    <div className="flex flex-col">
-                      <span className="text-md font-bold text-slate-900 group-hover:text-indigo-600 transition-colors uppercase tracking-tight">{item.name}</span>
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest truncate max-w-[150px]">{item.description || 'Void Description'}</span>
-                    </div>
-                  </td>
-                  <td className="px-10 py-6">
-                    <div className="w-14 h-14 rounded-2xl overflow-hidden border border-slate-100 shadow-inner relative group/img">
-                      {item.image_url ? (
-                        <img src={item.image_url} alt={item.name} className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-125" />
-                      ) : (
-                        <div className="w-full h-full bg-slate-50 flex items-center justify-center text-slate-300 italic font-black text-xs">NO-IMG</div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-10 py-6">
-                    <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-[9px] font-bold text-indigo-600 uppercase tracking-[0.1em]">
-                      {item.category_icon} {item.category_name}
-                    </span>
-                  </td>
-                  <td className="px-10 py-6">
-                    <div className="flex flex-col">
-                       <span className="text-xl font-black text-slate-900 italic">₹{item.price.toFixed(0)}</span>
-                       <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">Base INR</span>
-                    </div>
-                  </td>
-                  <td className="px-10 py-6">
-                    <div className="flex justify-center">
-                       <button 
-                        onClick={() => toggleAvailability(item.id, item.is_available)}
-                        className={`group/sw w-12 h-6 rounded-full p-1 transition-all duration-300 ${item.is_available ? 'bg-emerald-500' : 'bg-slate-200'}`}
-                      >
-                        <div className={`w-4 h-4 rounded-full bg-white transition-all duration-300 shadow-md ${item.is_available ? 'translate-x-6' : 'translate-x-0'}`}></div>
-                      </button>
-                    </div>
-                  </td>
-                  <td className="px-10 py-6 text-right">
-                    <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-4 group-hover:translate-x-0">
-                      <button
-                        onClick={() => openEditModal(item)}
-                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-indigo-600 hover:border-indigo-200 transition-all shadow-sm"
-                      >
-                        <Edit2 size={16} />
-                      </button>
-                      <button
-                        onClick={() => confirmDelete(item)}
-                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-rose-500 hover:border-rose-200 transition-all shadow-sm"
-                      >
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {filteredRows.length === 0 && (
-            <div className="py-20 flex flex-col items-center justify-center grayscale opacity-20">
-               <Ban size={64} className="text-slate-300" />
-               <p className="mt-4 font-black text-xs uppercase tracking-[0.5em] text-slate-400">No Data Matching Query</p>
-            </div>
-          )}
-        </div>
+      {/* SEARCH / FILTERS */}
+      <div className="mb-10 relative group">
+          <Search size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-slate-900" />
+          <input 
+            type="text" 
+            placeholder="Search Protocol ID or Name..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full h-16 pl-16 pr-6 bg-zinc-50 border border-zinc-100 rounded-[1.5rem] text-[10px] font-bold uppercase tracking-widest text-slate-900 focus:outline-none focus:border-slate-900 focus:bg-white transition-all placeholder:text-zinc-200 shadow-inner"
+          />
       </div>
 
-      {/* MODAL SYSTEM — Premium Overlay */}
+      {/* RESPONSIVE GRID / CARDS (Instead of Table on Mobile) */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
+        {filteredRows.map(item => (
+          <div key={item.id} className="group relative bg-white border border-zinc-100 rounded-[2.5rem] p-6 transition-all duration-300 hover:shadow-xl active:scale-[0.99] flex flex-col">
+             <div className="flex justify-between items-start mb-6">
+                <div className="w-16 h-16 rounded-[1.5rem] bg-zinc-50 border border-zinc-100 overflow-hidden shrink-0 shadow-inner relative group/img">
+                  {item.image_url ? (
+                    <img src={item.image_url.startsWith('http') ? item.image_url : `http://localhost:5000${item.image_url}`} alt={item.name} className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500" />
+                  ) : <div className="w-full h-full flex items-center justify-center text-zinc-200 font-black italic">!</div>}
+                  <div className={`absolute bottom-1 right-1 w-3 h-3 rounded-full border-2 border-white ${item.is_available ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+                </div>
+
+                <div className="flex gap-2">
+                   <button onClick={() => openEditModal(item)} className="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-300 hover:text-slate-900 transition-all active:scale-90">
+                      <Edit2 size={16} />
+                   </button>
+                   <button onClick={() => setDeletingItem(item)} className="w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-300 hover:text-red-500 transition-all active:scale-90">
+                      <Trash2 size={16} />
+                   </button>
+                </div>
+             </div>
+
+             <div className="mb-6 flex-1">
+                <span className="text-[8px] font-black text-indigo-500 uppercase tracking-widest mb-1 block italic">{item.category_icon} {item.category_name}</span>
+                <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter leading-tight italic line-clamp-1">{item.name}</h3>
+                <p className="text-[10px] font-bold text-zinc-300 mt-2 line-clamp-2 italic leading-relaxed">{item.description || 'CORE ENTRY WITHOUT PROTOCOL DETAILS.'}</p>
+             </div>
+
+             <div className="flex items-center justify-between pt-6 border-t border-zinc-50">
+                <div className="flex flex-col">
+                   <span className="text-[8px] font-black text-zinc-300 uppercase tracking-widest">Valuation</span>
+                   <span className="text-2xl font-black text-slate-900 italic tracking-tighter">₹{item.price.toFixed(0)}</span>
+                </div>
+                
+                <button 
+                  onClick={() => toggleAvailability(item.id, item.is_available)}
+                  className={`flex items-center gap-2 px-4 h-10 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all ${
+                    item.is_available 
+                    ? 'bg-emerald-50 text-emerald-600 border border-emerald-100' 
+                    : 'bg-red-50 text-red-500 border border-red-100'
+                  }`}
+                >
+                  {item.is_available ? 'LIVE' : 'HALTED'}
+                  <div className={`w-2 h-2 rounded-full ${item.is_available ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500'}`}></div>
+                </button>
+             </div>
+          </div>
+        ))}
+
+        {filteredRows.length === 0 && (
+          <div className="col-span-full py-32 flex flex-col items-center justify-center grayscale opacity-10 border-2 border-dashed border-slate-900 rounded-[3rem]">
+             <Ban size={64} />
+             <p className="mt-8 font-black text-[10px] uppercase tracking-[0.5em] italic">No Matches in Vault</p>
+          </div>
+        )}
+      </div>
+
+      {/* FORM MODAL - Transformed for Touch/Mobile Devices */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-md p-8 animate-in fade-in duration-300">
-          <div className="w-full max-w-4xl bg-white border border-slate-200 rounded-[2.5rem] shadow-[0_40px_100px_rgba(0,0,0,0.1)] overflow-hidden">
-            <header className="px-10 py-8 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-              <div>
-                <h3 className="text-2xl font-extrabold text-slate-900 font-syne tracking-tighter">
-                  {editingItem ? 'Reconfigure Formulation' : 'New Culinary Entry'}
-                </h3>
-                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mt-1">Matrix Interface Version 3.4</p>
-              </div>
-              <button 
-                onClick={closeModal} 
-                className="w-10 h-10 flex items-center justify-center rounded-full bg-white text-slate-400 hover:text-slate-900 border border-slate-100 transition-all shadow-sm"
-              >
-                <X size={20} />
-              </button>
-            </header>
-
-            <form onSubmit={handleSave} className="p-10 grid grid-cols-1 md:grid-cols-2 gap-8 max-h-[70vh] overflow-y-auto hide-scrollbar">
-              <div className="md:col-span-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block italic">Item Name</label>
-                <input
-                  value={form.name}
-                  onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
-                  className="w-full px-6 h-14 bg-slate-50 border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:border-indigo-600 focus:bg-white transition-all placeholder:text-slate-300"
-                  placeholder="Example: TRUFFLE MUSHROOM RISOTTO"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block italic">Classification</label>
-                <div className="relative">
-                  <select
-                    value={form.category_id}
-                    onChange={(e) => setForm((f) => ({ ...f, category_id: e.target.value }))}
-                    className="w-full px-6 h-14 bg-slate-50 border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:border-indigo-600 focus:bg-white appearance-none italic transition-all"
-                    required
-                  >
-                    <option value="" disabled>Select Matrix Category</option>
-                    {categories.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.icon} {c.name.toUpperCase()}
-                      </option>
-                    ))}
-                  </select>
-                  <ChefHat size={16} className="absolute right-6 top-1/2 -translate-y-1/2 text-slate-300 pointer-events-none" />
+        <div className="fixed inset-0 z-[1001] bg-slate-900/60 backdrop-blur-md flex items-end md:items-center justify-center p-0 md:p-8 animate-in slide-in-from-bottom-10 duration-500">
+          <div className="w-full max-w-2xl bg-white h-[90vh] md:h-auto md:max-h-[90vh] rounded-t-[3rem] md:rounded-[3rem] shadow-2xl flex flex-col overflow-hidden">
+             <header className="px-8 py-8 border-b border-zinc-100 flex justify-between items-center bg-zinc-50/50 flex-shrink-0"
+                     style={{ paddingTop: 'calc(var(--safe-top) + 2rem)' }}>
+                <div>
+                  <h3 className="text-2xl font-black text-slate-900 font-syne italic leading-none">{editingItem ? 'Edit Entry' : 'New Entry'}</h3>
+                  <p className="text-[10px] font-black text-zinc-300 uppercase tracking-widest mt-2">Inventory Management Protocol</p>
                 </div>
-              </div>
+                <button onClick={closeModal} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white border border-zinc-100 text-zinc-300 hover:text-slate-900 transition-all">
+                  <X size={24} />
+                </button>
+             </header>
 
-              <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block italic">Valuation (INR)</label>
-                <div className="relative">
-                  <input
-                    value={form.price}
-                    onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
-                    type="number"
-                    className="w-full pl-12 pr-6 h-14 bg-slate-50 border border-slate-200 rounded-2xl text-[10px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:border-indigo-600 focus:bg-white transition-all placeholder:text-slate-300"
-                    placeholder="00.00"
-                    required
-                  />
-                  <span className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 font-black italic">₹</span>
+             <form onSubmit={handleSave} className="flex-1 overflow-y-auto px-8 py-10 space-y-8 hide-scrollbar">
+                <div className="space-y-2">
+                   <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Formation Name</label>
+                   <input
+                     value={form.name}
+                     onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
+                     className="w-full h-14 bg-zinc-50 border border-zinc-100 rounded-2xl px-6 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-slate-900 focus:bg-white transition-all shadow-inner"
+                     placeholder="ID: CUISINE_NAME"
+                     required
+                   />
                 </div>
-              </div>
 
-              <div className="md:col-span-2 grid grid-cols-2 gap-4">
-                 <button 
-                   type="button"
-                   onClick={() => setForm(f => ({ ...f, is_veg: !f.is_veg }))}
-                   className={`h-14 rounded-2xl border-2 flex items-center justify-center gap-2 text-[10px] font-black tracking-widest uppercase transition-all ${
-                     form.is_veg ? 'bg-emerald-50 border-emerald-500 text-emerald-600 shadow-sm' : 'bg-slate-50 border-slate-100 text-slate-400'
-                   }`}
-                 >
-                   <Check size={16} /> {form.is_veg ? 'VEGETARIAN CORE' : 'ENABLE VEG-ONLY FLAG'}
-                 </button>
-                 <button 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                   <div className="space-y-2">
+                      <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Classification</label>
+                      <select
+                        value={form.category_id}
+                        onChange={(e) => setForm(f => ({ ...f, category_id: e.target.value }))}
+                        className="w-full h-14 bg-zinc-50 border border-zinc-100 rounded-2xl px-6 text-[10px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:border-slate-900 appearance-none italic transition-all shadow-inner"
+                        required
+                      >
+                        <option value="" disabled>Select Vector</option>
+                        {categories.map(c => <option key={c.id} value={c.id}>{c.icon} {c.name.toUpperCase()}</option>)}
+                      </select>
+                   </div>
+                   <div className="space-y-2">
+                      <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Valuation (INR)</label>
+                      <input
+                        value={form.price}
+                        onChange={(e) => setForm(f => ({ ...f, price: e.target.value }))}
+                        type="number"
+                        className="w-full h-14 bg-zinc-50 border border-zinc-100 rounded-2xl px-6 text-[10px] font-black uppercase tracking-widest focus:outline-none focus:border-slate-900 shadow-inner"
+                        placeholder="000"
+                        required
+                      />
+                   </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <button 
                     type="button"
-                    onClick={() => setForm(f => ({ ...f, is_available: !f.is_available }))}
-                    className={`h-14 rounded-2xl border-2 flex items-center justify-center gap-2 text-[10px] font-black tracking-widest uppercase transition-all ${
-                      form.is_available ? 'bg-indigo-50 border-indigo-500 text-indigo-600 shadow-sm' : 'bg-slate-50 border-slate-100 text-slate-400'
+                    onClick={() => setForm(f => ({ ...f, is_veg: !f.is_veg }))}
+                    className={`h-16 rounded-2xl border flex items-center justify-center gap-3 text-[9px] font-black tracking-widest uppercase transition-all ${
+                      form.is_veg ? 'bg-emerald-500 border-emerald-500 text-white shadow-xl' : 'bg-zinc-50 border-zinc-100 text-zinc-300'
                     }`}
                   >
-                    <Clock size={16} /> {form.is_available ? 'STOCK LIVE' : 'HALTED'}
+                    <Check size={18} /> {form.is_veg ? 'VEG CORE' : 'SWITCH VEG'}
                   </button>
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block italic">Detailed Protocol</label>
-                <textarea
-                  value={form.description}
-                  onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-                  rows={4}
-                  className="w-full px-6 py-5 bg-slate-50 border border-slate-200 rounded-[2rem] text-[10px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:border-indigo-600 focus:bg-white transition-all placeholder:text-slate-300"
-                  placeholder="Composition details..."
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block italic">Imaging System</label>
-                <div className="group relative w-full h-32 rounded-[2rem] border-2 border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center hover:border-indigo-500/50 hover:bg-indigo-50/30 transition-all cursor-pointer overflow-hidden">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => setForm((f) => ({ ...f, photo: e.target.files?.[0] || null }))}
-                    className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                  />
-                  <ImageIcon size={32} className="text-slate-300 group-hover:text-indigo-400 group-hover:scale-110 transition-all" />
-                  <p className="mt-4 text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] group-hover:text-indigo-600">
-                    {form.photo ? `SELECTED: ${form.photo.name.toUpperCase()}` : 'DEPLOY NEW VISUAL ASSET'}
-                  </p>
+                  <button 
+                    type="button"
+                    onClick={() => setForm(f => ({ ...f, is_available: !f.is_available }))}
+                    className={`h-16 rounded-2xl border flex items-center justify-center gap-3 text-[9px] font-black tracking-widest uppercase transition-all ${
+                      form.is_available ? 'bg-slate-900 border-slate-900 text-white shadow-xl' : 'bg-zinc-50 border-zinc-100 text-zinc-300'
+                    }`}
+                  >
+                    <Clock size={18} /> {form.is_available ? 'LIVE SCAN' : 'HALT SCAN'}
+                  </button>
                 </div>
-              </div>
 
-              <footer className="md:col-span-2 flex items-center justify-end gap-6 pt-10 mt-6 border-t border-slate-100">
+                <div className="space-y-2">
+                   <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Operational Description</label>
+                   <textarea
+                     value={form.description}
+                     onChange={(e) => setForm(f => ({ ...f, description: e.target.value }))}
+                     rows={4}
+                     className="w-full p-6 bg-zinc-50 border border-zinc-100 rounded-[2rem] text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-slate-900 shadow-inner italic"
+                     placeholder="Detailed composition parameters..."
+                   />
+                </div>
+
+                <div className="space-y-4">
+                   <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Visual Asset Overlay</label>
+                   <div className="relative h-40 group cursor-pointer">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => setForm(f => ({ ...f, photo: e.target.files?.[0] || null }))}
+                        className="absolute inset-0 opacity-0 z-20 cursor-pointer"
+                      />
+                      <div className="absolute inset-0 bg-zinc-50 border-2 border-dashed border-zinc-200 rounded-[2.5rem] flex flex-col items-center justify-center transition-all group-hover:bg-zinc-100/50 group-hover:border-slate-900/20">
+                         {form.photo ? (
+                            <div className="text-center p-6">
+                               <Check className="mx-auto text-emerald-500 mb-2" size={32} />
+                               <span className="text-[10px] font-black uppercase text-slate-900 truncate block max-w-xs">{form.photo.name}</span>
+                            </div>
+                         ) : (
+                            <>
+                               <ImageIcon size={32} className="text-zinc-200 mb-3" />
+                               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-300">Synchronize Image File</span>
+                            </>
+                         )}
+                      </div>
+                   </div>
+                </div>
+             </form>
+
+             <footer className="p-8 border-t border-zinc-100 bg-white flex flex-col md:flex-row gap-4 flex-shrink-0"
+                     style={{ paddingBottom: 'calc(var(--safe-bottom) + 2rem)' }}>
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-all italic underline underline-offset-8"
+                  className="w-full md:w-auto px-8 h-16 rounded-2xl text-[10px] font-black uppercase tracking-widest text-zinc-300 hover:text-slate-900 transition-all border border-transparent hover:border-zinc-100"
                 >
                   Terminate Process
                 </button>
                 <button
-                  type="submit"
+                  onClick={handleSave}
                   disabled={isSaving}
-                  className="px-10 h-16 bg-indigo-600 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-indigo-700 transition-all shadow-xl shadow-indigo-600/20 disabled:opacity-30 active:scale-95 flex items-center gap-3"
+                  className="flex-1 h-16 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl hover:bg-black shadow-2xl transition-all active:scale-95 flex items-center justify-center gap-3"
                 >
                   {isSaving ? 'UPLOADING...' : (editingItem ? 'COMMIT CHANGES' : 'GENERATE ENTRY')}
+                  <ArrowRight size={18} className="text-emerald-500" />
                 </button>
-              </footer>
-            </form>
+             </footer>
           </div>
         </div>
       )}
 
-      {/* Premium Confirm State */}
+      {/* DELETE CONFIRM */}
       {deletingItem && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-xl animate-in fade-in duration-500">
-          <div className="p-12 text-center max-w-lg w-full bg-white rounded-[3rem] shadow-2xl border border-slate-100">
-            <div className="w-24 h-24 bg-rose-50 border-2 border-rose-500 rounded-full flex items-center justify-center mx-auto mb-10 text-rose-500 animate-pulse">
-               <Ban size={40} />
-            </div>
-            <h3 className="text-3xl font-extrabold text-slate-900 font-syne tracking-tighter mb-4 italic">Irreversible Deletion</h3>
-            <p className="text-slate-400 uppercase text-[10px] font-black tracking-widest leading-relaxed mb-12">
-              You are about to purge <span className="text-rose-600 bg-rose-50 px-2 py-0.5 rounded italic">"{deletingItem.name.toUpperCase()}"</span> from the database. This action cannot be undone.
-            </p>
-            <div className="flex flex-col gap-4">
-              <button
-                onClick={doDelete}
-                className="w-full h-16 bg-rose-600 text-white rounded-2xl text-[10px] font-black tracking-widest uppercase hover:bg-rose-700 transition-all shadow-xl shadow-rose-600/20"
-              >
-                PROCEED WITH PURGE
-              </button>
-              <button
-                onClick={cancelDelete}
-                className="text-[10px] font-black text-slate-400 uppercase tracking-widest hover:text-slate-900 transition-all"
-              >
-                CANCEL & RETAIN
-              </button>
-            </div>
+        <div className="fixed inset-0 z-[1002] bg-slate-900/60 backdrop-blur-xl flex items-center justify-center p-6 animate-in zoom-in-95 duration-300">
+          <div className="w-full max-w-sm bg-white rounded-[3rem] p-10 text-center shadow-2xl">
+             <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl shadow-red-500/10">
+                <Trash2 size={32} />
+             </div>
+             <h3 className="text-2xl font-black italic text-slate-900 tracking-tighter mb-4">Purge Protocol</h3>
+             <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-relaxed mb-10">
+               Confirm irreversible deletion of item <br/>
+               <span className="text-red-500 bg-red-50 px-2 py-0.5 rounded italic break-all">"{deletingItem.name}"</span>
+             </p>
+             <div className="flex flex-col gap-3">
+                <button onClick={doDelete} className="w-full h-16 bg-red-600 text-white rounded-2xl text-[10px] font-black tracking-widest uppercase shadow-xl shadow-red-500/20 active:scale-95 transition-all">
+                  PROCEDE WITH PURGE
+                </button>
+                <button onClick={() => setDeletingItem(null)} className="w-full h-16 rounded-2xl text-[10px] font-black uppercase tracking-widest text-zinc-300 hover:text-slate-900 transition-all">
+                  ABORT
+                </button>
+             </div>
           </div>
         </div>
       )}

@@ -8,19 +8,12 @@ def create_app(config_class=Config):
     app = Flask(__name__, static_folder='static', static_url_path='/static')
     app.config.from_object(config_class)
 
-    # Robust CORS for development and ngrok
-    CORS(app, resources={r"/api/*": {
-        "origins": "*",
+    # Robust CORS for development
+    CORS(app, resources={r"/*": {
+        "origins": ["http://localhost:5173", "http://127.0.0.1:5173", "http://10.241.84.246:5173"],
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization", "X-Requested-With", "ngrok-skip-browser-warning"],
-        "supports_credentials": True
-    }})
-
-    # Middleware to automatically skip ngrok's browser warning page
-    @app.after_request
-    def add_ngrok_skip_header(response):
-        response.headers['ngrok-skip-browser-warning'] = '69420'
-        return response
+        "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"]
+    }}, supports_credentials=True)
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
