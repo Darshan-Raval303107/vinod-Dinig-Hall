@@ -45,101 +45,101 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#09090B] flex font-jakarta selection:bg-indigo-500 selection:text-white overflow-hidden">
+    <div className="min-h-screen bg-white flex font-jakarta selection:bg-indigo-500 selection:text-white overflow-hidden">
       {/* LEFT SIDE — Visual Branding / Cinematic Section */}
-      <div className="hidden lg:flex w-1/2 relative overflow-hidden bg-zinc-950">
+      <div className="hidden lg:flex w-1/2 relative overflow-hidden bg-[#FBF7F0]">
         <div className="absolute inset-0 z-0">
            {/* Animated geometric background */}
-           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(79,70,229,0.1),transparent_50%)]"></div>
-           <div className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[80%] bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.05),transparent_50%)]"></div>
+           <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,rgba(79,70,229,0.05),transparent_50%)]"></div>
+           <div className="absolute bottom-[-10%] right-[-10%] w-[80%] h-[80%] bg-[radial-gradient(circle_at_50%_50%,rgba(16,185,129,0.03),transparent_50%)]"></div>
         </div>
         
         <div className="relative z-10 w-full flex flex-col justify-between p-20">
           <header>
             <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-2xl">
+              <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-xl shadow-indigo-600/20">
                  <Globe size={28} />
               </div>
-              <h1 className="font-syne text-4xl font-black text-white italic tracking-tighter">Vinnod</h1>
+              <h1 className="font-syne text-4xl font-black text-slate-900 italic tracking-tighter">Vinnod</h1>
             </div>
           </header>
 
           <main>
-             <h2 className="font-fraunces text-7xl font-black text-white leading-none italic tracking-tighter mb-8">
-               Digital <br/> <span className="text-zinc-700">Hospitality</span> <br/> Redefined.
+             <h2 className="font-fraunces text-7xl font-black text-slate-900 leading-none italic tracking-tighter mb-8">
+               Digital <br/> <span className="text-indigo-600/30">Hospitality</span> <br/> Redefined.
              </h2>
-             <p className="max-w-md text-zinc-500 font-bold uppercase tracking-[0.3em] text-[10px] leading-loose">
+             <p className="max-w-md text-slate-400 font-bold uppercase tracking-[0.3em] text-[10px] leading-loose">
                Connecting physical dining spaces with advanced digital matrix controls. Experience the evolution of order management.
              </p>
           </main>
 
-          <footer className="flex items-center gap-8">
+          <footer className="flex items-center gap-8 border-t border-slate-200/50 pt-10">
              <div className="flex flex-col">
-                <span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest mb-1">Infrastructure Status</span>
+                <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">Infrastructure Status</span>
                 <div className="flex items-center gap-2">
-                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-                   <span className="text-[10px] font-black text-white italic">OPERATIONAL NODE-01</span>
+                   <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.2)]"></div>
+                   <span className="text-[10px] font-black text-slate-900 italic">OPERATIONAL NODE-01</span>
                 </div>
              </div>
-             <div className="h-10 w-[1px] bg-zinc-800"></div>
-             <p className="text-[10px] font-bold text-zinc-600 italic">© {new Date().getFullYear()} Vinnod Network Systems.</p>
+             <div className="h-10 w-[1px] bg-slate-200"></div>
+             <p className="text-[10px] font-bold text-slate-400 italic">© {new Date().getFullYear()} Vinnod Network Systems.</p>
           </footer>
         </div>
       </div>
 
       {/* RIGHT SIDE — Precision Login Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-[#09090B]">
-        <div className="w-full max-w-lg p-12 bg-zinc-900 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] border border-white/5 rounded-[3rem] animate-in slide-in-from-right-10 duration-1000">
+      <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
+        <div className="w-full max-w-lg p-12 bg-white shadow-[0_50px_100px_-20px_rgba(0,0,0,0.05)] border border-slate-100 rounded-[3rem] animate-in slide-in-from-right-10 duration-1000">
           <header className="mb-12">
             <div className="flex items-center gap-2 mb-4">
-              <ShieldCheck className="text-indigo-500" size={24} />
-              <span className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.4em]">Auth Protocol</span>
+              <ShieldCheck className="text-indigo-600" size={24} />
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.4em]">Auth Protocol</span>
             </div>
-            <h3 className="text-3xl font-extrabold text-white font-syne tracking-tighter italic">Establish Connection</h3>
-            <p className="text-zinc-600 font-medium text-sm mt-2">Enter your designated access keys to synchronize.</p>
+            <h3 className="text-3xl font-extrabold text-slate-900 font-syne tracking-tighter italic">Establish Connection</h3>
+            <p className="text-slate-400 font-medium text-sm mt-2">Enter your designated access keys to synchronize.</p>
           </header>
 
           {error && (
-            <div className="mb-8 p-5 bg-red-500/10 border border-red-500/20 text-red-500 text-[10px] font-black uppercase tracking-widest rounded-2xl flex items-center gap-3 italic animate-pulse">
+            <div className="mb-8 p-5 bg-rose-50 border border-rose-100 text-rose-600 text-[10px] font-black uppercase tracking-widest rounded-2xl flex items-center gap-3 italic animate-pulse">
                <Lock size={16} /> Access Denied: {error}
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-8">
             <div className="relative group">
-               <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-3 block italic">Credential ID (Email)</label>
+               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block italic">Credential ID (Email)</label>
                <div className="relative">
                  <input 
                    type="email" 
                    value={email}
                    onChange={(e) => setEmail(e.target.value)}
-                   className="w-full pl-14 pr-6 h-16 bg-black border border-white/5 rounded-2xl text-[12px] font-black uppercase tracking-widest text-white focus:outline-none focus:border-indigo-600 focus:shadow-[0_0_20px_rgba(79,70,229,0.1)] transition-all placeholder:text-zinc-800"
+                   className="w-full pl-14 pr-6 h-16 bg-slate-50 border border-slate-200 rounded-2xl text-[12px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:border-indigo-600 focus:bg-white transition-all placeholder:text-slate-200"
                    placeholder="IDENTITY@VINNOD.CORE"
                    required 
                  />
-                 <Mail size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-800 group-focus-within:text-indigo-600 transition-colors" />
+                 <Mail size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
                </div>
             </div>
 
             <div className="relative group">
-               <label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-3 block italic">Access Key (Password)</label>
+               <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 block italic">Access Key (Password)</label>
                <div className="relative">
                  <input 
                    type="password" 
                    value={password}
                    onChange={(e) => setPassword(e.target.value)}
-                   className="w-full pl-14 pr-6 h-16 bg-black border border-white/5 rounded-2xl text-[12px] font-black uppercase tracking-widest text-white focus:outline-none focus:border-indigo-600 focus:shadow-[0_0_20px_rgba(79,70,229,0.1)] transition-all placeholder:text-zinc-800"
+                   className="w-full pl-14 pr-6 h-16 bg-slate-50 border border-slate-200 rounded-2xl text-[12px] font-black uppercase tracking-widest text-slate-900 focus:outline-none focus:border-indigo-600 focus:bg-white transition-all placeholder:text-slate-200"
                    placeholder="••••••••••••"
                    required 
                  />
-                 <Lock size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-800 group-focus-within:text-indigo-600 transition-colors" />
+                 <Lock size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-indigo-600 transition-colors" />
                </div>
             </div>
 
             <button 
               type="submit" 
               disabled={isLoading}
-              className="group relative w-full h-20 bg-white text-black rounded-[2rem] shadow-2xl flex items-center justify-between px-3 overflow-hidden transition-all active:scale-[0.98] disabled:opacity-30"
+              className="group relative w-full h-20 bg-slate-900 text-white rounded-[2rem] shadow-xl shadow-slate-900/10 flex items-center justify-between px-3 overflow-hidden transition-all active:scale-[0.98] disabled:opacity-30"
             >
               <div className="h-14 bg-indigo-600 text-white rounded-[1.5rem] px-8 flex items-center gap-3 group-hover:bg-indigo-500 transition-all">
                 {isLoading ? <Loader2 size={16} className="animate-spin" /> : <ShieldCheck size={18} />}
@@ -152,18 +152,18 @@ const Login = () => {
           </form>
           
           <div className="mt-12 flex flex-col items-center gap-6">
-            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-zinc-800 to-transparent"></div>
+            <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-slate-100 to-transparent"></div>
             <div className="grid grid-cols-2 gap-4 w-full text-[9px] font-black uppercase tracking-widest text-center italic">
-               <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                  <p className="text-zinc-600 mb-1">CHEF NODE</p>
-                  <p className="text-white">chef@dineflow.com</p>
+               <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                  <p className="text-slate-400 mb-1">CHEF NODE</p>
+                  <p className="text-slate-900">chef@dineflow.com</p>
                </div>
-               <div className="p-4 rounded-xl bg-white/[0.02] border border-white/[0.05]">
-                  <p className="text-zinc-600 mb-1">OWNER NODE</p>
-                  <p className="text-white">owner@dineflow.com</p>
+               <div className="p-4 rounded-xl bg-slate-50 border border-slate-100">
+                  <p className="text-slate-400 mb-1">OWNER NODE</p>
+                  <p className="text-slate-900">owner@dineflow.com</p>
                </div>
             </div>
-            <Link to="/" className="text-[10px] font-black text-zinc-600 uppercase tracking-widest hover:text-white transition-all">
+            <Link to="/" className="text-[10px] font-black text-slate-300 uppercase tracking-widest hover:text-indigo-600 transition-all">
                Return to Landing Node
             </Link>
           </div>

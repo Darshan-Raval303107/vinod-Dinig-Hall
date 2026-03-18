@@ -8,7 +8,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
-import { ChefHat, ArrowRight, ShieldAlert, Globe, Star, ArrowDown, MapPin } from 'lucide-react';
+import { ChefHat, ArrowRight, ShieldAlert, Globe, Star, ArrowDown, MapPin, Smartphone } from 'lucide-react';
 import './landing.css';
 
 export default function Landing() {
@@ -97,7 +97,7 @@ export default function Landing() {
       const scale = Math.max(cw / iw, ch / ih);
       const dw = Math.ceil(iw * scale),  dh = Math.ceil(ih * scale);
       const dx = Math.floor((cw - dw) / 2), dy = Math.floor((ch - dh) / 2);
-      ctx.fillStyle = '#0a0a0b';
+      ctx.fillStyle = '#FBF7F0';
       ctx.fillRect(0, 0, cw, ch);
       ctx.drawImage(img, dx, dy, dw, dh);
     }
@@ -188,12 +188,16 @@ export default function Landing() {
             <a href="#experience">Heritage</a>
             <a href="#menu">Cuisine</a>
             <a href="#gallery">Space</a>
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-4 items-center pl-4 border-l border-zinc-200">
+               <Link className="vdh-btn vdh-btn--sm !bg-zinc-100 !text-zinc-950 hover:!bg-zinc-200" to="/qr-preview">
+                  <Smartphone size={14} className="mr-2" /> Mobile Access
+               </Link>
                <Link className="vdh-btn vdh-btn--sm" to="/login">
-                  <ChefHat size={14} className="mr-2" /> Staff Dashboard
+                  <ChefHat size={14} className="mr-2" /> Staff
                </Link>
             </div>
           </nav>
+
         </div>
       </header>
 

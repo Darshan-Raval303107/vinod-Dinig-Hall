@@ -68,39 +68,86 @@ def _require_owner_table_access(table: RestaurantTable, restaurant_id: str):
     return str(table.restaurant_id) == str(restaurant_id)
 
 
-@owner_bp.route('/owner/analytics/today', methods=['GET'])
+@owner_bp.route('/owner/analytics', methods=['GET'])
 @role_required('owner', 'admin')
-def get_today_analytics():
+def get_analytics():
     claims = get_jwt()
     restaurant_id = claims.get('restaurant_id')
+    timeframe = request.args.get('range', 'today') # today, month, year, all
     
-    today = datetime.utcnow().date()
-    # Simple bounds for sqlite/postgres compatibility without complex timezone casting for now
-    start_of_day = datetime(today.year, today.month, today.day)
+    now = datetime.utcnow()
+    today_start = datetime(now.year, now.month, now.day)
     
-    orders_today = Order.query.filter(
-        Order.restaurant_id == restaurant_id,
-        Order.created_at >= start_of_day
-    ).all()
+    # Base query for this restaurant
+    base_query = Order.query.filter(Order.restaurant_id == restaurant_id)
+    
+    if timeframe == 'today':
+        start_date = today_start
+        orders = base_query.filter(Order.created_at >= start_date).all()
+        
+        # Hourly counts for today
+        hourly_counts = {str(i).zfill(2)+":00": 0 for i in range(0, 24)}
+        for o in orders:
+            hour_str = o.created_at.strftime("%H:00")
+            if hour_str in hourly_counts:
+                hourly_counts[hour_str] += 1
+        chart_data = [{"time": k, "orders": v} for k, v in hourly_counts.items()]
+        
+    elif timeframe == 'month':
+        # Last 30 days
+        start_date = today_start - timedelta(days=29)
+        orders = base_query.filter(Order.created_at >= start_date).all()
+        
+        # Daily counts for last 30 days
+        daily_counts = {}
+        for i in range(30):
+            d = (start_date + timedelta(days=i)).strftime("%b %d")
+            daily_counts[d] = 0
+            
+        for o in orders:
+            d_str = o.created_at.strftime("%b %d")
+            if d_str in daily_counts:
+                daily_counts[d_str] += 1
+        chart_data = [{"time": k, "orders": v} for k, v in daily_counts.items()]
+        
+    elif timeframe == 'year':
+        # Current year (last 12 months)
+        start_date = datetime(now.year, 1, 1)
+        orders = base_query.filter(Order.created_at >= start_date).all()
+        
+        # Monthly counts
+        months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+        monthly_counts = {m: 0 for m in months}
+        for o in orders:
+            m_str = o.created_at.strftime("%b")
+            if m_str in monthly_counts:
+                monthly_counts[m_str] += 1
+        chart_data = [{"time": k, "orders": v} for k, v in monthly_counts.items()]
+        
+    else: # all-time
+        orders = base_query.all()
+        # Yearly counts
+        yearly_counts = {}
+        for o in orders:
+            y_str = o.created_at.strftime("%Y")
+            yearly_counts[y_str] = yearly_counts.get(y_str, 0) + 1
+        
+        sorted_years = sorted(yearly_counts.keys())
+        chart_data = [{"time": y, "orders": yearly_counts[y]} for y in sorted_years]
 
-    total_revenue = sum(float(o.total_price) for o in orders_today if o.status in ['paid', 'served'])
-    completed_orders = len([o for o in orders_today if o.status in ['paid', 'served']])
-    active_orders = len([o for o in orders_today if o.status not in ['paid', 'served', 'cancelled']])
-
-    # Hourly orders for chart
-    hourly_counts = {str(i).zfill(2)+":00": 0 for i in range(10, 24)} # Example 10am to 11pm
-    for o in orders_today:
-        hour_str = o.created_at.strftime("%H:00")
-        if hour_str in hourly_counts:
-            hourly_counts[hour_str] += 1
-
-    chart_data = [{"time": k, "orders": v} for k, v in hourly_counts.items()]
+    # Overall stats for the selected timeframe
+    revenue = sum(float(o.total_price) for o in orders if o.status in ['paid', 'served'])
+    completed = len([o for o in orders if o.status in ['paid', 'served']])
+    
+    # Active is always 'current' (not restricted by timeframe range, but restricted to 'not finished')
+    active = base_query.filter(Order.status.notin_(['paid', 'served', 'cancelled'])).count()
 
     return jsonify({
-        "revenue": total_revenue,
-        "completed": completed_orders,
-        "active": active_orders,
-        "hourly_chart": chart_data
+        "revenue": revenue,
+        "completed": completed,
+        "active": active,
+        "chart_data": chart_data,
+        "timeframe": timeframe
     }), 200
 
 @owner_bp.route('/owner/menu', methods=['GET'])

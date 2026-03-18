@@ -8,18 +8,20 @@
   --color-customer-text: #1C1917;
   --color-customer-surface: #E8D5C4;
 
-  /* Chef Theme: Dark, Professional, High-Contrast */
-  --color-chef-bg: #09090B;
-  --color-chef-surface: #18181B;
+  /* Chef Theme: Light, Professional, High-Contrast */
+  --color-chef-bg: #F4F4F5;
+  --color-chef-surface: #FFFFFF;
+  --color-chef-text: #09090B;
+  --color-chef-accent: #F97316;
   --color-chef-accepted: #10B981;
   --color-chef-cooking: #F59E0B;
   --color-chef-ready: #3B82F6;
 
-  /* Owner Theme: Corporate, Sleek, Trustworthy */
-  --color-owner-bg: #0F172A;
+  /* Owner Theme: Light Corporate, Sleek, Trustworthy */
+  --color-owner-bg: #F1F5F9;
   --color-owner-accent: #6366F1;
-  --color-owner-surface: #1E293B;
-  --color-owner-text: #F8FAFC;
+  --color-owner-surface: #FFFFFF;
+  --color-owner-text: #0F172A;
 
   /* Global Accent */
   --color-primary: #C85C1A;
@@ -72,7 +74,7 @@
 
 .theme-chef {
   background-color: var(--color-chef-bg);
-  color: #FFFFFF;
+  color: var(--color-chef-text);
   font-family: var(--font-geist);
 }
 
