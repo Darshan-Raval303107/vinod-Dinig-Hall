@@ -1,6 +1,3 @@
-from gevent import monkey
-monkey.patch_all()
-
 from flask import Flask, jsonify
 from flask_cors import CORS
 from config import Config
@@ -17,10 +14,10 @@ def create_app(config_class=Config):
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"]
     }}, supports_credentials=True)
-    db.init_app(app)
+    db.init_app(app)    
     migrate.init_app(app, db)
     jwt.init_app(app)
-    socketio.init_app(app)
+    socketio.init_app(app,async_mode="threading")
 
     # Initialise structured JSON logging for payment events
     from utils.logger import get_payment_logger
