@@ -1,61 +1,134 @@
-from flask import Blueprint, request, jsonify
-from extensions import db
-from models import Order, Payment
+"""
+Payment routes — production Razorpay integration.
 
-payments_bp = Blueprint('payments_bp', __name__)
+Endpoints:
+    POST /payments/create-order   — Create a Razorpay order for an existing DB order
+    POST /payments/verify-payment — Verify Razorpay callback signature
+    POST /webhook/razorpay        — Receive & process Razorpay webhook events
+"""
+from flask import Blueprint, request, jsonify, current_app
+from services.payment_service import (
+    process_create_order,
+    process_verify_payment,
+    process_webhook_event,
+)
+from services.razorpay_service import verify_webhook_signature
+from utils.logger import get_payment_logger
 
-@payments_bp.route('/payments/create', methods=['POST'])
-def create_payment():
-    data = request.json
-    order_id = data.get('order_id')
+payments_bp = Blueprint("payments_bp", __name__)
+logger = get_payment_logger("dineflow.routes.payments")
 
-    order = Order.query.get(order_id)
-    if not order:
-        return jsonify(msg="Order not found"), 404
 
-    # Dummy Razorpay Order ID for Phase 2
-    mock_razorpay_order_id = f"order_mock_{str(order.id)[:8]}"
+# ── Consistent response helper ──────────────────────────────────────────────
 
-    # Check if pending payment exists
-    payment = Payment.query.filter_by(order_id=order.id).first()
-    if not payment:
-        payment = Payment(
-            order_id=order.id,
-            amount=order.total_price,
-            payment_method='razorpay',
-            status='pending',
-            razorpay_order_id=mock_razorpay_order_id
+def _respond(result):
+    """Unpack the (body, status_code) tuple returned by the service layer."""
+    body, status = result
+    return jsonify(body), status
+
+
+# ── 1. Create Order ─────────────────────────────────────────────────────────
+
+@payments_bp.route("/payments/create-order", methods=["POST"])
+def create_order():
+    """
+    Expects JSON: { "order_id": "<uuid>" }
+    Returns:       { razorpay_order_id, amount, amount_paise, currency, key_id, order_id }
+    """
+    data = request.get_json(silent=True) or {}
+    order_id = data.get("order_id")
+
+    if not order_id:
+        return jsonify({"success": False, "error": "order_id is required"}), 400
+
+    try:
+        result = process_create_order(order_id)
+        body, status = result
+
+        # Inject the public key_id so the frontend can initialise Razorpay Checkout
+        if body.get("success"):
+            body["key_id"] = current_app.config["RAZORPAY_KEY_ID"]
+
+        return jsonify(body), status
+
+    except Exception as e:
+        logger.error(
+            "create-order failed",
+            exc_info=True,
+            extra={"extra_data": {"order_id": order_id}},
         )
-        db.session.add(payment)
-        db.session.commit()
+        return jsonify({"success": False, "error": "Internal server error"}), 500
 
-    return jsonify({
-        'razorpay_order_id': payment.razorpay_order_id,
-        'amount': float(payment.amount),
-        'currency': 'INR'
-    }), 200
 
-@payments_bp.route('/payments/verify', methods=['POST'])
+# ── 2. Verify Payment ──────────────────────────────────────────────────────
+
+@payments_bp.route("/payments/verify-payment", methods=["POST"])
 def verify_payment():
-    data = request.json
-    razorpay_order_id = data.get('razorpay_order_id')
-    razorpay_payment_id = data.get('razorpay_payment_id')
-    razorpay_signature = data.get('razorpay_signature')
+    """
+    Expects JSON: {
+        "razorpay_order_id":   "order_...",
+        "razorpay_payment_id": "pay_...",
+        "razorpay_signature":  "<hmac>"
+    }
+    """
+    data = request.get_json(silent=True) or {}
 
-    payment = Payment.query.filter_by(razorpay_order_id=razorpay_order_id).first()
-    if not payment:
-        return jsonify(msg="Payment record not found"), 404
+    razorpay_order_id = data.get("razorpay_order_id")
+    razorpay_payment_id = data.get("razorpay_payment_id")
+    razorpay_signature = data.get("razorpay_signature")
 
-    # Mock signature verification
-    if razorpay_payment_id and razorpay_signature:
-        payment.status = 'success'
-        
-        # Update order status
-        order = Order.query.get(payment.order_id)
-        if order:
-            order.status = 'paid'
-            
-        db.session.commit()
-        return jsonify(msg="Payment verified successfully"), 200
-    
-    return jsonify(msg="Invalid payment details"), 400
+    if not all([razorpay_order_id, razorpay_payment_id, razorpay_signature]):
+        return jsonify({
+            "success": False,
+            "error": "razorpay_order_id, razorpay_payment_id, and razorpay_signature are required",
+        }), 400
+
+    try:
+        return _respond(process_verify_payment(
+            razorpay_order_id, razorpay_payment_id, razorpay_signature
+        ))
+    except Exception as e:
+        logger.error(
+            "verify-payment failed",
+            exc_info=True,
+            extra={"extra_data": {"razorpay_order_id": razorpay_order_id}},
+        )
+        return jsonify({"success": False, "error": "Internal server error"}), 500
+
+
+# ── 3. Razorpay Webhook ────────────────────────────────────────────────────
+
+@payments_bp.route("/webhook/razorpay", methods=["POST"])
+def razorpay_webhook():
+    """
+    Razorpay sends POST with JSON body + X-Razorpay-Signature header.
+    Configure this URL in Razorpay Dashboard → Webhooks:
+        https://yourdomain.com/api/webhook/razorpay
+    """
+    # Read raw body BEFORE parsing JSON (needed for signature check)
+    raw_body = request.get_data()
+    signature = request.headers.get("X-Razorpay-Signature", "")
+
+    # Validate webhook signature
+    if not signature or not verify_webhook_signature(raw_body, signature):
+        logger.warning(
+            "Webhook rejected — invalid signature",
+            extra={"extra_data": {"ip": request.remote_addr}},
+        )
+        return jsonify({"success": False, "error": "Invalid webhook signature"}), 400
+
+    # Parse payload
+    event_data = request.get_json(silent=True)
+    if not event_data:
+        return jsonify({"success": False, "error": "Empty payload"}), 400
+
+    try:
+        return _respond(process_webhook_event(event_data))
+    except Exception as e:
+        logger.error(
+            "Webhook processing failed",
+            exc_info=True,
+            extra={"extra_data": {"event": event_data.get("event")}},
+        )
+        # Return 200 so Razorpay doesn't endlessly retry on our bug
+        return jsonify({"success": True, "message": "Error logged, will retry internally"}), 200

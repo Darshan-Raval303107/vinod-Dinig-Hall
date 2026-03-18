@@ -65,6 +65,7 @@ class Order(db.Model):
     table_number = db.Column(db.Integer, nullable=False)
     status = db.Column(db.String(50), nullable=False, default='pending') # states: pending, accepted, cooking, ready, served, cancelled, paid
     total_price = db.Column(db.Numeric(10, 2), nullable=False, default=0.0)
+    razorpay_payment_id = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -86,6 +87,22 @@ class Payment(db.Model):
     id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
     order_id = db.Column(db.String(36), db.ForeignKey('orders.id'), nullable=False)
     amount = db.Column(db.Numeric(10, 2), nullable=False)
-    payment_method = db.Column(db.String(50), nullable=False) # razorpay/upi/cash
-    status = db.Column(db.String(50), nullable=False, default='pending') # pending/success/failed
-    razorpay_order_id = db.Column(db.String(255), nullable=True)
+    payment_method = db.Column(db.String(50), nullable=False, default='razorpay') # razorpay/upi/cash
+    method = db.Column(db.String(50), nullable=True) # upi/card/netbanking/wallet
+    status = db.Column(db.String(50), nullable=False, default='pending') # pending/authorized/captured/success/failed
+    razorpay_order_id = db.Column(db.String(255), nullable=True, unique=True)
+    razorpay_payment_id = db.Column(db.String(255), nullable=True, unique=True)
+    event_id = db.Column(db.String(255), nullable=True) # last webhook event_id for idempotency
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class WebhookEvent(db.Model):
+    """Tracks processed Razorpay webhook events for idempotency."""
+    __tablename__ = 'webhook_events'
+    id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
+    event_id = db.Column(db.String(255), unique=True, nullable=False)
+    event_type = db.Column(db.String(100), nullable=False)
+    processed = db.Column(db.Boolean, default=False)
+    payload = db.Column(db.Text, nullable=True) # raw JSON for debugging
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

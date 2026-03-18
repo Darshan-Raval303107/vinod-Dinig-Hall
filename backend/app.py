@@ -8,11 +8,32 @@ def create_app(config_class=Config):
     app = Flask(__name__, static_folder='static', static_url_path='/static')
     app.config.from_object(config_class)
 
-    CORS(app)
+    # Robust CORS for development and ngrok
+    CORS(app, resources={r"/api/*": {
+        "origins": "*",
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization", "X-Requested-With", "ngrok-skip-browser-warning"],
+        "supports_credentials": True
+    }})
+
+    # Middleware to automatically skip ngrok's browser warning page
+    @app.after_request
+    def add_ngrok_skip_header(response):
+        response.headers['ngrok-skip-browser-warning'] = '69420'
+        return response
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
     socketio.init_app(app)
+
+    # Initialise structured JSON logging for payment events
+    from utils.logger import get_payment_logger
+    get_payment_logger()
+
+    # Import all models so Flask-Migrate detects them
+    with app.app_context():
+        from models import (User, Restaurant, RestaurantTable, MenuCategory,
+                            MenuItem, Order, OrderItem, Payment, WebhookEvent)  # noqa: F401
 
     # Register Blueprints
     from routes.menu import menu_bp

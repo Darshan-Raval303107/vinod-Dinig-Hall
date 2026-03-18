@@ -12,3 +12,8 @@ class Config:
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-prod')
     JWT_ACCESS_TOKEN_EXPIRES = 86400 # 24 hours
     REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+
+    # Razorpay Payment Gateway
+    RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', '')
+    RAZORPAY_KEY_SECRET = os.environ.get('RAZORPAY_KEY_SECRET', '')
+    RAZORPAY_WEBHOOK_SECRET = os.environ.get('RAZORPAY_WEBHOOK_SECRET', '')
