@@ -33,11 +33,12 @@ const Payment = () => {
 
     // Mock settlement logic as previously requested
     setTimeout(async () => {
+        const mockSuffix = Math.random().toString(36).substring(7);
         try {
           await api.post('/payments/verify', {
             razorpay_order_id: paymentData.razorpay_order_id,
-            razorpay_payment_id: "pay_mock_direct",
-            razorpay_signature: "sig_mock_direct"
+            razorpay_payment_id: `pay_mock_${mockSuffix}`,
+            razorpay_signature: `sig_mock_${mockSuffix}`
           });
           setPaymentSuccess(true);
           setTimeout(() => {

@@ -1,3 +1,6 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, jsonify
 from flask_cors import CORS
 from config import Config
@@ -8,9 +11,9 @@ def create_app(config_class=Config):
     app = Flask(__name__, static_folder='static', static_url_path='/static')
     app.config.from_object(config_class)
 
-    # Robust CORS for development
+    # Robust CORS for development + Deployment
     CORS(app, resources={r"/*": {
-        "origins": ["http://localhost:5173", "http://127.0.0.1:5173", "http://10.241.84.246:5173"],
+        "origins": "*",
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"]
     }}, supports_credentials=True)
