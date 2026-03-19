@@ -2,33 +2,47 @@ from flask import Flask, jsonify
 from flask_cors import CORS
 from config import Config
 from extensions import db, migrate, jwt, socketio
+import os
+from dotenv import load_dotenv  # ← ADD THIS if not already
+
+# Load .env file early (very important for keys)
+load_dotenv()  # ← ADD THIS (place at top of file or here)
 
 def create_app(config_class=Config):
-    # Setup static folder explicitly to serve our QR codes
     app = Flask(__name__, static_folder='static', static_url_path='/static')
     app.config.from_object(config_class)
 
-    # Robust CORS for development + Deployment
+    # Force debug mode ON during development (critical!)
+    # This shows full tracebacks in browser + terminal
+    app.config['DEBUG'] = True                          # ← ADD / FORCE THIS
+    app.config['ENV'] = 'development'                   # ← ADD THIS too
+
+    # Even better: read from environment (safer for prod later)
+    # app.config['DEBUG'] = os.getenv('FLASK_DEBUG', '1') == '1'
+
+    # CORS – your current setup is fine, but add expose_headers if needed later
     CORS(app, resources={r"/*": {
         "origins": "*",
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-        "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"]
+        "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"],
+        "expose_headers": ["Content-Range", "X-Content-Range"]  # optional
     }}, supports_credentials=True)
-    db.init_app(app)    
+
+    db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    socketio.init_app(app,async_mode="threading")
+    socketio.init_app(app, async_mode="threading")
 
-    # Initialise structured JSON logging for payment events
+    # Logger – assuming it's ok
     from utils.logger import get_payment_logger
     get_payment_logger()
 
-    # Import all models so Flask-Migrate detects them
+    # Models import (inside context – good)
     with app.app_context():
         from models import (User, Restaurant, RestaurantTable, MenuCategory,
-                            MenuItem, Order, OrderItem, Payment, WebhookEvent)  # noqa: F401
+                            MenuItem, Order, OrderItem, Payment, WebhookEvent)
 
-    # Register Blueprints
+    # Blueprints – good
     from routes.menu import menu_bp
     from routes.orders import orders_bp
     from routes.payments import payments_bp
@@ -43,12 +57,42 @@ def create_app(config_class=Config):
     app.register_blueprint(chef_bp, url_prefix='/api')
     app.register_blueprint(owner_bp, url_prefix='/api')
 
+    # Health check – good
+
     @app.route('/health')
     def health_check():
         return jsonify({"status": "healthy"})
 
+    # ── VERY IMPORTANT: Global error handler for 500 ──────────────────────
+    # This will show real error messages even when DEBUG=False later
+    @app.errorhandler(Exception)
+    def handle_exception(e):
+        # Log the full traceback
+        app.logger.exception("Unhandled exception occurred")
+        
+        # Return meaningful JSON instead of generic HTML 500
+        response = {
+            "success": False,
+            "error": str(e),
+            "message": "Internal server error – check server logs for details"
+        }
+        if app.debug:
+            # In debug mode, also include traceback (for browser)
+            import traceback
+            response["traceback"] = traceback.format_exc()
+        
+        return jsonify(response), 500
+
     return app
+
 
 if __name__ == '__main__':
     app = create_app()
-    socketio.run(app, debug=True, host='0.0.0.0', port=5000)
+    
+    # Use socketio.run with debug=True + allow_unsafe_werkzeug if needed
+    # But better: run Flask normally in debug mode for development
+    # socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
+    
+    # Recommended for development: run with Flask's built-in server
+    app.run(debug=True, host='0.0.0.0', port=5000, use_reloader=True)
+    # ↑ This line is usually enough and shows errors better in terminal/browser

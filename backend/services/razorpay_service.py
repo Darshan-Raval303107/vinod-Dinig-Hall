@@ -1,113 +1,35 @@
 """
-Mock Razorpay SDK wrapper (Production-ready structure)
-
-Purpose:
-- Simulate Razorpay order creation without real API calls
-- Validate keys and inputs
-- Provide clean logging and error handling
-- Easy to replace with real Razorpay SDK later
+Real Razorpay SDK integration (Production-ready)
+Replaces the old mock version completely
 """
 
-import uuid
 import logging
+import hmac
+import hashlib
 from typing import Dict, Optional
 from flask import current_app
+import razorpay  # ← Official library - make sure pip install razorpay
 
-# Configure logger
-logger = logging.getLogger("razorpay_mock")
+logger = logging.getLogger("razorpay_real")
 logger.setLevel(logging.INFO)
 
 
-# ─────────────────────────────────────────────────────────────
-# Mock Razorpay Client
-# ─────────────────────────────────────────────────────────────
-
-class MockRazorpayClient:
+def get_client():
     """
-    A mock version of Razorpay client that mimics:
-    - order.create()
-    - utility.verify_payment_signature()
+    Returns real Razorpay client.
+    Raises error if keys are missing.
     """
-
-    def __init__(self, key_id: str, key_secret: str):
-        self.key_id = key_id
-        self.key_secret = key_secret
-
-        # Mimic Razorpay SDK structure
-        self.order = self
-        self.utility = self
-
-        # Validate keys
-        if not self.key_id:
-            logger.warning("⚠️ Razorpay KEY_ID is missing")
-
-        if not self.key_secret:
-            logger.warning("⚠️ Razorpay KEY_SECRET is missing")
-
-    # ── Order Creation ───────────────────────────────────────
-
-    def create(self, data: Dict) -> Dict:
-        """
-        Simulates Razorpay order.create()
-        """
-
-        amount = data.get("amount")
-
-        # Validate amount
-        if amount is None:
-            raise ValueError("Amount is required")
-
-        if not isinstance(amount, int):
-            raise TypeError("Amount must be integer (in paise)")
-
-        if amount <= 0:
-            raise ValueError("Amount must be greater than 0")
-
-        # Generate fake order
-        order = {
-            "id": f"order_{uuid.uuid4().hex[:14]}",
-            "amount": amount,
-            "currency": data.get("currency", "INR"),
-            "status": "created",
-            "receipt": data.get("receipt"),
-            "notes": data.get("notes", {})
-        }
-
-        logger.info(f"✅ Mock Order Created: {order['id']} | Amount: {amount}")
-        return order
-
-    # ── Signature Verification ───────────────────────────────
-
-    def verify_payment_signature(self, params: Dict) -> bool:
-        """
-        Simulates signature verification
-        """
-        logger.info("🔐 Mock signature verification successful")
-        return True
-
-
-# ─────────────────────────────────────────────────────────────
-# Helper: Get Client
-# ─────────────────────────────────────────────────────────────
-
-def get_client() -> MockRazorpayClient:
-    """
-    Fetch Razorpay keys from Flask config
-    and return mock client
-    """
-
     key_id = current_app.config.get("RAZORPAY_KEY_ID")
     key_secret = current_app.config.get("RAZORPAY_KEY_SECRET")
 
     if not key_id or not key_secret:
-        logger.error("❌ Razorpay keys not configured properly")
+        logger.error("RAZORPAY_KEY_ID or RAZORPAY_KEY_SECRET is missing in config")
+        raise RuntimeError("Razorpay keys are not configured properly")
 
-    return MockRazorpayClient(key_id, key_secret)
+    logger.info(f"Using Razorpay key: {key_id[:10]}...")
 
+    return razorpay.Client(auth=(key_id, key_secret))
 
-# ─────────────────────────────────────────────────────────────
-# Create Order (Main Function)
-# ─────────────────────────────────────────────────────────────
 
 def create_razorpay_order(
     amount_paise: int,
@@ -115,17 +37,9 @@ def create_razorpay_order(
     notes: Optional[Dict] = None
 ) -> Dict:
     """
-    Create a mock Razorpay order
-
-    Args:
-        amount_paise (int): Amount in paise (₹100 = 10000)
-        receipt (str): Unique receipt ID
-        notes (dict): Optional metadata
-
-    Returns:
-        dict: Mock Razorpay order
+    Creates a REAL Razorpay order.
+    Returns the order object from Razorpay API.
     """
-
     try:
         client = get_client()
 
@@ -133,24 +47,34 @@ def create_razorpay_order(
             "amount": amount_paise,
             "currency": "INR",
             "receipt": receipt,
-            "payment_capture": 1
+            "payment_capture": 1,  # auto-capture (recommended for most cases)
         }
 
         if notes:
             order_data["notes"] = notes
 
-        order = client.order.create(order_data)
+        rz_order = client.order.create(order_data)
 
-        return order
+        logger.info(f"Real Razorpay order created: {rz_order['id']} | Amount: ₹{amount_paise/100}")
 
+        # Return only what frontend needs (no qr_code, no payment_url)
+        return {
+            "id": rz_order["id"],
+            "amount": rz_order["amount"],
+            "amount_paid": rz_order.get("amount_paid", 0),
+            "amount_due": rz_order.get("amount_due", rz_order["amount"]),
+            "currency": rz_order["currency"],
+            "status": rz_order["status"],
+            "receipt": rz_order.get("receipt"),
+        }
+
+    except razorpay.errors.BadRequestError as e:
+        logger.error(f"Razorpay BadRequest: {e.error}")
+        raise RuntimeError(f"Razorpay error: {e.error.get('description', str(e))}")
     except Exception as e:
-        logger.exception("❌ Failed to create Razorpay order")
+        logger.exception("Failed to create Razorpay order")
         raise RuntimeError(f"Order creation failed: {str(e)}")
 
-
-# ─────────────────────────────────────────────────────────────
-# Payment Signature Verification
-# ─────────────────────────────────────────────────────────────
 
 def verify_payment_signature(
     razorpay_order_id: str,
@@ -158,39 +82,44 @@ def verify_payment_signature(
     razorpay_signature: str
 ) -> bool:
     """
-    Mock verification of payment signature
+    Verifies Razorpay payment signature using official method.
+    Returns True if valid, False otherwise.
     """
-
     try:
         client = get_client()
-
         params = {
             "razorpay_order_id": razorpay_order_id,
             "razorpay_payment_id": razorpay_payment_id,
             "razorpay_signature": razorpay_signature
         }
-
-        return client.utility.verify_payment_signature(params)
-
+        is_valid = client.utility.verify_payment_signature(params)
+        logger.info(f"Signature verification: {'VALID' if is_valid else 'INVALID'}")
+        return is_valid
     except Exception as e:
-        logger.exception("❌ Signature verification failed")
+        logger.exception("Signature verification failed")
         return False
 
 
-# ─────────────────────────────────────────────────────────────
-# Webhook Verification (Mock)
-# ─────────────────────────────────────────────────────────────
-
 def verify_webhook_signature(body: bytes, signature: str) -> bool:
     """
-    Mock webhook signature verification
+    Verifies Razorpay webhook signature using HMAC-SHA256.
+    Requires RAZORPAY_WEBHOOK_SECRET in config.
     """
+    webhook_secret = current_app.config.get("RAZORPAY_WEBHOOK_SECRET")
+    if not webhook_secret:
+        logger.warning("RAZORPAY_WEBHOOK_SECRET not set → webhook verification disabled")
+        return False
 
     try:
-        # Always true (mock)
-        logger.info("🔔 Webhook signature verified (mock)")
-        return True
+        expected = hmac.new(
+            webhook_secret.encode('utf-8'),
+            body,
+            hashlib.sha256
+        ).hexdigest()
 
+        is_valid = hmac.compare_digest(expected, signature)
+        logger.info(f"Webhook signature: {'VALID' if is_valid else 'INVALID'}")
+        return is_valid
     except Exception as e:
-        logger.exception("❌ Webhook verification failed")
+        logger.exception("Webhook signature verification error")
         return False

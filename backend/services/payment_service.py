@@ -1,10 +1,12 @@
 """
 Payment business-logic layer.
-Updated with robust logging and validation to debug 500 errors.
+Updated for REAL Razorpay integration (no mock, no QR code generation)
 """
+
 import json
 import logging
 from decimal import Decimal
+from flask import current_app
 from extensions import db
 from models import Order, Payment, WebhookEvent
 from services.razorpay_service import (
@@ -18,14 +20,12 @@ logger = logging.getLogger("dineflow.payment_service")
 # ── Helpers ─────────────────────────────────────────────────────────────────
 
 def _amount_to_paise(amount: Decimal) -> int:
-    """Convert a Decimal amount in ₹ to integer paise (Razorpay expects paise)."""
-    # 4. Validate Amount Format
     try:
         if amount is None or amount <= 0:
             return 0
         return int(amount * 100)
     except Exception as e:
-        logger.error(f"Error converting amount {amount} to paise: {str(e)}")
+        logger.error(f"Amount conversion error: {str(e)}")
         return 0
 
 
@@ -41,87 +41,84 @@ def _err(message: str, status: int = 400):
 
 def process_create_order(order_id: str):
     """
-    1. Fetch the order from the DB and compute total server-side.
-    2. If a pending Razorpay order already exists, return it (idempotent).
-    ...
+    Creates or reuses a Razorpay order for the given order_id.
+    Returns only the fields needed for Razorpay Checkout.js
     """
-    # 6. Debug Logging (Mandatory)
-    logger.info(f"Looking up order_id in DB: {order_id}")
-    
+    logger.info(f"Processing create order for order_id: {order_id}")
+
     try:
         order = Order.query.get(order_id)
         if not order:
-            logger.error(f"Order {order_id} not found in database")
-            return _err("Order not found in our database system", 404)
+            logger.error(f"Order not found: {order_id}")
+            return _err("Order not found in database", 404)
 
-        # Re-calculate total from line items (never trust frontend)
-        total = sum(
-            item.unit_price * item.quantity for item in order.items
-        )
-        logger.info(f"Order total: {total} for items: {len(order.items)}")
-        
-        # 4. Validate Amount Format
+        # Always recalculate total server-side
+        total = sum(item.unit_price * item.quantity for item in order.items)
+        logger.info(f"Calculated total: ₹{total} ({len(order.items)} items)")
+
         if total <= 0:
-            logger.error(f"Invalid total amount: {total}")
-            return _err("Order total must be greater than zero")
+            return _err("Order total must be greater than zero", 400)
 
         order.total_price = total
         amount_paise = _amount_to_paise(total)
-        logger.info(f"Computed amount_paise: {amount_paise}")
 
-        # Check for existing pending payment (idempotent re-creation)
+        # Check for existing pending payment (idempotency)
         existing = Payment.query.filter_by(order_id=order.id).first()
-        if existing and existing.razorpay_order_id and existing.status == "pending":
-            db.session.commit()  # save recalculated total
-            logger.info(f"Returning existing payment record: {existing.razorpay_order_id}")
+        if existing and existing.razorpay_order_id and existing.status in ("pending", "created"):
+            db.session.commit()
+            logger.info(f"Returning existing Razorpay order: {existing.razorpay_order_id}")
             return _ok({
                 "razorpay_order_id": existing.razorpay_order_id,
                 "amount": float(total),
                 "amount_paise": amount_paise,
                 "currency": "INR",
                 "order_id": order.id,
+                "razorpay_key_id": current_app.config.get("RAZORPAY_KEY_ID")
             })
 
-        # 7. Handle Razorpay API Errors (the service will raise)
-        logger.info(f"Calling Razorpay API (Mock) for amount {amount_paise}")
+        # Create new real Razorpay order
         rz_order = create_razorpay_order(
             amount_paise=amount_paise,
             receipt=order.id,
-            notes={"restaurant_id": str(order.restaurant_id), "table": order.table_number},
+            notes={
+                "restaurant_id": str(order.restaurant_id),
+                "table": order.table_number or "N/A",
+                "internal_order_id": order_id
+            }
         )
-        logger.info(f"Razorpay order result: {rz_order.get('id')} - {rz_order.get('status')}")
 
-        # 8. Persist payment record
+        # Save payment record
         if existing:
             existing.razorpay_order_id = rz_order["id"]
             existing.amount = total
-            existing.status = "pending"
+            existing.status = "created"
         else:
             payment = Payment(
                 order_id=order.id,
                 amount=total,
                 payment_method="razorpay",
-                status="pending",
+                status="created",
                 razorpay_order_id=rz_order["id"],
             )
             db.session.add(payment)
 
         db.session.commit()
-        logger.info(f"Payment record saved successfully in DB for order {order.id}")
+        logger.info(f"New payment record saved for order {order.id}")
 
-        # 8. Return Proper Response
+        # Return minimal data for frontend Checkout
         return _ok({
             "razorpay_order_id": rz_order["id"],
             "amount": float(total),
             "amount_paise": amount_paise,
             "currency": "INR",
             "order_id": order.id,
+            "razorpay_key_id": current_app.config.get("RAZORPAY_KEY_ID")
         })
-        
+
     except Exception as e:
-        logger.error(f"FATAL Exception in process_create_order: {str(e)}", exc_info=True)
-        # Re-raise to ensure the route handler logs the full traceback
-        raise e
+        db.session.rollback()
+        logger.exception(f"Critical error in process_create_order: {str(e)}")
+        raise
 
 
 # ── Verify Payment ──────────────────────────────────────────────────────────
@@ -131,48 +128,51 @@ def process_verify_payment(
     razorpay_payment_id: str,
     razorpay_signature: str,
 ):
-    """
-    Verify payment signature.
-    """
+    logger.info(f"Verifying payment {razorpay_payment_id} for order {razorpay_order_id}")
+
     try:
-        logger.info(f"Verifying payment {razorpay_payment_id} for order {razorpay_order_id}")
-        
         payment = Payment.query.filter_by(razorpay_order_id=razorpay_order_id).first()
         if not payment:
+            logger.warning(f"Payment record missing for razorpay_order_id: {razorpay_order_id}")
             return _err("Payment record not found", 404)
 
-        # Already verified — idempotent
-        if payment.status in ("success", "captured"):
-            return _ok({"message": "Payment already verified", "order_id": payment.order_id})
+        if payment.status in ("success", "captured", "paid"):
+            return _ok({
+                "message": "Payment already verified",
+                "order_id": payment.order_id
+            })
 
         is_valid = verify_payment_signature(
-            razorpay_order_id, razorpay_payment_id, razorpay_signature
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature
         )
 
         if not is_valid:
-            logger.warning("Payment signature verification failed")
-            return _err("Payment verification failed — invalid signature", 400)
+            logger.warning("Invalid payment signature")
+            return _err("Invalid payment signature", 400)
 
-        # Mark payment + order as paid
+        # Mark success
         payment.razorpay_payment_id = razorpay_payment_id
         payment.status = "success"
 
-        order = Order.query.get(payment.order_id)
-        if order:
-            order.status = "paid"
-            order.razorpay_payment_id = razorpay_payment_id
+        linked_order = Order.query.get(payment.order_id)
+        if linked_order:
+            linked_order.status = "paid"
+            linked_order.razorpay_payment_id = razorpay_payment_id
 
         db.session.commit()
-        logger.info(f"Payment verified successfully in DB: {payment.id}")
+        logger.info(f"Payment successfully verified: {payment.id}")
 
         return _ok({
             "message": "Payment verified successfully",
             "order_id": payment.order_id,
         })
-        
+
     except Exception as e:
-        logger.error(f"Error in process_verify_payment: {str(e)}", exc_info=True)
-        raise e
+        db.session.rollback()
+        logger.exception("Verification failed")
+        return _err(f"Verification failed: {str(e)}", 500)
 
 
 # ── Webhook Event Processing ───────────────────────────────────────────────
@@ -185,80 +185,77 @@ _STATUS_PRIORITY = {
     "failed": 3,
 }
 
-def _can_transition(current_status: str, new_status: str) -> bool:
-    cur = _STATUS_PRIORITY.get(current_status, -1)
-    nxt = _STATUS_PRIORITY.get(new_status, -1)
-    if new_status == "failed":
-        return current_status not in ("success", "captured")
+def _can_transition(current: str, new: str) -> bool:
+    cur = _STATUS_PRIORITY.get(current, -1)
+    nxt = _STATUS_PRIORITY.get(new, -1)
+    if new == "failed":
+        return current not in ("success", "captured")
     return nxt > cur
 
 
 def process_webhook_event(event_data: dict):
-    """
-    Handle validated Razorpay webhook.
-    """
     event_id = event_data.get("event_id") or event_data.get("id")
     event_type = event_data.get("event")
 
     if not event_id or not event_type:
         return _err("Invalid webhook payload")
 
-    existing_event = WebhookEvent.query.filter_by(event_id=event_id).first()
-    if existing_event and existing_event.processed:
+    existing = WebhookEvent.query.filter_by(event_id=event_id).first()
+    if existing and existing.processed:
         return _ok({"message": "Event already processed"})
 
-    if not existing_event:
-        existing_event = WebhookEvent(
+    if not existing:
+        existing = WebhookEvent(
             event_id=event_id,
             event_type=event_type,
             payload=json.dumps(event_data),
         )
-        db.session.add(existing_event)
+        db.session.add(existing)
 
     payload = event_data.get("payload", {})
     payment_entity = payload.get("payment", {}).get("entity", {})
     rz_order_id = payment_entity.get("order_id")
     rz_payment_id = payment_entity.get("id")
-    payment_method = payment_entity.get("method")
+    method = payment_entity.get("method")
 
     if not rz_order_id:
-        existing_event.processed = True
+        existing.processed = True
         db.session.commit()
-        return _ok({"message": "Event acknowledged (no order_id)"})
+        return _ok({"message": "No order_id in payload"})
 
     payment = Payment.query.filter_by(razorpay_order_id=rz_order_id).first()
     if not payment:
-        existing_event.processed = True
+        existing.processed = True
         db.session.commit()
-        return _ok({"message": "No matching payment record"})
+        return _ok({"message": "No matching payment found"})
 
     status_map = {
         "payment.authorized": "authorized",
         "payment.captured": "captured",
         "payment.failed": "failed",
     }
+
     new_status = status_map.get(event_type)
     if not new_status:
-        existing_event.processed = True
+        existing.processed = True
         db.session.commit()
-        return _ok({"message": f"Event type '{event_type}' acknowledged"})
+        return _ok({"message": f"Ignored event: {event_type}"})
 
     if _can_transition(payment.status, new_status):
-        payment.status = new_status if new_status != "captured" else "success"
+        payment.status = "success" if new_status == "captured" else new_status
         payment.razorpay_payment_id = rz_payment_id or payment.razorpay_payment_id
-        payment.method = payment_method or payment.method
+        payment.method = method or payment.method
         payment.event_id = event_id
 
         order = Order.query.get(payment.order_id)
         if order:
-            if new_status == "captured":
+            if new_status in ("captured", "success"):
                 order.status = "paid"
                 order.razorpay_payment_id = rz_payment_id
-            elif new_status == "failed":
-                if order.status not in ("paid",):
-                    order.status = "failed"
+            elif new_status == "failed" and order.status != "paid":
+                order.status = "failed"
 
-    existing_event.processed = True
+    existing.processed = True
     db.session.commit()
 
     return _ok({"message": "Webhook processed"})

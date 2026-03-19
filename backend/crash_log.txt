@@ -1,0 +1,22 @@
+Traceback (most recent call last):
+  File "C:\Users\Raval Darshan\Desktop\Vinnod_Dining Hall\backend\services\razorpay_service.py", line 43, in create_razorpay_order
+    client = get_client()
+  File "C:\Users\Raval Darshan\Desktop\Vinnod_Dining Hall\backend\services\razorpay_service.py", line 27, in get_client
+    return razorpay.Client(auth=(key_id, key_secret))
+           ^^^^^^^^
+NameError: name 'razorpay' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "C:\Users\Raval Darshan\Desktop\Vinnod_Dining Hall\backend\routes\payments.py", line 65, in create_order
+    result = process_create_order(order_id)
+  File "C:\Users\Raval Darshan\Desktop\Vinnod_Dining Hall\backend\services\payment_service.py", line 93, in process_create_order
+    rz_order = create_razorpay_order(
+        amount_paise=amount_paise,
+    ...<5 lines>...
+        },
+    )
+  File "C:\Users\Raval Darshan\Desktop\Vinnod_Dining Hall\backend\services\razorpay_service.py", line 61, in create_razorpay_order
+    raise RuntimeError(f"Order creation failed: {str(e)}")
+RuntimeError: Order creation failed: name 'razorpay' is not defined
