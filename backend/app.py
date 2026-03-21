@@ -1,5 +1,9 @@
 from flask import Flask, jsonify
 from flask_cors import CORS
+import logging
+
+# Set up basic logging for production visibility
+logging.basicConfig(level=logging.INFO)
 from config import Config
 from extensions import db, migrate, jwt, socketio
 import os
@@ -58,11 +62,24 @@ def create_app(config_class=Config):
     app.register_blueprint(chef_bp, url_prefix='/api')
     app.register_blueprint(owner_bp, url_prefix='/api')
 
-    # Health check – good
-
+    # ── UPDATED Health check ──────────────────────────────────────────────
     @app.route('/health')
     def health_check():
-        return jsonify({"status": "healthy"})
+        try:
+            # Check DB connection
+            from sqlalchemy import text
+            db.session.execute(text('SELECT 1'))
+            return jsonify({
+                "status": "healthy",
+                "database": "connected"
+            }), 200
+        except Exception as e:
+            app.logger.error(f"Health check failed: {str(e)}")
+            return jsonify({
+                "status": "unhealthy",
+                "database": "error",
+                "details": str(e) if app.debug else "Resource issue"
+            }), 500
 
     # ── VERY IMPORTANT: Global error handler for 500 ──────────────────────
     # This will show real error messages even when DEBUG=False later

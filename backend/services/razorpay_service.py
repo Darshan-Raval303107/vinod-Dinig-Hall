@@ -9,6 +9,7 @@ import hashlib
 from typing import Dict, Optional
 from flask import current_app
 import razorpay  # ← Official library - make sure pip install razorpay
+import requests
 
 logger = logging.getLogger("razorpay_real")
 logger.setLevel(logging.INFO)
@@ -28,7 +29,9 @@ def get_client():
 
     logger.info(f"Using Razorpay key: {key_id[:10]}...")
 
-    return razorpay.Client(auth=(key_id, key_secret))
+    client = razorpay.Client(auth=(key_id, key_secret))
+    client.set_app_details({"title": "DineFlow", "version": "1.0"})
+    return client
 
 
 def create_razorpay_order(
@@ -71,6 +74,9 @@ def create_razorpay_order(
     except razorpay.errors.BadRequestError as e:
         logger.error(f"Razorpay BadRequest: {e.error}")
         raise RuntimeError(f"Razorpay error: {e.error.get('description', str(e))}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Razorpay connection failed: {str(e)}")
+        raise RuntimeError(f"Razorpay connection failed: {str(e)}")
     except Exception as e:
         logger.exception("Failed to create Razorpay order")
         raise RuntimeError(f"Order creation failed: {str(e)}")
