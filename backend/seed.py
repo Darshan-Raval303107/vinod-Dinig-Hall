@@ -75,15 +75,25 @@ def seed_data():
         db.session.add_all([cat_starters, cat_mains, cat_drinks])
         db.session.commit()
 
-        items = [
-            MenuItem(category_id=cat_starters.id, name="Paneer Tikka",    description="Spicy grilled paneer cubes",   price=250.00, is_veg=True,  prep_time=15),
-            MenuItem(category_id=cat_starters.id, name="Chicken Wings",   description="BBQ chicken wings",            price=350.00, is_veg=False, prep_time=20),
-            MenuItem(category_id=cat_mains.id,    name="Butter Chicken",  description="Creamy tomato chicken curry",  price=450.00, is_veg=False, prep_time=25),
-            MenuItem(category_id=cat_mains.id,    name="Dal Makhani",     description="Slow-cooked black lentils",    price=300.00, is_veg=True,  prep_time=20),
-            MenuItem(category_id=cat_drinks.id,   name="Mango Lassi",     description="Sweet mango yogurt drink",     price=120.00, is_veg=True,  prep_time=5),
-            MenuItem(category_id=cat_drinks.id,   name="Fresh Lime Soda", description="Refreshing lime soda",         price=80.00,  is_veg=True,  prep_time=5),
+        items_starters = [
+            MenuItem(category_id=cat_starters.id, name="Paneer Tikka",    description="Spiced grilled cottage cheese",   price=250.00, is_veg=True,  prep_time=15, image_url="https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?auto=format&fit=crop&q=80&w=800"),
+            MenuItem(category_id=cat_starters.id, name="Chicken Wings",   description="Crispy BBQ glazed wings",            price=350.00, is_veg=False, prep_time=20, image_url="https://images.unsplash.com/photo-1527477396000-e27163b481c2?auto=format&fit=crop&q=80&w=800"),
+            MenuItem(category_id=cat_starters.id, name="Tandoori Broccoli", description="Charred florets in yogurt marinade", price=280.00, is_veg=True,  prep_time=12, image_url="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&q=80&w=800"),
         ]
-        db.session.add_all(items)
+        
+        items_mains = [
+            MenuItem(category_id=cat_mains.id,    name="Butter Chicken",  description="Velvety tomato cream curry",  price=450.00, is_veg=False, prep_time=25, image_url="https://images.unsplash.com/photo-1603894584373-5ac82b2ae398?auto=format&fit=crop&q=80&w=800"),
+            MenuItem(category_id=cat_mains.id,    name="Dal Makhani",     description="24-hour slow-cooked lentils",    price=300.00, is_veg=True,  prep_time=20, image_url="https://images.unsplash.com/photo-1585937421612-70a008356fbe?auto=format&fit=crop&q=80&w=800"),
+            MenuItem(category_id=cat_mains.id,    name="Veg Biryani",     description="Saffron infused basmati rice",   price=380.00, is_veg=True,  prep_time=25, image_url="https://images.unsplash.com/photo-1563379091339-03b21ab4a4f8?auto=format&fit=crop&q=80&w=800"),
+            MenuItem(category_id=cat_mains.id,    name="Garlic Naan",     description="Leavened clay oven bread",       price=60.00,  is_veg=True,  prep_time=8,  image_url="/images/garlic_naan.png"),
+        ]
+
+        items_drinks = [
+            MenuItem(category_id=cat_drinks.id,   name="Mango Lassi",     description="Alphonso mango yogurt blend",     price=120.00, is_veg=True,  prep_time=5,  image_url="/images/mango_lassi.png"),
+            MenuItem(category_id=cat_drinks.id,   name="Virgin Mojito",   description="Muddled lime and mint soda",         price=150.00, is_veg=True,  prep_time=5,  image_url="https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?auto=format&fit=crop&q=80&w=800"),
+        ]
+
+        db.session.add_all(items_starters + items_mains + items_drinks)
         db.session.commit()
 
         print("\n✅ Database seeded successfully!")

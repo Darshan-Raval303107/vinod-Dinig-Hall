@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { socket } from '../../api/socket';
-import { CheckCircle2, Clock, ChefHat, CheckSquare, CreditCard, ChevronRight, Activity, Bell, Info } from 'lucide-react';
+import { CheckCircle2, Clock, ChefHat, CheckSquare, CreditCard, ChevronRight, Activity, Bell, Info, ArrowLeft } from 'lucide-react';
 
 const STATUS_STEPS = [
   { id: 'pending', label: 'Order Registered', icon: Clock, desc: 'Kitchen node processing arrival' },
@@ -62,16 +62,30 @@ const OrderStatus = () => {
   const currentStepIndex = STATUS_STEPS.findIndex(s => s.id === order.status);
   
   return (
-    <div className="theme-customer min-h-screen font-jakarta bg-[#FBF7F0] flex flex-col pt-20 pb-36 px-8 animate-in fade-in duration-1000">
+    <div className="theme-customer min-h-screen font-jakarta bg-[#FBF7F0] flex flex-col pt-12 pb-40 px-6 animate-in fade-in duration-1000">
+      {/* Top Header with Back Button */}
+      <div className="flex items-center justify-between mb-8">
+        <button 
+          onClick={() => navigate('/menu?restaurant=spice-lounge&table=1')}
+          className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-customer-surface/20 text-customer-text/60 shadow-sm active:scale-95 transition-all"
+        >
+          <ArrowLeft size={18} />
+        </button>
+        <div className="flex flex-col items-end">
+          <span className="text-[8px] font-black text-customer-text/20 uppercase tracking-[0.3em]">Status Matrix</span>
+          <span className="text-[10px] font-bold text-customer-accent italic">v2.4.0 Live</span>
+        </div>
+      </div>
+
       {/* Visual Activity Tracker */}
-      <div className="flex flex-col items-center text-center mb-12">
+      <div className="flex flex-col items-center text-center mb-10">
         <div className="flex items-center gap-3 px-6 py-2.5 bg-white border border-customer-surface/30 rounded-full shadow-sm mb-6 relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-customer-accent/5 to-transparent translate-x-[-150%] animate-[shine_3s_infinite]"></div>
           <Activity size={16} className="text-customer-accent animate-pulse" />
           <span className="text-[10px] font-black text-customer-text/40 uppercase tracking-[0.3em]">Live Matrix Tracking</span>
         </div>
         
-        <h1 className="font-fraunces text-5xl font-black italic text-customer-text tracking-tighter leading-tight mb-2">Order Progress</h1>
+        <h1 className="font-fraunces text-5xl font-black italic text-customer-text tracking-tighter leading-tight mb-2 uppercase">Progress</h1>
         <div className="flex items-center gap-3 justify-center">
            <span className="text-[11px] font-black text-customer-text/30 uppercase tracking-[0.2em] italic underline underline-offset-4 decoration-customer-accent/20">Ref: #{order.order_id.substring(0,8).toUpperCase()}</span>
            <span className="text-xs font-bold text-customer-accent bg-customer-accent/5 px-3 py-1 rounded-lg">TABLE {order.table_number}</span>
@@ -79,9 +93,9 @@ const OrderStatus = () => {
       </div>
 
       {/* Modern High-End Vertical Timeline */}
-      <div className="bg-white rounded-[3rem] p-10 shadow-[0_40px_100px_-30px_rgba(0,0,0,0.06)] border border-customer-surface/20 relative mb-12 flex flex-col gap-10 overflow-hidden">
+      <div className="bg-white rounded-[3rem] p-8 md:p-10 shadow-[0_40px_100px_-30px_rgba(0,0,0,0.06)] border border-customer-surface/20 relative mb-10 flex flex-col gap-8 md:gap-10 overflow-hidden">
         {/* Glowing track line */}
-        <div className="absolute left-14 top-14 bottom-14 w-0.5 bg-customer-surface/20 -z-0">
+        <div className="absolute left-12 md:left-14 top-14 bottom-14 w-0.5 bg-customer-surface/20 -z-0">
           <div className="absolute top-0 left-0 w-full bg-customer-accent transition-all duration-[2000ms] shadow-[0_0_15px_rgba(200,92,26,0.3)]" style={{ height: `${(currentStepIndex / (STATUS_STEPS.length - 1)) * 100}%` }}></div>
         </div>
 
@@ -92,82 +106,123 @@ const OrderStatus = () => {
           const Icon = step.icon;
           
           return (
-            <div key={step.id} className="flex gap-8 relative z-10 transition-all duration-700 items-center">
-              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all duration-1000 border
+            <div key={step.id} className="flex gap-6 md:gap-8 relative z-10 transition-all duration-700 items-center">
+              <div className={`w-9 h-9 md:w-10 md:h-10 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all duration-1000 border
                 ${isCompleted ? 'bg-customer-accent text-white shadow-xl shadow-customer-accent/30 border-customer-accent' : 
                   isActive ? 'bg-white text-customer-accent border-customer-accent animate-[pulse_2s_infinite] shadow-lg' : 
                   'bg-[#FBF7F0] text-customer-text/20 border-customer-surface/30'}
               `}>
-                <Icon size={18} className={`${isCompleted ? 'animate-[bounce_1s_ease-out]' : ''}`} />
+                <Icon size={16} className={`${isCompleted ? 'animate-[bounce_1s_ease-out]' : ''}`} />
               </div>
 
               <div className={`flex flex-col gap-0.5 flex-1 transition-opacity duration-700 ${isFuture ? 'opacity-30' : 'opacity-100'}`}>
                 <div className="flex items-baseline justify-between overflow-hidden">
-                  <span className={`font-fraunces italic text-xl font-bold tracking-tight text-customer-text group-hover:text-customer-accent transition-colors`}>
+                  <span className={`font-fraunces italic text-lg md:text-xl font-bold tracking-tight text-customer-text transition-colors ${isActive ? 'text-customer-accent' : ''}`}>
                     {step.label}
                   </span>
                   {isActive && <div className="h-1 flex-1 bg-customer-accent/10 mx-4 border-b border-dashed border-customer-accent/30 hidden sm:block"></div>}
                   {isCompleted && !isActive && <div className="w-5 h-5 bg-emerald-500 rounded-full flex items-center justify-center text-white scale-75 animate-in zoom-in-50"><CheckCircle2 size={12} /></div>}
                 </div>
-                <p className="text-[10px] font-bold text-customer-text/30 uppercase tracking-widest">{step.desc}</p>
+                <p className="text-[9px] md:text-[10px] font-bold text-customer-text/30 uppercase tracking-widest">{step.desc}</p>
               </div>
             </div>
           );
         })}
       </div>
 
+      {/* Order Summary Section */}
+      <div className="mb-12">
+        <div className="flex items-center gap-3 mb-6">
+           <div className="w-8 h-[1.5px] bg-customer-accent/30"></div>
+           <h3 className="text-[10px] font-black text-customer-text/30 uppercase tracking-[0.3em] font-syne">Curations in Progress</h3>
+        </div>
+        
+        <div className="grid grid-cols-1 gap-3">
+          {order.items?.map((item, idx) => (
+            <div key={idx} className="flex items-center justify-between p-4 bg-white/60 border border-white rounded-2xl shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className={`w-1.5 h-1.5 rounded-full ${item.is_veg ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
+                <span className="text-xs font-bold text-customer-text uppercase tracking-tight">{item.name}</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[9px] font-black text-customer-text/20 uppercase tracking-widest leading-none">Qty.</span>
+                <span className="font-fraunces italic font-bold text-customer-accent">{item.quantity}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
       {/* Info Card Overlay */}
-      <div className="p-8 bg-white border border-customer-surface/40 rounded-[2.5rem] shadow-sm flex items-start gap-4 mb-20">
-         <div className="w-12 h-12 bg-customer-accent/5 rounded-2xl flex items-center justify-center flex-shrink-0 text-customer-accent">
-            <Info size={24} />
+      <div className="p-6 md:p-8 bg-white border border-customer-surface/40 rounded-[2.5rem] shadow-sm flex items-start gap-4 mb-20 relative overflow-hidden group">
+         <div className="absolute top-0 right-0 w-32 h-32 bg-customer-accent/5 rounded-full blur-3xl -mr-10 -mt-10"></div>
+         <div className="w-10 h-10 md:w-12 md:h-12 bg-customer-accent/5 rounded-2xl flex items-center justify-center flex-shrink-0 text-customer-accent relative z-10">
+            <Info size={20} />
          </div>
-         <div className="flex-1">
-            <h4 className="text-sm font-bold text-customer-text italic font-fraunces mb-1">Quality Guaranteed</h4>
-            <p className="text-[10px] text-customer-text/40 font-medium uppercase tracking-widest leading-relaxed">
-               Each dish undergoes final inspection before release. Expected prep latency: 15-20 min.
+         <div className="flex-1 relative z-10">
+            <h4 className="text-sm font-bold text-customer-text italic font-fraunces mb-1">Ritual Protocol</h4>
+            <p className="text-[9px] md:text-[10px] text-customer-text/40 font-medium uppercase tracking-widest leading-relaxed">
+               Crafting perfection takes time. Your selection is currently being handled by our elite kitchen squad.
             </p>
          </div>
       </div>
 
       {/* Floating Dynamic Bottom Action Bar */}
-      <div className="fixed bottom-10 left-0 right-0 px-8 z-50 animate-in slide-in-from-bottom-10 duration-1000 delay-500">
+      <div className="fixed bottom-10 left-0 right-0 px-6 z-50 animate-in slide-in-from-bottom-10 duration-1000 delay-500">
         <div className="max-w-md mx-auto">
-          {order.status === 'served' ? (
+          {order.status === 'paid' ? (
             <button 
-              onClick={() => navigate(`/payment/${orderId}`)}
-              className="group relative w-full h-20 bg-customer-text text-white rounded-[2.5rem] shadow-[0_40px_80px_-20px_rgba(31,31,31,0.6)] flex items-center justify-between px-3 overflow-hidden transition-all active:scale-[0.98] border border-white/5"
+              onClick={() => navigate(`/bill/${orderId}`)}
+              className="w-full h-20 bg-emerald-600/10 border-2 border-emerald-500/20 text-emerald-600 rounded-[2.5rem] flex items-center justify-between gap-4 px-8 shadow-2xl backdrop-blur-md active:scale-95 transition-all group"
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
-              
-              <div className="h-14 bg-customer-accent rounded-[2rem] px-8 flex items-center gap-3 shadow-[0_8px_25px_rgba(200,92,26,0.3)]">
-                <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center animate-bounce">
-                  <CreditCard size={14} />
-                </div>
-                <span className="text-xs font-black uppercase tracking-[0.2em] italic">Final Settlement</span>
-              </div>
-
-              <div className="flex items-center gap-2 font-fraunces italic text-xl pr-6 transition-all group-hover:translate-x-1">
-                ₹{order.total_price.toFixed(0)} <ChevronRight size={22} />
-              </div>
-            </button>
-          ) : order.status === 'paid' ? (
-            <div className="w-full h-20 bg-emerald-600/10 border-2 border-emerald-500/20 text-emerald-600 rounded-[2.5rem] flex items-center justify-center gap-4 px-8 shadow-2xl backdrop-blur-md">
-               <CheckCircle2 size={24} className="animate-in spring-300" />
-               <div className="flex flex-col">
-                  <span className="text-xs font-black uppercase tracking-widest leading-none">Transaction Validated</span>
-                  <span className="text-[9px] font-bold text-emerald-600/40 uppercase tracking-widest mt-1">Visit finalized. Thank you.</span>
+               <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+                     <CheckCircle2 size={24} />
+                  </div>
+                  <div className="flex flex-col items-start text-left">
+                     <span className="text-xs font-black uppercase tracking-widest leading-none">Status Finalized</span>
+                     <span className="text-[9px] font-bold text-emerald-600/60 uppercase tracking-widest mt-1">Transaction Node Verified</span>
+                  </div>
                </div>
-            </div>
+               <div className="flex items-center gap-2 font-fraunces italic text-lg pr-2 group-hover:translate-x-1 transition-transform">
+                  VIEW INVOICE <ChevronRight size={20} />
+               </div>
+            </button>
           ) : (
-             <div className="w-full h-20 bg-white border border-customer-surface/30 rounded-[2.5rem] flex items-center justify-between px-3 shadow-2xl shadow-indigo-500/5">
-                <div className="h-14 bg-[#FBF7F0] border border-customer-surface/20 rounded-[2rem] px-8 flex items-center gap-4">
-                   <div className="w-2 h-2 rounded-full bg-customer-accent animate-ping"></div>
-                   <span className="text-[10px] font-black uppercase tracking-[0.3em] text-customer-text/40 italic">Live Feed Connected</span>
+            <div className="flex flex-col gap-4">
+              {/* Optional: Add "Pay Early" message if status is not served */}
+              {order.status !== 'served' && (
+                <div className="flex justify-center">
+                   <button 
+                     onClick={() => navigate(`/payment/${orderId}`)}
+                     className="text-[9px] font-black text-customer-accent uppercase tracking-[0.2em] italic hover:underline underline-offset-4 opacity-60 hover:opacity-100 transition-all mb-1"
+                   >
+                     Skip queue & Settle Bill Now? 
+                   </button>
                 </div>
-                <div className="pr-10 text-[10px] font-black uppercase tracking-widest text-customer-accent animate-pulse">
-                   Tracking Live...
+              )}
+              
+              <button 
+                onClick={() => navigate(`/payment/${orderId}`)}
+                className={`group relative w-full h-20 rounded-[2.5rem] shadow-[0_40px_80px_-20px_rgba(31,31,31,0.2)] flex items-center justify-between px-3 overflow-hidden transition-all active:scale-[0.98] border border-white/5 
+                  ${order.status === 'served' ? 'bg-customer-text text-white' : 'bg-white border-customer-surface/30'}`}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                
+                <div className={`h-14 rounded-[2rem] px-8 flex items-center gap-3 transition-all ${order.status === 'served' ? 'bg-customer-accent shadow-[0_8px_25px_rgba(200,92,26,0.3)]' : 'bg-[#FBF7F0] border border-customer-surface/10'}`}>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${order.status === 'served' ? 'bg-white/20 animate-bounce text-white' : 'bg-customer-accent/10 text-customer-accent'}`}>
+                    <CreditCard size={14} />
+                  </div>
+                  <span className={`text-[10px] font-black uppercase tracking-[0.2em] italic ${order.status === 'served' ? 'text-white' : 'text-customer-text/40'}`}>
+                    {order.status === 'served' ? 'Final Settlement' : 'Pay Advance'}
+                  </span>
                 </div>
-             </div>
+
+                <div className={`flex items-center gap-2 font-fraunces italic text-xl pr-6 transition-all group-hover:translate-x-1 ${order.status === 'served' ? 'text-white' : 'text-customer-text'}`}>
+                  ₹{order.total_price.toFixed(0)} <ChevronRight size={22} className={order.status === 'served' ? 'text-white' : 'text-customer-accent'} />
+                </div>
+              </button>
+            </div>
           )}
         </div>
       </div>

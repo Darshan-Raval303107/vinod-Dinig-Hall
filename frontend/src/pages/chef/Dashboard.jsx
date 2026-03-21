@@ -13,7 +13,6 @@ const ChefDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [currentTime, setCurrentTime] = useState(new Date());
-  const [activeTab, setActiveTab] = useState('pending'); // 'pending', 'active', 'ready'
 
   const fetchOrders = () => {
     api.get('/chef/orders')
@@ -81,93 +80,100 @@ const ChefDashboard = () => {
   const readyOrders   = activeOrders.filter(o => o.status === 'ready');
 
   return (
-    <div className="theme-chef min-h-screen bg-white flex flex-col font-jakarta selection:bg-slate-900 selection:text-white pb-32">
+    <div className="theme-chef min-h-screen bg-[#F8FAFC] flex flex-col font-jakarta selection:bg-slate-900 selection:text-white pb-10">
       
-      {/* MOBILE HEADER - Optimized for Kitchen Workflow */}
-      <header className="sticky top-0 z-[100] bg-white/80 backdrop-blur-3xl border-b border-zinc-100 px-6 py-6"
-              style={{ paddingTop: 'calc(var(--safe-top) + 1.5rem)' }}>
-        <div className="flex justify-between items-center mb-6">
-          <div className="flex items-center gap-3">
-             <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white shadow-lg">
-                <ChefHat size={20} />
-             </div>
-             <div>
-                <h1 className="font-syne text-xl font-black italic tracking-tighter text-slate-900 leading-none">ALPHA KITCHEN</h1>
-                <p className="text-[9px] font-black text-zinc-300 uppercase tracking-widest mt-1.5 flex items-center gap-1.5 leading-none italic">
-                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> {user?.name.toUpperCase()} / LIVE
-                </p>
-             </div>
-          </div>
-
-          <button onClick={handleLogout} className="w-10 h-10 flex items-center justify-center rounded-xl bg-red-50 text-red-500 border border-red-100 active:scale-95 transition-all">
-             <LogOut size={18} />
-          </button>
+      {/* HEADER - Sticky & Minimal */}
+      <header className="sticky top-0 z-[100] bg-white/80 backdrop-blur-3xl border-b border-zinc-100 px-8 py-6 flex justify-between items-center">
+        <div className="flex items-center gap-4">
+           <div className="w-12 h-12 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-xl">
+              <ChefHat size={24} />
+           </div>
+           <div>
+              <h1 className="font-syne text-2xl font-black italic tracking-tighter text-slate-900 leading-none">ALPHA KITCHEN</h1>
+              <p className="text-[10px] font-black text-zinc-300 uppercase tracking-widest mt-2 flex items-center gap-2 leading-none italic">
+                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> {user?.name.toUpperCase()} / SESSION MASTER
+              </p>
+           </div>
         </div>
 
-        {/* QUICK STATS - Horizontal Scroll */}
-        <div className="flex overflow-x-auto hide-scrollbar gap-3 pb-2 -mx-2 px-2">
-           <TabButton 
-             id="pending" 
-             label="Pending" 
-             count={pendingOrders.length} 
-             active={activeTab === 'pending'} 
-             onClick={setActiveTab} 
-             icon={<Bell size={14} />}
-           />
-           <TabButton 
-             id="active" 
-             label="Cooking" 
-             count={cookingOrders.length} 
-             active={activeTab === 'active'} 
-             onClick={setActiveTab}
-             icon={<Timer size={14} />}
-             isAlert={cookingOrders.length > 5}
-           />
-           <TabButton 
-             id="ready" 
-             label="Ready" 
-             count={readyOrders.length} 
-             active={activeTab === 'ready'} 
-             onClick={setActiveTab}
-             icon={<Coffee size={14} />}
-           />
+        <div className="flex items-center gap-8">
+           <div className="hidden md:flex flex-col items-end">
+              <div className="flex items-center gap-2 text-[11px] font-black text-slate-900 uppercase tracking-widest italic">
+                 <Clock size={14} strokeWidth={3} />
+                 {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
+              </div>
+              <span className="text-[9px] font-bold text-zinc-300 uppercase tracking-[0.2em] mt-1">Matrix Time</span>
+           </div>
+           <button onClick={handleLogout} className="flex items-center gap-3 px-6 py-3 rounded-xl bg-red-50 text-red-500 border border-red-100 font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all">
+              <LogOut size={16} /> LOGOUT
+           </button>
         </div>
       </header>
 
-      {/* ORDERS LIST CONTAINER */}
-      <main className="px-6 mt-8 animate-in fade-in duration-500">
-         <div className="flex items-center justify-between mb-8">
-            <h2 className="font-fraunces text-2xl font-black italic text-slate-900 capitalize">
-               {activeTab} Queue
-            </h2>
-            <div className="flex items-center gap-2 text-[10px] font-black text-zinc-300 uppercase tracking-widest italic leading-none">
-               <Clock size={12} strokeWidth={3} />
-               {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
-            </div>
-         </div>
+      {/* HORIZONTAL KANBAN BOARD */}
+      <main className="flex-1 px-8 py-10 overflow-x-auto">
+        <div className="flex gap-8 h-full min-w-[1200px] animate-in fade-in duration-700">
+           
+           {/* PENDING COLUMN */}
+           <div className="flex-1 flex flex-col min-w-[380px]">
+              <div className="flex items-center justify-between mb-8 px-2">
+                 <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center text-orange-500">
+                       <Bell size={18} />
+                    </div>
+                    <h2 className="font-fraunces text-2xl font-black italic text-slate-900">Pending</h2>
+                 </div>
+                 <span className="px-3 py-1 bg-white border border-zinc-100 rounded-full text-[10px] font-black text-zinc-400">{pendingOrders.length}</span>
+              </div>
+              <div className="flex-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+                 {pendingOrders.length > 0 ? (
+                    pendingOrders.map(order => <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />)
+                 ) : <EmptyState icon={<Bell size={48} />} text="Queue Clear" />}
+              </div>
+           </div>
 
-         <div className="space-y-6">
-            {activeTab === 'pending' && (
-               pendingOrders.length > 0 ? (
-                  pendingOrders.map(order => <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />)
-               ) : <EmptyState icon={<Bell size={48} />} text="No Incoming Orders" />
-            )}
-            {activeTab === 'active' && (
-               cookingOrders.length > 0 ? (
-                  cookingOrders.map(order => <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />)
-               ) : <EmptyState icon={<Timer size={48} />} text="Stations Are Clear" />
-            )}
-            {activeTab === 'ready' && (
-               readyOrders.length > 0 ? (
-                  readyOrders.map(order => <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />)
-               ) : <EmptyState icon={<Coffee size={48} />} text="No Orders Ready" />
-            )}
-         </div>
+           {/* COOKING COLUMN */}
+           <div className="flex-1 flex flex-col min-w-[380px]">
+              <div className="flex items-center justify-between mb-8 px-2">
+                 <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-500">
+                       <Timer size={18} />
+                    </div>
+                    <h2 className="font-fraunces text-2xl font-black italic text-slate-900">Active Prep</h2>
+                 </div>
+                 <span className="px-3 py-1 bg-white border border-zinc-100 rounded-full text-[10px] font-black text-zinc-400">{cookingOrders.length}</span>
+              </div>
+              <div className="flex-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+                 {cookingOrders.length > 0 ? (
+                    cookingOrders.map(order => <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />)
+                 ) : <EmptyState icon={<Timer size={48} />} text="Stations Cold" />}
+              </div>
+           </div>
+
+           {/* READY COLUMN */}
+           <div className="flex-1 flex flex-col min-w-[380px]">
+              <div className="flex items-center justify-between mb-8 px-2">
+                 <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-sky-500/10 flex items-center justify-center text-sky-500">
+                       <Coffee size={18} />
+                    </div>
+                    <h2 className="font-fraunces text-2xl font-black italic text-slate-900">Dispatched</h2>
+                 </div>
+                 <span className="px-3 py-1 bg-white border border-zinc-100 rounded-full text-[10px] font-black text-zinc-400">{readyOrders.length}</span>
+              </div>
+              <div className="flex-1 space-y-6 overflow-y-auto pr-2 custom-scrollbar">
+                 {readyOrders.length > 0 ? (
+                    readyOrders.map(order => <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />)
+                 ) : <EmptyState icon={<Coffee size={48} />} text="Wait-Station Empty" />}
+              </div>
+           </div>
+
+        </div>
       </main>
 
       {/* ERROR CONSOLE */}
       {error && (
-        <div className="fixed bottom-[calc(var(--safe-bottom)+2rem)] left-6 right-6 p-4 rounded-2xl bg-red-600 text-white shadow-2xl z-[200] border border-white/20 animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-10 left-10 right-10 p-4 rounded-2xl bg-red-600 text-white shadow-2xl z-[200] border border-white/20 animate-in slide-in-from-bottom-5">
           <div className="flex items-center gap-3">
              <AlertCircle size={18} />
              <span className="text-[10px] font-black uppercase tracking-widest italic">{error}</span>
@@ -178,26 +184,6 @@ const ChefDashboard = () => {
   );
 };
 
-const TabButton = ({ id, label, count, active, onClick, icon, isAlert }) => (
-  <button 
-    onClick={() => onClick(id)}
-    className={`flex items-center gap-3 px-6 py-4 rounded-2xl border transition-all shrink-0 active:scale-95 ${
-      active 
-      ? 'bg-slate-900 border-slate-900 text-white shadow-xl -translate-y-1' 
-      : 'bg-zinc-50 border-zinc-100 text-zinc-400'
-    }`}
-  >
-    <div className={`${active ? 'text-white' : 'text-zinc-300'} ${isAlert && !active ? 'text-orange-500 animate-pulse' : ''}`}>
-       {icon}
-    </div>
-    <span className="text-[10px] font-black uppercase tracking-widest italic">{label}</span>
-    <span className={`w-6 h-6 rounded-lg flex items-center justify-center text-[10px] font-black ${
-      active ? 'bg-white/10 text-white' : 'bg-zinc-100 text-zinc-400'
-    }`}>
-      {count}
-    </span>
-  </button>
-);
 
 const EmptyState = ({ icon, text }) => (
   <div className="py-24 flex flex-col items-center justify-center opacity-10 border-2 border-dashed border-slate-900 rounded-[3rem]">

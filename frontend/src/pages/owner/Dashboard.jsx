@@ -1,10 +1,25 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { useAuthStore } from '../../store';
-import { LayoutDashboard, LogOut, UtensilsCrossed, QrCode, Users, Settings, Bell, Search, Globe, ChevronRight, Menu as MenuIcon, X } from 'lucide-react';
+import { 
+  LayoutDashboard, 
+  LogOut, 
+  UtensilsCrossed, 
+  QrCode, 
+  Users, 
+  Settings, 
+  Bell, 
+  Search, 
+  Globe, 
+  ChevronRight, 
+  Menu as MenuIcon, 
+  X,
+  FileText 
+} from 'lucide-react';
 import AnalyticsView from './AnalyticsView';
 import MenuManagerView from './MenuManagerView';
 import TablesManagerView from './TablesManagerView';
+import OrderHistoryView from './OrderHistoryView';
 import SettingsView from './SettingsView';
 
 const OwnerDashboard = () => {
@@ -20,6 +35,7 @@ const OwnerDashboard = () => {
 
   const navItems = [
     { path: '/owner/dashboard', label: 'Pulse', icon: LayoutDashboard },
+    { path: '/owner/dashboard/orders', label: 'Ledger', icon: FileText },
     { path: '/owner/dashboard/menu', label: 'Cuisine', icon: UtensilsCrossed },
     { path: '/owner/dashboard/tables', label: 'Network', icon: QrCode },
     { path: '/owner/dashboard/settings', label: 'Config', icon: Settings },
@@ -159,6 +175,7 @@ const OwnerDashboard = () => {
           <div className="max-w-7xl mx-auto">
             <Routes>
               <Route path="/" element={<AnalyticsView />} />
+              <Route path="/orders" element={<OrderHistoryView />} />
               <Route path="/menu" element={<MenuManagerView />} />
               <Route path="/tables" element={<TablesManagerView />} />
               <Route path="/staff" element={<div className="p-12 text-zinc-300 uppercase font-black tracking-[0.3em] text-center border-2 border-dashed border-zinc-100 rounded-[3rem] italic animate-pulse">Staff Matrix Coming Soon</div>} />

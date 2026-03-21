@@ -93,7 +93,7 @@ const Payment = () => {
 
             setPaymentSuccess(true);
             setTimeout(() => {
-              navigate(`/order-status/${orderId}`);
+              navigate(`/bill/${orderId}`);
             }, 2500);
           } catch (verifyErr) {
             setError(

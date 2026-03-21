@@ -26,8 +26,8 @@ const Cart = () => {
 
       const res = await api.post('/orders', payload);
       clearCart();
-      // Razorpay intent readiness: We go to Payment page immediately
-      navigate(`/payment/${res.data.order_id}`);
+      // Show progress first as requested
+      navigate(`/order-status/${res.data.order_id}`);
     } catch (err) {
       setError(err.response?.data?.msg || 'System constraint: Order creation failed.');
       setIsSubmitting(false);

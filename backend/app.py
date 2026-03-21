@@ -12,17 +12,17 @@ def create_app(config_class=Config):
     app = Flask(__name__, static_folder='static', static_url_path='/static')
     app.config.from_object(config_class)
 
-    # Force debug mode ON during development (critical!)
-    # This shows full tracebacks in browser + terminal
-    app.config['DEBUG'] = True                          # ← ADD / FORCE THIS
-    app.config['ENV'] = 'development'                   # ← ADD THIS too
+    # Set debug and env from environment variables
+    app.config['DEBUG'] = os.getenv('FLASK_DEBUG', '0') == '1'
+    app.config['ENV'] = os.getenv('FLASK_ENV', 'production')
 
     # Even better: read from environment (safer for prod later)
     # app.config['DEBUG'] = os.getenv('FLASK_DEBUG', '1') == '1'
 
     # CORS – your current setup is fine, but add expose_headers if needed later
+    allowed_origins = os.getenv('ALLOWED_ORIGINS', '*').split(',')
     CORS(app, resources={r"/*": {
-        "origins": "*",
+        "origins": allowed_origins,
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"],
         "expose_headers": ["Content-Range", "X-Content-Range"]  # optional
@@ -86,13 +86,13 @@ def create_app(config_class=Config):
     return app
 
 
+# Instantiate the app for Gunicorn
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
+    # Use socketio.run for development if needed
+    # socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
     
-    # Use socketio.run with debug=True + allow_unsafe_werkzeug if needed
-    # But better: run Flask normally in debug mode for development
-    # socketio.run(app, debug=True, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
-    
-    # Recommended for development: run with Flask's built-in server
-    app.run(debug=True, host='0.0.0.0', port=5000, use_reloader=True)
-    # ↑ This line is usually enough and shows errors better in terminal/browser
+    # Run with Flask's built-in server for local development
+    port = int(os.getenv('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)

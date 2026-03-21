@@ -196,53 +196,96 @@ export default function Landing() {
           </div>
         </section>
 
-        {/* ── Experience Section ── */}
-        <section id="experience" className="py-32 px-6 md:px-12 bg-[#FBF9F7]">
-            <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-24 items-center">
-                <div className="stagger-reveal">
-                    <h2 className="font-fraunces text-5xl md:text-7xl font-black tracking-tighter mb-10 text-[#1C1917] leading-none">
-                        Intentional <br/><span className="italic text-[#C85C1A]">Sanctuary.</span>
-                    </h2>
-                    <p className="text-[#1C1917]/70 leading-relaxed max-w-lg mb-12">
-                        Our architecture celebrates the ritual of the meal. Using organic materials, 
-                        ambient acoustics, and a digital ordering flow designed to disappear.
-                    </p>
-                    <div className="grid grid-cols-2 gap-12 border-t border-[#1C1917]/10 pt-12">
-                        <div>
-                            <div className="font-fraunces text-4xl font-black italic text-[#C85C1A] mb-2">100%</div>
-                            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1C1917]/50">Organic Spices</div>
-                        </div>
-                        <div>
-                            <div className="font-fraunces text-4xl font-black italic text-[#1C1917] mb-2">12ms</div>
-                            <div className="text-[10px] font-bold uppercase tracking-[0.2em] text-[#1C1917]/50">Kitchen Latency</div>
-                        </div>
-                    </div>
-                </div>
-                
-                {/* Stats / Interactive Card */}
-                <div className="bg-[#1C1917] text-[#FBF9F7] rounded-[2rem] p-10 md:p-16 relative overflow-hidden stagger-reveal interactive-element">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-[#C85C1A] blur-[100px] opacity-20 rounded-full translate-x-1/2 -translate-y-1/2"></div>
-                    <div className="flex items-center gap-3 mb-16 relative z-10">
-                        <div className="w-2 h-2 rounded-full bg-[#C85C1A] animate-pulse"></div>
-                        <span className="text-[10px] uppercase tracking-[0.3em] font-bold">Live Protocol</span>
-                    </div>
-                    
-                    <div className="space-y-8 relative z-10">
-                        <div className="flex justify-between items-end border-b border-[#FBF9F7]/10 pb-4">
-                            <span className="text-xs font-black uppercase tracking-widest text-[#FBF9F7]/50">Head Chef</span>
-                            <span className="font-fraunces italic text-2xl">Gordon</span>
-                        </div>
-                        <div className="flex justify-between items-end border-b border-[#FBF9F7]/10 pb-4">
-                            <span className="text-xs font-black uppercase tracking-widest text-[#FBF9F7]/50">Atmos</span>
-                            <span className="font-fraunces italic text-2xl text-[#C85C1A]">Zen</span>
-                        </div>
-                        <div className="flex justify-between items-end pb-4">
-                            <span className="text-xs font-black uppercase tracking-widest text-[#FBF9F7]/50">Capacity</span>
-                            <span className="font-fraunces italic text-2xl">Optimal</span>
-                        </div>
-                    </div>
-                </div>
+        {/* ── Signature Curations (Featured Menu) ── */}
+        <section id="menu" className="py-32 px-6 md:px-12 bg-white">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col md:flex-row justify-between items-end mb-20 stagger-reveal">
+              <div>
+                <h2 className="font-fraunces text-5xl md:text-7xl font-black tracking-tighter text-[#1C1917] leading-none mb-6">
+                  Signature <br/><span className="italic text-[#C85C1A]">Curations.</span>
+                </h2>
+                <div className="w-20 h-[1.5px] bg-[#C85C1A]"></div>
+              </div>
+              <p className="max-w-md text-sm font-medium uppercase tracking-[0.2em] text-[#1C1917]/40 leading-relaxed mt-8 md:mt-0">
+                A preview of our daily ritual. Hand-selected ingredients, 
+                translated into cinematic textures. 
+              </p>
             </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+              {[
+                { name: "Mango Lassi", img: "/images/mango_lassi.png", cat: "Beverages" },
+                { name: "Garlic Naan", img: "/images/garlic_naan.png", cat: "Mains" },
+                { name: "Signature Special", img: "/images/live_item.png", cat: "Live Selection" }
+              ].map((item, i) => (
+                <div key={i} className="group cursor-pointer stagger-reveal">
+                  <div className="aspect-[4/5] overflow-hidden rounded-[2rem] mb-6 relative">
+                    <img 
+                      src={item.img} 
+                      alt={item.name} 
+                      className="w-full h-full object-cover grayscale-[0.2] transition-all duration-700 group-hover:scale-110 group-hover:grayscale-0" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1C1917]/20 to-transparent"></div>
+                    <div className="absolute top-6 left-6 px-4 py-1.5 bg-white/90 backdrop-blur rounded-full text-[8px] font-black uppercase tracking-[0.2em]">
+                      {item.cat}
+                    </div>
+                  </div>
+                  <h3 className="font-fraunces text-2xl font-black italic tracking-tight text-[#1C1917] group-hover:text-[#C85C1A] transition-colors">
+                    {item.name}
+                  </h3>
+                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#1C1917]/30 mt-2">Chef's Select Node 0x{i+1}</p>
+                </div>
+              ))}
+            </div>
+
+            <div className="mt-20 flex justify-center">
+               <Link to="/menu?restaurant=spice-lounge&table=1" className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-[#1C1917] hover:text-[#C85C1A] transition-all">
+                  Access Full Repository <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+               </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ── Ritual Schedule (Opening Times) ── */}
+        <section className="py-32 px-6 md:px-12 bg-[#FBF9F7] border-t border-[#1C1917]/5">
+           <div className="max-w-4xl mx-auto text-center stagger-reveal">
+              <div className="flex items-center justify-center gap-4 mb-10">
+                 <div className="w-12 h-[1px] bg-[#C85C1A]/30"></div>
+                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#C85C1A]">Temporal Matrix</span>
+                 <div className="w-12 h-[1px] bg-[#C85C1A]/30"></div>
+              </div>
+              <h2 className="font-fraunces text-6xl md:text-8xl font-black italic tracking-tighter text-[#1C1917] mb-16">
+                 Ritual <br/>Schedule.
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24">
+                 <div className="p-12 bg-white rounded-[3rem] shadow-sm border border-[#1C1917]/5 interactive-element">
+                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#1C1917]/30 mb-6">Culinary Flow</div>
+                    <div className="space-y-4">
+                       <div className="flex justify-between items-center border-b border-[#1C1917]/5 pb-4">
+                          <span className="font-bold text-sm">Mon — Fri</span>
+                          <span className="font-fraunces italic font-bold text-lg">11:00 — 23:00</span>
+                       </div>
+                       <div className="flex justify-between items-center border-b border-[#1C1917]/5 pb-4">
+                          <span className="font-bold text-sm">Sat — Sun</span>
+                          <span className="font-fraunces italic font-bold text-lg">10:00 — 00:00</span>
+                       </div>
+                    </div>
+                 </div>
+
+                 <div className="p-12 bg-[#1C1917] text-[#FBF9F7] rounded-[3rem] shadow-2xl relative overflow-hidden interactive-element">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#C85C1A]/10 rounded-full blur-3xl"></div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FBF9F7]/30 mb-6">Current Status</div>
+                    <div className="flex flex-col items-center gap-4">
+                       <div className="w-4 h-4 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_20px_rgba(16,185,129,0.5)]"></div>
+                       <div className="font-fraunces text-4xl font-black italic">Live Protocol</div>
+                       <p className="text-[10px] font-bold uppercase tracking-widest text-[#FBF9F7]/40 leading-relaxed max-w-[150px]">
+                          Node spice-lounge is currently operational.
+                       </p>
+                    </div>
+                 </div>
+              </div>
+           </div>
         </section>
 
       </main>

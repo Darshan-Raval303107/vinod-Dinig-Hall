@@ -420,6 +420,39 @@ def generate_qr(table_id):
     return jsonify(msg="QR Code generated successfully", url=qr_image_url), 200
 
 
+@owner_bp.route('/owner/orders', methods=['GET'])
+@role_required('owner', 'admin')
+def get_all_orders():
+    restaurant_id = _get_claim_restaurant_id()
+    if not restaurant_id:
+        return jsonify(msg="restaurant_id missing"), 400
+    
+    # Fetch orders sorted by most recent
+    orders = Order.query.filter_by(restaurant_id=restaurant_id).order_by(Order.created_at.desc()).all()
+    
+    res = []
+    for order in orders:
+        items_data = []
+        for item in order.items:
+            items_data.append({
+                "name": item.menu_item.name,
+                "quantity": item.quantity,
+                "price": float(item.unit_price),
+                "is_veg": item.menu_item.is_veg
+            })
+        
+        res.append({
+            "id": str(order.id),
+            "table_number": order.table_number,
+            "status": order.status,
+            "total_price": float(order.total_price),
+            "created_at": order.created_at.isoformat() if order.created_at else None,
+            "items": items_data
+        })
+        
+    return jsonify(res), 200
+
+
 # ─── User-Login toggle (owner control) ──────────────────────────────────────
 
 @owner_bp.route('/owner/settings/user-login', methods=['GET'])
