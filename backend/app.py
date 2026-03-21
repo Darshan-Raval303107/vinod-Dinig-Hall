@@ -31,7 +31,8 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    socketio.init_app(app, async_mode="threading")
+    # SocketIO init with gevent async mode (IMPORTANT for Render gevent worker)
+    socketio.init_app(app, async_mode="gevent", cors_allowed_origins=allowed_origins)
 
     # Logger – assuming it's ok
     from utils.logger import get_payment_logger
@@ -71,15 +72,17 @@ def create_app(config_class=Config):
         app.logger.exception("Unhandled exception occurred")
         
         # Return meaningful JSON instead of generic HTML 500
+        error_msg = str(e) if app.debug else "Internal Server Error"
         response = {
             "success": False,
-            "error": str(e),
+            "error": error_msg,
             "message": "Internal server error – check server logs for details"
         }
         if app.debug:
             # In debug mode, also include traceback (for browser)
             import traceback
             response["traceback"] = traceback.format_exc()
+
         
         return jsonify(response), 500
 
