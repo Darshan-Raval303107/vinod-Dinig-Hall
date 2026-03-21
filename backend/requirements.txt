@@ -14,4 +14,6 @@ gevent>=23.9.0
 gevent-websocket>=0.10.1
 razorpay
 psycopg2-binary
+requests
+
 
