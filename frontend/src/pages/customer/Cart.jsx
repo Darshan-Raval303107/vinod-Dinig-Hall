@@ -169,7 +169,7 @@ const Cart = () => {
       </div>
 
       {/* MOBILE STICKY ACTION */}
-      <div className="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-white via-white to-transparent z-[100] pb-[calc(1.5rem + var(--safe-bottom))]">
+      <div className="fixed bottom-24 left-0 right-0 px-6 z-[90] animate-in slide-in-from-bottom-10 duration-700">
         <div className="max-w-md mx-auto">
           <button 
             onClick={handlePlaceOrder}

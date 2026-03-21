@@ -168,7 +168,7 @@ const OrderStatus = () => {
       </div>
 
       {/* Floating Dynamic Bottom Action Bar */}
-      <div className="fixed bottom-10 left-0 right-0 px-6 z-50 animate-in slide-in-from-bottom-10 duration-1000 delay-500">
+      <div className="fixed bottom-24 left-0 right-0 px-6 z-[90] animate-in slide-in-from-bottom-10 duration-1000 delay-500">
         <div className="max-w-md mx-auto">
           {order.status === 'paid' ? (
             <button 

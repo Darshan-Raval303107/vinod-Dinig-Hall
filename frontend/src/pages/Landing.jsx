@@ -79,7 +79,8 @@ export default function Landing() {
       if (!img) return;
       const cw = canvas.width, ch = canvas.height;
       const iw = img.naturalWidth, ih = img.naturalHeight;
-      const scale = Math.max(cw / iw, ch / ih);
+      // Use cover scale on laptop, but fit width on portrait mobile to stop spreading
+      const scale = cw < ch ? (cw / iw) * 1.2 : Math.max(cw / iw, ch / ih);
       const dw = Math.ceil(iw * scale), dh = Math.ceil(ih * scale);
       const dx = Math.floor((cw - dw) / 2), dy = Math.floor((ch - dh) / 2);
       ctx.fillStyle = '#FBF9F7';
@@ -144,12 +145,12 @@ export default function Landing() {
 
       <main id="top">
         {/* ── Cinematic Scroll Hero ── */}
-        <section ref={heroScrollRef} className="h-[300vh] relative w-full">
-          <div className="sticky top-0 h-screen w-full overflow-hidden flex flex-col justify-between p-6 md:p-12">
+        <section ref={heroScrollRef} className="h-[250vh] md:h-[300vh] relative w-full">
+          <div className="sticky top-0 h-[100svh] w-full overflow-hidden flex flex-col justify-between p-6 md:p-12">
             
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover -z-10 mix-blend-multiply opacity-90" />
             
-            <div className="mt-24 md:mt-32 max-w-4xl stagger-reveal">
+            <div className="mt-24 max-w-4xl stagger-reveal">
                 <div className="flex items-center gap-4 mb-6">
                     <div className="w-12 h-[1px] bg-[#1C1917]"></div>
                     <span className="text-[10px] font-bold uppercase tracking-[0.4em]">Est. MMXXVI</span>
