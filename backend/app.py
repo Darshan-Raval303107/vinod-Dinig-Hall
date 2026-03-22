@@ -57,6 +57,14 @@ def create_app(config_class=Config):
     with app.app_context():
         try:
             from flask_migrate import upgrade, stamp
+            from sqlalchemy import text
+            try:
+                db.session.execute(text("ALTER TABLE restaurant_tables ADD COLUMN is_active BOOLEAN DEFAULT TRUE;"))
+                db.session.commit()
+                app.logger.info("✅ Manually migrated is_active column.")
+            except Exception:
+                db.session.rollback()
+                
             try:
                 upgrade()
                 app.logger.info("✅ Database auto-migration successful.")
