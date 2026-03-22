@@ -71,7 +71,7 @@ def update_order_status(order_id):
     socketio.emit('order:status_update', {
         'orderId': str(order.id),
         'status': order.status
-    })
+    }, room=f"order_{order.id}")
     
     # Emit to chef dashboard room to update across multiple chef screens
     socketio.emit('order:status_update_chef', {

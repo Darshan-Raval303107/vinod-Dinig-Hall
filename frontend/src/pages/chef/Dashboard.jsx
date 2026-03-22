@@ -32,6 +32,7 @@ const ChefDashboard = () => {
     const clockInt = setInterval(() => setCurrentTime(new Date()), 1000);
 
     socket.connect();
+    socket.emit('chef:join', { restaurantId: user.restaurant_id });
     
     socket.on('order:new', (data) => {
       try {

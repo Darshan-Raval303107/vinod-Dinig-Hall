@@ -15,7 +15,21 @@ class Config:
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-prod')
 
     JWT_ACCESS_TOKEN_EXPIRES = 86400 # 24 hours
-    REDIS_URL = os.environ.get('REDIS_URL', 'redis://localhost:6379/0')
+    REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+    REDIS_PORT = os.environ.get('REDIS_PORT', '6379')
+    REDIS_USER = os.environ.get('REDIS_USER', 'default')
+    REDIS_PASSWORD = os.environ.get('REDIS_PASSWORD', '')
+
+    REDIS_URL = os.environ.get('REDIS_URL')
+    if not REDIS_URL and REDIS_HOST:
+        # Build REDIS_URL if individual components are provided
+        if REDIS_PASSWORD:
+            REDIS_URL = f"redis://{REDIS_USER}:{REDIS_PASSWORD}@{REDIS_HOST}:{REDIS_PORT}"
+        else:
+            REDIS_URL = f"redis://{REDIS_HOST}:{REDIS_PORT}"
+
+    if REDIS_URL and not REDIS_URL.startswith(('redis://', 'rediss://')):
+        REDIS_URL = 'redis://' + REDIS_URL
 
     # Razorpay Payment Gateway
     RAZORPAY_KEY_ID = os.environ.get('RAZORPAY_KEY_ID', '')

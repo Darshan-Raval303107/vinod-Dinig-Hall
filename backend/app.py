@@ -59,6 +59,24 @@ def create_app(config_class=Config):
         message_queue=app.config.get('REDIS_URL')
     )
 
+    # ── SocketIO Room Handlers ───────────────────────────────────────────
+    from flask_socketio import join_room
+
+    @socketio.on('customer:join')
+    def on_customer_join(data):
+        order_id = data.get('orderId')
+        if order_id:
+            join_room(f"order_{order_id}")
+            app.logger.info(f"Customer joined room: order_{order_id}")
+
+    @socketio.on('chef:join')
+    def on_chef_join(data):
+        restaurant_id = data.get('restaurantId')
+        if restaurant_id:
+            join_room(str(restaurant_id))
+            app.logger.info(f"Chef joined room: {restaurant_id}")
+
+
     # Logger – assuming it's ok
     from utils.logger import get_payment_logger
     get_payment_logger()
@@ -82,6 +100,26 @@ def create_app(config_class=Config):
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(chef_bp, url_prefix='/api')
     app.register_blueprint(owner_bp, url_prefix='/api')
+
+    # ── Redis Test Routes ────────────────────────────────────────────────
+    @app.route('/api/redis/set')
+    def redis_set():
+        try:
+            from extensions import limiter
+            # Use the storage from limiter to avoid re-creating a client
+            limiter.storage.set('test_key', 'Redis is working! 🚀')
+            return jsonify(msg="Value set in Redis"), 200
+        except Exception as e:
+            return jsonify(error=str(e)), 500
+
+    @app.route('/api/redis/get')
+    def redis_get():
+        try:
+            from extensions import limiter
+            value = limiter.storage.get('test_key')
+            return jsonify(msg=f"Value from Redis: {value}"), 200
+        except Exception as e:
+            return jsonify(error=str(e)), 500
 
     # ── UPDATED Health check ──────────────────────────────────────────────
     @app.route('/health')
