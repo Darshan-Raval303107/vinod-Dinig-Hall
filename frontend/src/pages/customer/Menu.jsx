@@ -17,7 +17,7 @@ const Menu = () => {
   const [menuData, setMenuData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [vegOnly, setVegOnly] = useState(false);
+  const [vegOnly, setVegOnly] = useState(true);
   const [activeCategory, setActiveCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   
@@ -105,14 +105,7 @@ const Menu = () => {
             </div>
           </div>
           
-          <button 
-                onClick={() => setVegOnly(!vegOnly)}
-                className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-300 border shadow-sm ${
-                vegOnly ? 'bg-emerald-500 border-emerald-400 text-white shadow-emerald-100 rotate-12' : 'bg-zinc-50 border-zinc-100 text-zinc-300'
-                }`}
-            >
-                <Leaf size={20} fill={vegOnly ? 'white' : 'none'} />
-            </button>
+          {/* Vegetarian Toggle Hidden per request */}
         </div>
 
         {/* SEARCH: Deeply set for easy thumb reach */}
@@ -194,7 +187,7 @@ const Menu = () => {
                       )}
                       
                       <div className="absolute top-2 right-2 flex items-center justify-center w-5 h-5 bg-white/90 backdrop-blur-sm rounded-lg border border-zinc-100 shadow-sm">
-                        <span className={`w-2 h-2 rounded-full ${item.is_veg ? 'bg-emerald-500' : 'bg-red-500'}`}></span>
+                        <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
                       </div>
                     </div>
 

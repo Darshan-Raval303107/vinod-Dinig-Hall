@@ -147,54 +147,53 @@ export default function Landing() {
       <main id="top">
         {/* ── Cinematic Scroll Hero ── */}
         <section ref={heroScrollRef} className="h-[250vh] md:h-[300vh] relative w-full">
-          <div className="sticky top-0 h-[100svh] w-full overflow-hidden flex flex-col justify-center md:p-12 p-6">
+          <div className="sticky top-0 h-[100svh] w-full overflow-hidden flex flex-col justify-between py-12 md:py-24 px-8 md:px-24">
             
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover -z-10 mix-blend-multiply opacity-95" />
             
-            <div className="mt-8 md:mt-24 max-w-4xl stagger-reveal text-center md:text-left flex flex-col items-center md:items-start">
-                <div className="flex items-center gap-4 mb-6 md:mb-8">
+            <div className="stagger-reveal text-center md:text-left">
+                <div className="flex items-center justify-center md:justify-start gap-4 mb-4 md:mb-6">
                     <div className="w-8 md:w-12 h-[1px] bg-[#1C1917]/30"></div>
                     <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.5em] text-[#C85C1A]">Est. MMXXVI</span>
-                    <div className="md:hidden w-8 h-[1px] bg-[#1C1917]/30"></div>
                 </div>
-                <h1 className="font-fraunces text-5xl sm:text-6xl md:text-[8.5rem] font-black leading-[0.9] tracking-tighter mb-8 md:mb-10 text-[#1C1917] drop-shadow-sm">
-                    The ritual of <br />
-                    <span className="italic text-[#C85C1A]">dining.</span>
+                <h1 className="font-fraunces text-4xl sm:text-5xl md:text-[8rem] font-black leading-[0.9] tracking-tighter mb-4 md:mb-6 text-[#1C1917] drop-shadow-sm">
+                    The ritual of <span className="italic text-[#C85C1A]">dining.</span>
                 </h1>
-                <p className="max-w-xs md:max-w-md text-[11px] md:text-sm font-bold leading-relaxed uppercase tracking-[0.2em] text-[#1C1917]/60 md:text-[#1C1917]/70">
+                <p className="max-w-xs md:max-w-md mx-auto md:mx-0 text-[10px] md:text-xs font-bold leading-relaxed uppercase tracking-[0.2em] text-[#1C1917]/60 md:text-[#1C1917]/70">
                     A cinematic sequence of flavors. Every element perfectly choreographed. 
-                    Scroll to experience the unveiling.
                 </p>
 
                 {!isLoginEnabled && (
-                  <div className="mt-10 inline-flex items-center gap-3 bg-red-50 text-red-700 px-6 py-4 rounded-full border border-red-100 shadow-sm">
+                  <div className="mt-6 inline-flex items-center gap-3 bg-red-50 text-red-700 px-6 py-4 rounded-full border border-red-100 shadow-sm">
                     <ShieldAlert size={16} />
                     <span className="text-[9px] font-black uppercase tracking-widest">Operations Halted</span>
                   </div>
                 )}
+            </div>
 
-                <div className="mt-10 md:mt-14 flex flex-col md:flex-row gap-6 w-full md:w-auto">
+            <div className="w-full flex flex-col items-center gap-8 md:gap-12 stagger-reveal">
+                <div className="flex flex-col md:flex-row gap-6 w-full md:w-auto justify-center">
                     {isLoginEnabled ? (
-                        <Link to="/window" className="group flex items-center justify-center gap-4 bg-[#1C1917] text-[#FBF9F7] px-12 py-5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.2)] active:scale-95">
-                            Begin Journey <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+                        <Link to="/window" className="group flex items-center justify-center gap-6 bg-[#1C1917] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95">
+                            Begin Journey <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
                         </Link>
                     ) : (
-                        <button disabled className="flex items-center justify-center bg-gray-100 text-gray-400 px-12 py-5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] cursor-not-allowed">
+                        <button disabled className="flex items-center justify-center bg-gray-100 text-gray-400 px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] cursor-not-allowed">
                             Service Offline
                         </button>
                     )}
                 </div>
-            </div>
 
-            <div className="absolute bottom-10 left-0 right-0 px-6 md:px-12 flex justify-between items-end pb-8 stagger-reveal pointer-events-none">
-                <div className="flex flex-col items-center gap-4 animate-bounce">
-                  <span className="text-[9px] font-black uppercase tracking-[0.4em] rotate-180" style={{ writingMode: 'vertical-rl' }}>
-                      Scroll
-                  </span>
-                </div>
-                <div className="text-right">
-                    <div className="text-[9px] font-black uppercase tracking-[0.4em] mb-2 text-[#C85C1A]/60">Node 0x41</div>
-                    <div className="font-fraunces italic font-black text-xs md:text-base">Center District</div>
+                <div className="w-full flex justify-between items-end pb-4 pointer-events-none">
+                    <div className="flex flex-col items-center gap-4 animate-bounce">
+                      <span className="text-[9px] font-black uppercase tracking-[0.4em] rotate-180" style={{ writingMode: 'vertical-rl' }}>
+                          Scroll
+                      </span>
+                    </div>
+                    <div className="text-right">
+                        <div className="text-[9px] font-black uppercase tracking-[0.4em] mb-2 text-[#C85C1A]/60">Node 0x41</div>
+                        <div className="font-fraunces italic font-black text-xs md:text-base">Center District</div>
+                    </div>
                 </div>
             </div>
 

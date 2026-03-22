@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import api from '../../api/axios';
+import api, { API_ORIGIN } from '../../api/axios';
 import { Plus, Edit2, Trash2, Search, X, Image as ImageIcon, Check, Ban, Clock, ChefHat, Filter, ArrowRight } from 'lucide-react';
 
 const emptyForm = {
@@ -202,7 +202,7 @@ const MenuManagerView = () => {
              <div className="flex justify-between items-start mb-6">
                 <div className="w-16 h-16 rounded-[1.5rem] bg-zinc-50 border border-zinc-100 overflow-hidden shrink-0 shadow-inner relative group/img">
                   {item.image_url ? (
-                    <img src={item.image_url.startsWith('http') ? item.image_url : `http://localhost:5000${item.image_url}`} alt={item.name} className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500" />
+                    <img src={item.image_url.startsWith('http') ? item.image_url : `${API_ORIGIN}${item.image_url}`} alt={item.name} className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500" />
                   ) : <div className="w-full h-full flex items-center justify-center text-zinc-200 font-black italic">!</div>}
                   <div className={`absolute bottom-1 right-1 w-3 h-3 rounded-full border-2 border-white ${item.is_available ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
                 </div>
@@ -306,15 +306,7 @@ const MenuManagerView = () => {
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <button 
-                    type="button"
-                    onClick={() => setForm(f => ({ ...f, is_veg: !f.is_veg }))}
-                    className={`h-16 rounded-2xl border flex items-center justify-center gap-3 text-[9px] font-black tracking-widest uppercase transition-all ${
-                      form.is_veg ? 'bg-emerald-500 border-emerald-500 text-white shadow-xl' : 'bg-zinc-50 border-zinc-100 text-zinc-300'
-                    }`}
-                  >
-                    <Check size={18} /> {form.is_veg ? 'VEG CORE' : 'SWITCH VEG'}
-                  </button>
+                  {/* Veg Toggle Hidden per request - Always true */}
                   <button 
                     type="button"
                     onClick={() => setForm(f => ({ ...f, is_available: !f.is_available }))}
