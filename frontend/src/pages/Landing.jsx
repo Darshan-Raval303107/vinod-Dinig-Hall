@@ -175,7 +175,7 @@ export default function Landing() {
 
                 <div className="mt-10 md:mt-14 flex flex-col md:flex-row gap-6 w-full md:w-auto">
                     {isLoginEnabled ? (
-                        <Link to="/menu?restaurant=spice-lounge&table=1" className="group flex items-center justify-center gap-4 bg-[#1C1917] text-[#FBF9F7] px-12 py-5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.2)] active:scale-95">
+                        <Link to="/window" className="group flex items-center justify-center gap-4 bg-[#1C1917] text-[#FBF9F7] px-12 py-5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.2)] active:scale-95">
                             Begin Journey <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                         </Link>
                     ) : (
@@ -248,7 +248,7 @@ export default function Landing() {
             </div>
 
             <div className="mt-24 md:mt-32 flex justify-center">
-               <Link to="/menu?restaurant=spice-lounge&table=1" className="group flex flex-col items-center gap-4 text-[10px] font-black uppercase tracking-[0.5em] text-[#1C1917] hover:text-[#C85C1A] transition-all">
+               <Link to="/window" className="group flex flex-col items-center gap-4 text-[10px] font-black uppercase tracking-[0.5em] text-[#1C1917] hover:text-[#C85C1A] transition-all">
                   <span className="border-b border-transparent group-hover:border-[#C85C1A] transition-all pb-2">Access Repository</span>
                   <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
                </Link>
