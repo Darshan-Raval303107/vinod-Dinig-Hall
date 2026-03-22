@@ -56,9 +56,17 @@ def create_app(config_class=Config):
     # This automatically adds new columns/tables whenever the app boots up on Render!
     with app.app_context():
         try:
-            from flask_migrate import upgrade
-            upgrade()
-            app.logger.info("✅ Database auto-migration successful.")
+            from flask_migrate import upgrade, stamp
+            try:
+                upgrade()
+                app.logger.info("✅ Database auto-migration successful.")
+            except Exception as inner_e:
+                error_str = str(inner_e).lower()
+                if "already exists" in error_str or "duplicatecolumn" in error_str:
+                    stamp()
+                    app.logger.info("✅ Database stamped to head after detecting existing schema. DuplicateColumn completely ignored.")
+                else:
+                    raise inner_e
         except Exception as e:
             app.logger.error(f"❌ Database auto-migration failed: {e}")
 
