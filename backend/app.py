@@ -93,6 +93,7 @@ def create_app(config_class=Config):
     from routes.auth import auth_bp
     from routes.chef import chef_bp
     from routes.owner import owner_bp
+    from routes.window import window_bp
     
     app.register_blueprint(menu_bp, url_prefix='/api')
     app.register_blueprint(orders_bp, url_prefix='/api')
@@ -100,6 +101,7 @@ def create_app(config_class=Config):
     app.register_blueprint(auth_bp, url_prefix='/api')
     app.register_blueprint(chef_bp, url_prefix='/api')
     app.register_blueprint(owner_bp, url_prefix='/api')
+    app.register_blueprint(window_bp, url_prefix='/api/window')
 
     # ── Redis Test Routes ────────────────────────────────────────────────
     @app.route('/redis/set')

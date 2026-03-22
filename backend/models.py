@@ -62,12 +62,26 @@ class Order(db.Model):
     __tablename__ = 'orders'
     id = db.Column(db.String(36), primary_key=True, default=generate_uuid)
     restaurant_id = db.Column(db.String(36), db.ForeignKey('restaurants.id'), nullable=False)
-    table_number = db.Column(db.Integer, nullable=False)
-    status = db.Column(db.String(50), nullable=False, default='pending') # states: pending, accepted, cooking, ready, served, cancelled, paid
+    table_number = db.Column(db.Integer, nullable=True) # Nullable for window orders
+    order_type = db.Column(db.String(20), nullable=False, default='table') # 'table' or 'window'
+    customer_name = db.Column(db.String(255), nullable=True)
+    pickup_code = db.Column(db.String(4), nullable=True)
+    pickup_code_generated_at = db.Column(db.DateTime, nullable=True)
+    pickup_code_used_at = db.Column(db.DateTime, nullable=True)
+    status = db.Column(db.String(50), nullable=False, default='pending') # states: pending, accepted, cooking, ready, served, cancelled, paid, picked_up
     total_price = db.Column(db.Numeric(10, 2), nullable=False, default=0.0)
     razorpay_payment_id = db.Column(db.String(255), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    __table_args__ = (
+        db.Index(
+            'idx_active_window_pickup_code',
+            'pickup_code',
+            unique=True,
+            postgresql_where=db.text("order_type = 'window' AND status NOT IN ('completed', 'cancelled', 'picked_up', 'delivered')")
+        ),
+    )
 
     items = db.relationship('OrderItem', backref='order', lazy=True)
     payment = db.relationship('Payment', backref='order', uselist=False, lazy=True)
