@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import api from '../../api/axios';
+import { socket } from '../../api/socket';
+import { useAuthStore } from '../../store';
 import { 
   FileText, 
   Search, 
@@ -18,6 +20,7 @@ import {
 import gsap from 'gsap';
 
 const OrderHistoryView = () => {
+  const { user } = useAuthStore();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -39,7 +42,33 @@ const OrderHistoryView = () => {
   useEffect(() => {
     fetchOrders();
     gsap.fromTo('.ledger-row', { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.8, stagger: 0.05, ease: 'back.out(1.7)' });
-  }, []);
+
+    if (user?.restaurant_id) {
+      socket.connect();
+      socket.emit('chef:join', { restaurantId: user.restaurant_id });
+      
+      socket.on('order:new', () => {
+        try {
+          const audio = new Audio('/notification.mp3'); 
+          audio.play().catch(e => console.log('Haptic sound blocked', e));
+        } catch (e) {}
+        fetchOrders();
+      });
+      
+      socket.on('order:status_update', (data) => {
+        setOrders(prev => prev.map(o => o.id === data.orderId ? { ...o, status: data.status } : o));
+      });
+      socket.on('order:status_update_chef', (data) => {
+        setOrders(prev => prev.map(o => o.id === data.orderId ? { ...o, status: data.status } : o));
+      });
+    }
+
+    return () => {
+      socket.off('order:new');
+      socket.off('order:status_update');
+      socket.off('order:status_update_chef');
+    };
+  }, [user]);
 
   const toggleOrder = (id) => {
     const newExpanded = new Set(expandedOrders);

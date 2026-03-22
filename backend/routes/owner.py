@@ -262,9 +262,14 @@ def update_menu_item(item_id):
         return jsonify(msg="Insufficient permissions"), 403
     
     if request.method == 'DELETE':
-        db.session.delete(item)
-        db.session.commit()
-        return jsonify(msg="Item deleted"), 200
+        from sqlalchemy.exc import IntegrityError
+        try:
+            db.session.delete(item)
+            db.session.commit()
+            return jsonify(msg="Item deleted"), 200
+        except IntegrityError:
+            db.session.rollback()
+            return jsonify(msg="Item is locked by transaction history. Please HALT the item instead of deleting."), 400
         
     # Support both JSON updates (toggle availability) and multipart updates (full edit + photo)
     if request.content_type and request.content_type.startswith("multipart/form-data"):
