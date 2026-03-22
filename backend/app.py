@@ -105,21 +105,22 @@ def create_app(config_class=Config):
     @app.route('/redis/set')
     def redis_set():
         try:
-            from extensions import limiter
-            # Use the storage from limiter to avoid re-creating a client
-            limiter.storage.set('test_key', 'Redis is working! 🚀')
+            import redis
+            r = redis.from_url(app.config['REDIS_URL'], decode_responses=True)
+            r.set('test_key', 'Redis is working! 🚀')
             return jsonify(msg="Value set in Redis"), 200
         except Exception as e:
-            return jsonify(error=str(e)), 500
+            return jsonify(error=str(e), source="redis_set"), 500
 
     @app.route('/redis/get')
     def redis_get():
         try:
-            from extensions import limiter
-            value = limiter.storage.get('test_key')
+            import redis
+            r = redis.from_url(app.config['REDIS_URL'], decode_responses=True)
+            value = r.get('test_key')
             return jsonify(msg=f"Value from Redis: {value}"), 200
         except Exception as e:
-            return jsonify(error=str(e)), 500
+            return jsonify(error=str(e), source="redis_get"), 500
 
     # ── UPDATED Health check ──────────────────────────────────────────────
     @app.route('/health')
