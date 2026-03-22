@@ -82,10 +82,25 @@ def create_app(config_class=Config):
                 "details": str(e) if app.debug else "Resource issue"
             }), 500
 
+    # ── UPDATED Error Handling ──────────────────────────────────────────────
+    @app.errorhandler(404)
+    def not_found(e):
+        return jsonify({
+            "success": False,
+            "error": "Not Found",
+            "message": str(e.description) if hasattr(e, 'description') else str(e)
+        }), 404
+
     # ── VERY IMPORTANT: Global error handler for 500 ──────────────────────
     # This will show real error messages even when DEBUG=False later
     @app.errorhandler(Exception)
     def handle_exception(e):
+        # Werkzeug HTTP exceptions (like 404) should be handled by their specific handlers
+        # or returned as is if they already have a response.
+        from werkzeug.exceptions import HTTPException
+        if isinstance(e, HTTPException):
+            return e
+
         # Log the full traceback
         app.logger.exception("Unhandled exception occurred")
         
