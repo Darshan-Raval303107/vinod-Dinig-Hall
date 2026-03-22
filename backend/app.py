@@ -45,14 +45,19 @@ def create_app(config_class=Config):
     }}, supports_credentials=True)
     
     # Ratelimiter – using Redis from config
-    limiter.init_app(app)
     app.config['RATELIMIT_STORAGE_URI'] = app.config.get('REDIS_URL')
+    limiter.init_app(app)
 
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
-    # SocketIO init with gevent async mode (IMPORTANT for Render gevent worker)
-    socketio.init_app(app, async_mode="gevent", cors_allowed_origins=allowed_origins)
+    # SocketIO init with gevent async mode + Redis message queue for scaling
+    socketio.init_app(
+        app, 
+        async_mode="gevent", 
+        cors_allowed_origins=allowed_origins,
+        message_queue=app.config.get('REDIS_URL')
+    )
 
     # Logger – assuming it's ok
     from utils.logger import get_payment_logger
@@ -105,6 +110,15 @@ def create_app(config_class=Config):
             "error": "Not Found",
             "message": str(e.description) if hasattr(e, 'description') else str(e)
         }), 404
+
+    @app.errorhandler(429)
+    def ratelimit_handler(e):
+        return jsonify({
+            "success": False,
+            "error": "Too Many Requests",
+            "message": "Rate limit exceeded. Please try again later.",
+            "description": str(e.description) if hasattr(e, 'description') else str(e)
+        }), 429
 
     # ── VERY IMPORTANT: Global error handler for 500 ──────────────────────
     # This will show real error messages even when DEBUG=False later

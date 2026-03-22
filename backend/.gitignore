@@ -1,1 +1,29 @@
-venv
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+venv/
+venv_311/
+venv_performance/
+.env
+.venv
+env/
+ENV/
+
+# Database
+*.db
+*.sqlite3
+
+# Logs
+*.log
+crash_log.txt
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# Flask/Instance
+instance/
+.pytest_cache/
