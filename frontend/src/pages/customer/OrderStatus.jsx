@@ -43,7 +43,7 @@ const OrderStatus = () => {
       }
     });
 
-    const interval = setInterval(fetchStatus, 30000);
+    const interval = setInterval(fetchStatus, 12000); // 12s fallback for high reliability
 
     return () => {
       clearInterval(interval);

@@ -42,6 +42,18 @@ def create_window_order():
 
         # Commit outside of the inner block (which just manages the SAVEPOINT)
         db.session.commit()
+
+        # Emit to chef room for this restaurant so it shows up instantly on the dashboard
+        from extensions import socketio
+        socketio.emit('order:new', {
+            'order_id': str(new_order.id),
+            'table_number': new_order.table_number, # will be 0
+            'status': new_order.status,
+            'order_type': new_order.order_type,
+            'pickup_code': new_order.pickup_code,
+            'total_price': float(new_order.total_price),
+            'items_count': len(items_data)
+        }, room=str(new_order.restaurant_id))
             
         return jsonify({
             "success": True,
