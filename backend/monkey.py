@@ -9,6 +9,7 @@ try:
         time=True,
         thread=True,
         os=False,
+        signal=False,
         select=True,
         ssl=True, # Critical fix for SSL recursion
         subprocess=False,

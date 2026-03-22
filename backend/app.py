@@ -122,6 +122,19 @@ def create_app(config_class=Config):
         except Exception as e:
             return jsonify(error=str(e), source="redis_get"), 500
 
+    @app.route('/setup-database-now')
+    def setup_database_now():
+        try:
+            import subprocess
+            import sys
+            result = subprocess.run([sys.executable, "seed.py"], capture_output=True, text=True)
+            if result.returncode == 0:
+                return jsonify(msg="Database tables created and seeded successfully!", output=result.stdout.split('\n')), 200
+            else:
+                return jsonify(error="Failed to seed database", details=result.stderr.split('\n')), 500
+        except Exception as e:
+            return jsonify(error=str(e)), 500
+
     # ── UPDATED Health check ──────────────────────────────────────────────
     @app.route('/health')
     def health_check():
