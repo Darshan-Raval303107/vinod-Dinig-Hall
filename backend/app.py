@@ -51,6 +51,17 @@ def create_app(config_class=Config):
     db.init_app(app)
     migrate.init_app(app, db)
     jwt.init_app(app)
+
+    # ── Auto-Migrate Database on Startup ──────────────────────────────────
+    # This automatically adds new columns/tables whenever the app boots up on Render!
+    with app.app_context():
+        try:
+            from flask_migrate import upgrade
+            upgrade()
+            app.logger.info("✅ Database auto-migration successful.")
+        except Exception as e:
+            app.logger.error(f"❌ Database auto-migration failed: {e}")
+
     # SocketIO init with gevent async mode + Redis message queue for scaling
     socketio.init_app(
         app, 
