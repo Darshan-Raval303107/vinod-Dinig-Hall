@@ -40,7 +40,11 @@ const TablesManagerView = () => {
       });
   };
 
-  const getQrFullUrl = (qrUrl) => `${API_ORIGIN}${qrUrl}`;
+  const getQrFullUrl = (qrUrl) => {
+    if (!qrUrl) return '';
+    if (qrUrl.startsWith('http')) return qrUrl;
+    return `${API_ORIGIN}${qrUrl}`;
+  };
 
   const handleDownloadQR = async (qrUrl, tableNumber) => {
     if (!qrUrl) return;
@@ -50,7 +54,8 @@ const TablesManagerView = () => {
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `NODE-T${tableNumber}-ACCESS.png`;
+    const filename = tableNumber === 0 ? 'WINDOW-PICKUP-STATION.png' : `NODE-T${tableNumber}-ACCESS.png`;
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -101,12 +106,22 @@ const TablesManagerView = () => {
           <p className="text-[10px] font-black text-zinc-300 uppercase tracking-widest mt-3 italic">Physical-to-digital interface management.</p>
         </div>
         
-        <button
-          onClick={openAdd}
-          className="mt-8 lg:mt-0 w-full lg:w-auto h-16 px-10 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-3"
-        >
-          <Plus size={18} /> Deploy Station
-        </button>
+        <div className="mt-8 lg:mt-0 flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
+          {!tables.some(t => t.table_number === 0) && (
+            <button
+              onClick={() => { setNewTableNumber('0'); setIsAddOpen(true); }}
+              className="h-16 px-10 bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-sm hover:bg-emerald-100 transition-all flex items-center justify-center gap-3"
+            >
+              <Zap size={18} /> Deploy Window Station
+            </button>
+          )}
+          <button
+            onClick={openAdd}
+            className="h-16 px-10 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-3"
+          >
+            <Plus size={18} /> Deploy Station
+          </button>
+        </div>
       </header>
 
       {error && (
@@ -117,13 +132,15 @@ const TablesManagerView = () => {
 
       {/* NODE GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {tables.map(table => (
+        {tables.sort((a,b) => a.table_number - b.table_number).map(table => (
           <div key={table.id} className="group relative bg-white border border-zinc-100 rounded-[2.5rem] p-6 transition-all duration-300 hover:shadow-xl active:scale-[0.99] flex flex-col">
             <header className="flex justify-between items-start mb-6">
               <div className="flex items-center gap-4">
                  <div className="w-14 h-14 rounded-2xl bg-zinc-50 border border-zinc-100 flex flex-col items-center justify-center shrink-0">
                     <span className="text-[7px] font-black text-zinc-300 uppercase tracking-tighter leading-none mb-1">NODE</span>
-                    <span className="text-xl font-black text-slate-900 italic tracking-tighter leading-none">T{table.table_number}</span>
+                    <span className="text-xl font-black text-slate-900 italic tracking-tighter leading-none">
+                      {table.table_number === 0 ? 'WINDOW' : `T${table.table_number}`}
+                    </span>
                  </div>
                  <div className="flex flex-col">
                     <span className="text-[8px] font-black text-zinc-300 uppercase tracking-widest">Protocol Status</span>

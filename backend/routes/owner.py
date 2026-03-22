@@ -396,10 +396,13 @@ def generate_qr(table_id):
         return jsonify(msg="Insufficient permissions"), 403
     restaurant = Restaurant.query.get(table.restaurant_id)
     
-    frontend_url = os.environ.get('FRONTEND_URL', 'http://localhost:5173')
+    frontend_url = os.environ.get('FRONTEND_URL', 'https://vinod-dinig-hall.vercel.app').rstrip('/')
     
     # URL encoded in the QR code
-    data_url = f"{frontend_url}/menu?restaurant={restaurant.slug}&table={table.table_number}"
+    if table.table_number == 0:
+        data_url = f"{frontend_url}/window"
+    else:
+        data_url = f"{frontend_url}/menu?restaurant={restaurant.slug}&table={table.table_number}"
     
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
     qr.add_data(data_url)
