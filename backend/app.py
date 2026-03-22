@@ -6,7 +6,7 @@ import logging
 # Set up basic logging for production visibility
 logging.basicConfig(level=logging.INFO)
 from config import Config
-from extensions import db, migrate, jwt, socketio
+from extensions import db, migrate, jwt, socketio, limiter
 import os
 from dotenv import load_dotenv  # ← ADD THIS if not already
 
@@ -24,14 +24,29 @@ def create_app(config_class=Config):
     # Even better: read from environment (safer for prod later)
     # app.config['DEBUG'] = os.getenv('FLASK_DEBUG', '1') == '1'
 
-    # CORS – your current setup is fine, but add expose_headers if needed later
+    # CORS – Allow Vercel domains + localhost for dev
     allowed_origins = os.getenv('ALLOWED_ORIGINS', '*').split(',')
+    # Add common origins for Vercel/Localhost if not already present
+    if '*' not in allowed_origins:
+        additional_origins = [
+            "https://*.vercel.app",
+            "http://localhost:5173",
+            "http://localhost:3000"
+        ]
+        for origin in additional_origins:
+            if origin not in allowed_origins:
+                allowed_origins.append(origin)
+    
     CORS(app, resources={r"/*": {
         "origins": allowed_origins,
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization", "X-Requested-With"],
-        "expose_headers": ["Content-Range", "X-Content-Range"]  # optional
+        "expose_headers": ["Content-Range", "X-Content-Range"]
     }}, supports_credentials=True)
+    
+    # Ratelimiter – using Redis from config
+    limiter.init_app(app)
+    app.config['RATELIMIT_STORAGE_URI'] = app.config.get('REDIS_URL')
 
     db.init_app(app)
     migrate.init_app(app, db)

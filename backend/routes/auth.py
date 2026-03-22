@@ -2,10 +2,12 @@ from flask import Blueprint, request, jsonify
 from flask_jwt_extended import create_access_token
 from models import User, Restaurant
 from utils import check_password
+from extensions import limiter
 
 auth_bp = Blueprint('auth_bp', __name__)
 
 @auth_bp.route('/auth/login', methods=['POST'])
+@limiter.limit("10 per minute")
 def login():
     data = request.json
     email = data.get('email')
