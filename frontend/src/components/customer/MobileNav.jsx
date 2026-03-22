@@ -4,8 +4,12 @@ import { useCartStore } from '../../store';
 
 const MobileNav = () => {
   const location = useLocation();
-  const { items } = useCartStore();
+  const { items, restaurantId, tableNumber } = useCartStore();
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
+
+  const menuLink = tableNumber === '0' || tableNumber === 0 
+    ? '/window' 
+    : `/menu?restaurant=${restaurantId || 'spice-lounge'}&table=${tableNumber || '1'}`;
 
   // Only show on customer pages
   const customerPages = ['/menu', '/cart', '/order-status'];
@@ -30,9 +34,9 @@ const MobileNav = () => {
           <span className="text-[10px] font-black uppercase tracking-widest">Home</span>
         </Link>
         
-        <Link to="/menu?restaurant=spice-lounge&table=1" className={getLinkClass('/menu')}>
+        <Link to={menuLink} className={getLinkClass(menuLink.split('?')[0])}>
           <div className="relative">
-            <User size={22} strokeWidth={isActive('/menu') ? 2.5 : 2} />
+            <User size={22} strokeWidth={(isActive('/menu') || isActive('/window')) ? 2.5 : 2} />
           </div>
           <span className="text-[10px] font-black uppercase tracking-widest">Menu</span>
         </Link>

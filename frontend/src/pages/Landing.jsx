@@ -154,15 +154,11 @@ export default function Landing() {
             <div className="stagger-reveal text-center md:text-left">
                 <div className="flex items-center justify-center md:justify-start gap-4 mb-4 md:mb-6">
                     <div className="w-8 md:w-12 h-[1px] bg-[#1C1917]/30"></div>
-                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.5em] text-[#C85C1A]">Est. MMXXVI</span>
+                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.5em] text-[#C85C1A]">Est. 2007</span>
                 </div>
                 <h1 className="font-fraunces text-4xl sm:text-5xl md:text-[8rem] font-black leading-[0.9] tracking-tighter mb-4 md:mb-6 text-[#1C1917] drop-shadow-sm">
                     The ritual of <span className="italic text-[#C85C1A]">dining.</span>
                 </h1>
-                <p className="max-w-xs md:max-w-md mx-auto md:mx-0 text-[10px] md:text-xs font-bold leading-relaxed uppercase tracking-[0.2em] text-[#1C1917]/60 md:text-[#1C1917]/70">
-                    A cinematic sequence of flavors. Every element perfectly choreographed. 
-                </p>
-
                 {!isLoginEnabled && (
                   <div className="mt-6 inline-flex items-center gap-3 bg-red-50 text-red-700 px-6 py-4 rounded-full border border-red-100 shadow-sm">
                     <ShieldAlert size={16} />

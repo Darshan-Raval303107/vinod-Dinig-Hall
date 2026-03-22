@@ -35,6 +35,7 @@ class RestaurantTable(db.Model):
     restaurant_id = db.Column(db.String(36), db.ForeignKey('restaurants.id'), nullable=False)
     table_number = db.Column(db.Integer, nullable=False)
     qr_code_url = db.Column(db.Text, nullable=True)
+    is_active = db.Column(db.Boolean, default=True)
 
 class MenuCategory(db.Model):
     __tablename__ = 'menu_categories'

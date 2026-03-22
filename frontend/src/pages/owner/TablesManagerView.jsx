@@ -40,6 +40,25 @@ const TablesManagerView = () => {
       });
   };
 
+  const handleToggleTable = async (tableId, currentStatus) => {
+    try {
+      await api.put(`/owner/tables/${tableId}`, { is_active: !currentStatus });
+      fetchTables();
+    } catch (err) {
+      setError("Failed to toggle node status.");
+    }
+  };
+
+  const handleDeleteTable = async (tableId) => {
+    if (!window.confirm("Are you sure you want to completely purge this table/window?")) return;
+    try {
+      await api.delete(`/owner/tables/${tableId}`);
+      fetchTables();
+    } catch (err) {
+      setError("Failed to purge node.");
+    }
+  };
+
   const getQrFullUrl = (qrUrl) => {
     if (!qrUrl) return '';
     if (qrUrl.startsWith('http')) return qrUrl;
@@ -145,20 +164,27 @@ const TablesManagerView = () => {
                  <div className="flex flex-col">
                     <span className="text-[8px] font-black text-zinc-300 uppercase tracking-widest">Protocol Status</span>
                     <div className="flex items-center gap-1.5 mt-1.5">
-                       <div className={`w-1.5 h-1.5 rounded-full ${table.qr_code_url ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500'}`}></div>
-                       <span className={`text-[9px] font-black ${table.qr_code_url ? 'text-emerald-500' : 'text-red-500'} italic uppercase tracking-widest`}>
-                         {table.qr_code_url ? 'LIVE-LINK' : 'VOID'}
+                       <div className={`w-1.5 h-1.5 rounded-full ${table.is_active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500'}`}></div>
+                       <span className={`text-[9px] font-black ${table.is_active ? 'text-emerald-500' : 'text-red-500'} italic uppercase tracking-widest`}>
+                         {table.is_active ? 'LIVE' : 'HALTED'}
                        </span>
                     </div>
                  </div>
               </div>
+              
+              <button 
+                onClick={() => handleToggleTable(table.id, table.is_active !== false)}
+                className={`w-10 h-10 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center transition-all active:scale-90 ${table.is_active !== false ? 'text-emerald-500' : 'text-zinc-300'}`}
+              >
+                <Zap size={16} />
+              </button>
             </header>
 
             <div className="relative mb-8 h-56 bg-zinc-50 border border-zinc-100 rounded-[2rem] p-6 flex flex-col items-center justify-center group/qr shadow-inner">
                {table.qr_code_url ? (
                  <div className="relative z-10 p-3 bg-white rounded-2xl shadow-xl transition-transform duration-500 group-hover/qr:scale-110 group-hover/qr:rotate-2">
                    <img
-                     src={getQrFullUrl(table.qr_code_url)}
+                     src={`${getQrFullUrl(table.qr_code_url)}?t=${Date.now()}`}
                      alt={`Node T${table.table_number}`}
                      className="w-24 h-24 object-contain grayscale-[0.3] group-hover/qr:grayscale-0 transition-all"
                    />
@@ -195,6 +221,13 @@ const TablesManagerView = () => {
                 className="w-14 h-14 flex items-center justify-center bg-zinc-50 border border-zinc-100 text-zinc-300 hover:text-slate-900 rounded-2xl transition-all active:scale-95 disabled:opacity-20"
               >
                 <Printer size={18} />
+              </button>
+              
+              <button 
+                onClick={() => handleDeleteTable(table.id)}
+                className="w-14 h-14 flex items-center justify-center bg-zinc-50 border border-zinc-100 text-zinc-300 hover:text-red-500 rounded-2xl transition-all active:scale-95"
+              >
+                <Trash2 size={18} />
               </button>
             </footer>
           </div>

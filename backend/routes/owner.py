@@ -339,7 +339,8 @@ def get_tables():
     return jsonify([{
         "id": str(t.id),
         "table_number": t.table_number,
-        "qr_code_url": t.qr_code_url
+        "qr_code_url": t.qr_code_url,
+        "is_active": t.is_active
     } for t in tables]), 200
 
 @owner_bp.route('/owner/tables', methods=['POST'])
@@ -384,8 +385,36 @@ def create_table():
             "id": str(table.id),
             "table_number": table.table_number,
             "qr_code_url": table.qr_code_url,
+            "is_active": table.is_active,
         },
     ), 201
+
+@owner_bp.route('/owner/tables/<table_id>', methods=['DELETE'])
+@role_required('owner', 'admin')
+def delete_table(table_id):
+    table = RestaurantTable.query.get_or_404(table_id)
+    restaurant_id = _get_claim_restaurant_id()
+    if not _require_owner_table_access(table, restaurant_id):
+        return jsonify(msg="Insufficient permissions"), 403
+
+    db.session.delete(table)
+    db.session.commit()
+    return jsonify(msg="Table deleted"), 200
+
+@owner_bp.route('/owner/tables/<table_id>', methods=['PUT'])
+@role_required('owner', 'admin')
+def update_table(table_id):
+    table = RestaurantTable.query.get_or_404(table_id)
+    restaurant_id = _get_claim_restaurant_id()
+    if not _require_owner_table_access(table, restaurant_id):
+        return jsonify(msg="Insufficient permissions"), 403
+
+    data = request.json or {}
+    if 'is_active' in data:
+        table.is_active = bool(data['is_active'])
+    
+    db.session.commit()
+    return jsonify(msg="Table updated", is_active=table.is_active), 200
 
 @owner_bp.route('/owner/tables/<table_id>/qr', methods=['POST'])
 @role_required('owner', 'admin')
