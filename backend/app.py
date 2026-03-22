@@ -228,9 +228,6 @@ def create_app(config_class=Config):
 app = create_app()
 
 if __name__ == '__main__':
-    # Use socketio.run for development if needed
-    # socketio.run(app, host='0.0.0.0', port=5000, allow_unsafe_werkzeug=True)
-    
-    # Run with Flask's built-in server for local development
+    # Use socketio.run for robust WebSocket support (Production and Development)
     port = int(os.getenv('PORT', 5000))
-    app.run(host='0.0.0.0', port=port)
+    socketio.run(app, host='0.0.0.0', port=port, allow_unsafe_werkzeug=True)

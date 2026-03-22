@@ -6,7 +6,7 @@ export const API_ORIGIN = (() => {
   try {
     return new URL(API_BASE_URL).origin;
   } catch {
-    return 'https://vinod-dinig-hall.vercel.app';
+    return 'https://vinod-dinig-hall.onrender.com';
   }
 })();
 
