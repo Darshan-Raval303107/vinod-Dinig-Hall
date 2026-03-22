@@ -102,7 +102,7 @@ def create_app(config_class=Config):
     app.register_blueprint(owner_bp, url_prefix='/api')
 
     # ── Redis Test Routes ────────────────────────────────────────────────
-    @app.route('/api/redis/set')
+    @app.route('/redis/set')
     def redis_set():
         try:
             from extensions import limiter
@@ -112,7 +112,7 @@ def create_app(config_class=Config):
         except Exception as e:
             return jsonify(error=str(e)), 500
 
-    @app.route('/api/redis/get')
+    @app.route('/redis/get')
     def redis_get():
         try:
             from extensions import limiter
