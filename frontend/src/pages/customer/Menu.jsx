@@ -98,7 +98,9 @@ const Menu = () => {
               {menuData.restaurant.name}
             </h1>
             <div className="flex items-center gap-3 text-[9px] font-black uppercase tracking-[0.2em] text-zinc-300">
-              <span className="text-customer-accent font-black">Table {table}</span>
+              <span className="text-customer-accent font-black">
+                {table === '0' ? 'Window Pickup' : `Table ${table}`}
+              </span>
               <span className="w-1 h-1 bg-zinc-200 rounded-full"></span>
               <span className="flex items-center gap-1"><Star size={10} className="fill-customer-accent text-customer-accent" /> 4.9</span>
               <span className="w-1 h-1 bg-zinc-200 rounded-full"></span>

@@ -9,6 +9,7 @@ import OrderStatus from './pages/customer/OrderStatus';
 import Payment from './pages/customer/Payment';
 import Bill from './pages/customer/Bill';
 import QRPreview from './pages/customer/QRPreview';
+import WindowRedirect from './pages/customer/WindowRedirect';
 
 import Login from './pages/auth/Login';
 import Unauthorized from './pages/auth/Unauthorized';
@@ -28,6 +29,7 @@ function App() {
             <Route path="/payment/:orderId" element={<Payment />} />
             <Route path="/bill/:orderId" element={<Bill />} />
             <Route path="/qr-preview" element={<QRPreview />} />
+            <Route path="/window" element={<WindowRedirect />} />
 
             <Route path="/login" element={<Login />} />
             <Route path="/unauthorized" element={<Unauthorized />} />

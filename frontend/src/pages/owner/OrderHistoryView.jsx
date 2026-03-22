@@ -59,7 +59,8 @@ const OrderHistoryView = () => {
 
   const filteredOrders = orders.filter(o => 
     o.id.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    o.table_number.toString().includes(searchQuery)
+    (o.table_number && o.table_number.toString().includes(searchQuery)) ||
+    (o.pickup_code && o.pickup_code.toLowerCase().includes(searchQuery.toLowerCase()))
   );
 
   if (loading) return (
@@ -124,8 +125,14 @@ const OrderHistoryView = () => {
                         </div>
                         
                         <div className="flex flex-col">
-                           <span className={`text-[10px] font-black uppercase tracking-widest ${expandedOrders.has(order.id) ? 'text-white/40' : 'text-zinc-300'}`}>Table Node</span>
-                           <span className="font-bold text-sm uppercase">ST-TABLE-{order.table_number.toString().padStart(2, '0')}</span>
+                           <span className={`text-[10px] font-black uppercase tracking-widest ${expandedOrders.has(order.id) ? 'text-white/40' : 'text-zinc-300'}`}>
+                             {order.order_type === 'window' ? 'Pickup Code' : 'Table Node'}
+                           </span>
+                           <span className="font-bold text-sm uppercase">
+                             {order.order_type === 'window' 
+                               ? `OTP: ${order.pickup_code}` 
+                               : `ST-TABLE-${(order.table_number || 0).toString().padStart(2, '0')}`}
+                           </span>
                         </div>
 
                         <div className="hidden lg:flex flex-col px-8 border-l border-zinc-100/10">

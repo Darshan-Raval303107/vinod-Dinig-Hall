@@ -444,6 +444,8 @@ def get_all_orders():
         res.append({
             "id": str(order.id),
             "table_number": order.table_number,
+            "order_type": order.order_type,
+            "pickup_code": order.pickup_code,
             "status": order.status,
             "total_price": float(order.total_price),
             "created_at": order.created_at.isoformat() if order.created_at else None,
