@@ -5,8 +5,8 @@ const WindowRedirect = () => {
   const navigate = useNavigate();
   
   useEffect(() => {
-    // Defaulting to 'spice-lounge' and table '0' for Window Pickup
-    navigate('/menu?restaurant=spice-lounge&table=0');
+    // Defaulting to the base /menu which now defaults to Window Pickup
+    navigate('/menu');
   }, [navigate]);
 
   return (

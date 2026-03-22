@@ -11,8 +11,8 @@ gsap.registerPlugin(ScrollTrigger);
 const Menu = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const restaurantSlug = searchParams.get('restaurant');
-  const table = searchParams.get('table');
+  const restaurantSlug = searchParams.get('restaurant') || 'spice-lounge';
+  const table = searchParams.get('table') || '0';
   
   const [menuData, setMenuData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -25,11 +25,8 @@ const Menu = () => {
   const { items: cartItems, addItem, setContext } = useCartStore();
 
   useEffect(() => {
-    if (!restaurantSlug || !table) {
-      setError('System Access Error: Entity parameters (restaurant/table) are missing from the request.');
-      setLoading(false);
-      return;
-    }
+    // Default context set via searchParams logic above
+    setLoading(true); // Ensure loading state is reset on re-mount if needed
 
     api.get(`/menu?restaurant=${restaurantSlug}&table=${table}`)
       .then(res => {
