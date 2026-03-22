@@ -5,5 +5,5 @@ const URL = import.meta.env.VITE_SOCKET_URL || 'https://vinod-dinig-hall.onrende
 export const socket = io(URL, {
   autoConnect: false,
   withCredentials: true,
-  transports: ['websocket', 'polling']
+  transports: ['polling', 'websocket']
 });

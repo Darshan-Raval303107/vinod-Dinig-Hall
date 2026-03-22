@@ -74,7 +74,7 @@ def create_app(config_class=Config):
     socketio.init_app(
         app, 
         async_mode="gevent", 
-        cors_allowed_origins=allowed_origins,
+        cors_allowed_origins="*", 
         message_queue=app.config.get('REDIS_URL')
     )
 
