@@ -88,7 +88,11 @@ const OrderStatus = () => {
         <h1 className="font-fraunces text-5xl font-black italic text-customer-text tracking-tighter leading-tight mb-2 uppercase">Progress</h1>
         <div className="flex items-center gap-3 justify-center">
            <span className="text-[11px] font-black text-customer-text/30 uppercase tracking-[0.2em] italic underline underline-offset-4 decoration-customer-accent/20">Ref: #{order.order_id.substring(0,8).toUpperCase()}</span>
-           <span className="text-xs font-bold text-customer-accent bg-customer-accent/5 px-3 py-1 rounded-lg">TABLE {order.table_number}</span>
+           {order.order_type === 'window' ? (
+             <span className="text-sm font-black text-white bg-customer-accent px-4 py-1.5 rounded-lg shadow-lg">PICKUP CODE: {order.pickup_code}</span>
+           ) : (
+             <span className="text-xs font-bold text-customer-accent bg-customer-accent/5 px-3 py-1 rounded-lg">TABLE {order.table_number}</span>
+           )}
         </div>
       </div>
 

@@ -81,6 +81,8 @@ def get_order_status(order_id):
         'order_id': order.id,
         'status': order.status,
         'table_number': order.table_number,
+        'order_type': order.order_type,
+        'pickup_code': order.pickup_code,
         'total_price': float(order.total_price),
         'created_at': order.created_at.isoformat() if order.created_at else None,
         'items': items_data

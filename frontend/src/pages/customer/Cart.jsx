@@ -18,13 +18,22 @@ const Cart = () => {
     setError('');
 
     try {
+      const isWindow = String(tableNumber).toLowerCase() === 'window' || parseInt(tableNumber, 10) === 0 || !tableNumber;
+
       const payload = {
         restaurant_id: restaurantId,
-        table_number: parseInt(tableNumber, 10),
-        items: items.map(i => ({ menu_item_id: i.id, quantity: i.quantity }))
+        table_number: isWindow ? 0 : parseInt(tableNumber, 10),
+        total: totalAmount,
+        items: items.map(i => ({ menu_item_id: i.id, quantity: i.quantity, price: i.price }))
       };
 
-      const res = await api.post('/orders', payload);
+      const endpoint = isWindow ? '/window/order' : '/orders';
+      const res = await api.post(endpoint, payload);
+      
+      if (isWindow && res.data.pickup_code) {
+        alert(res.data.message); // Show code immediately after ordering
+      }
+
       clearCart();
       // Show progress first as requested
       navigate(`/order-status/${res.data.order_id}`);
