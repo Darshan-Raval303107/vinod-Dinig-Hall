@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
-import { ChefHat, ArrowRight, ShieldAlert, Star, MapPin, Info, Smartphone } from 'lucide-react';
+import { ChefHat, ArrowRight, ShieldAlert, Star, MapPin, Info, Smartphone, Clock, Zap } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
@@ -69,7 +69,6 @@ export default function Landing() {
         canvas.height = h;
         ctx.imageSmoothingEnabled = true;
         ctx.imageSmoothingQuality = 'high';
-        // Redraw current
       }
     }
 
@@ -79,8 +78,7 @@ export default function Landing() {
       if (!img) return;
       const cw = canvas.width, ch = canvas.height;
       const iw = img.naturalWidth, ih = img.naturalHeight;
-      // Use cover scale on laptop, but fit width on portrait mobile to stop spreading
-      const scale = cw < ch ? (cw / iw) * 1.2 : Math.max(cw / iw, ch / ih);
+      const scale = cw < ch ? (cw / iw) * 1.5 : Math.max(cw / iw, ch / ih);
       const dw = Math.ceil(iw * scale), dh = Math.ceil(ih * scale);
       const dx = Math.floor((cw - dw) / 2), dy = Math.floor((ch - dh) / 2);
       ctx.fillStyle = '#FBF9F7';
@@ -89,6 +87,7 @@ export default function Landing() {
       lastDrawn = idx;
     }
 
+    // Prefetch
     for (let i = 1; i <= FRAME_COUNT; i++) {
         const img = new Image();
         img.src = FRAME_PATH(i);
@@ -131,12 +130,14 @@ export default function Landing() {
   }, []);
 
   return (
-    <div className="bg-[#FBF9F7] text-[#1C1917] font-sans selection:bg-[#C85C1A] selection:text-white pb-32">
+    <div className="bg-[#FBF9F7] text-[#1C1917] font-jakarta selection:bg-[#C85C1A] selection:text-white pb-32">
       
       {/* ── Navigation ── */}
-      <nav className="fixed top-0 left-0 w-full z-50 p-6 flex justify-between items-center mix-blend-difference text-white">
-        <a href="#top" className="font-fraunces text-2xl tracking-tight italic font-black hover:text-[#C85C1A] transition-colors">Vinnod</a>
-        <div className="hidden md:flex gap-8 text-xs font-bold uppercase tracking-widest">
+      <nav className="fixed top-0 left-0 w-full z-50 p-6 flex justify-between md:justify-between items-center mix-blend-difference text-white">
+        <div className="w-full flex justify-center md:justify-start">
+            <a href="#top" className="font-fraunces text-2xl tracking-tight italic font-black hover:text-[#C85C1A] transition-colors">Vinnod</a>
+        </div>
+        <div className="hidden md:flex gap-8 text-[10px] font-black uppercase tracking-[0.3em]">
             <a href="#experience" className="hover:text-[#C85C1A] transition-colors">Philosophy</a>
             <a href="#menu" className="hover:text-[#C85C1A] transition-colors">Curations</a>
             <Link to="/login" className="hover:text-[#C85C1A] transition-colors">Staff Portal</Link>
@@ -146,51 +147,54 @@ export default function Landing() {
       <main id="top">
         {/* ── Cinematic Scroll Hero ── */}
         <section ref={heroScrollRef} className="h-[250vh] md:h-[300vh] relative w-full">
-          <div className="sticky top-0 h-[100svh] w-full overflow-hidden flex flex-col justify-between p-6 md:p-12">
+          <div className="sticky top-0 h-[100svh] w-full overflow-hidden flex flex-col justify-center md:p-12 p-6">
             
-            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover -z-10 mix-blend-multiply opacity-90" />
+            <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover -z-10 mix-blend-multiply opacity-95" />
             
-            <div className="mt-24 max-w-4xl stagger-reveal">
-                <div className="flex items-center gap-4 mb-6">
-                    <div className="w-12 h-[1px] bg-[#1C1917]"></div>
-                    <span className="text-[10px] font-bold uppercase tracking-[0.4em]">Est. MMXXVI</span>
+            <div className="mt-8 md:mt-24 max-w-4xl stagger-reveal text-center md:text-left flex flex-col items-center md:items-start">
+                <div className="flex items-center gap-4 mb-6 md:mb-8">
+                    <div className="w-8 md:w-12 h-[1px] bg-[#1C1917]/30"></div>
+                    <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.5em] text-[#C85C1A]">Est. MMXXVI</span>
+                    <div className="md:hidden w-8 h-[1px] bg-[#1C1917]/30"></div>
                 </div>
-                <h1 className="font-fraunces text-6xl md:text-[8rem] font-black leading-[0.9] tracking-tighter mb-8 text-[#1C1917]">
+                <h1 className="font-fraunces text-5xl sm:text-6xl md:text-[8.5rem] font-black leading-[0.9] tracking-tighter mb-8 md:mb-10 text-[#1C1917] drop-shadow-sm">
                     The ritual of <br />
                     <span className="italic text-[#C85C1A]">dining.</span>
                 </h1>
-                <p className="max-w-md text-sm md:text-base font-medium leading-relaxed uppercase tracking-wider text-[#1C1917]/70">
+                <p className="max-w-xs md:max-w-md text-[11px] md:text-sm font-bold leading-relaxed uppercase tracking-[0.2em] text-[#1C1917]/60 md:text-[#1C1917]/70">
                     A cinematic sequence of flavors. Every element perfectly choreographed. 
-                    Scroll to experience the unveiling of our legendary Gujarati Thali.
+                    Scroll to experience the unveiling.
                 </p>
 
                 {!isLoginEnabled && (
-                  <div className="mt-12 inline-flex items-center gap-3 bg-red-50 text-red-700 px-6 py-4 rounded-full border border-red-100">
-                    <ShieldAlert size={18} />
-                    <span className="text-xs font-bold uppercase tracking-widest">Operations Halted by Management</span>
+                  <div className="mt-10 inline-flex items-center gap-3 bg-red-50 text-red-700 px-6 py-4 rounded-full border border-red-100 shadow-sm">
+                    <ShieldAlert size={16} />
+                    <span className="text-[9px] font-black uppercase tracking-widest">Operations Halted</span>
                   </div>
                 )}
 
-                <div className="mt-12 flex flex-col md:flex-row gap-6">
+                <div className="mt-10 md:mt-14 flex flex-col md:flex-row gap-6 w-full md:w-auto">
                     {isLoginEnabled ? (
-                        <Link to="/menu?restaurant=spice-lounge&table=1" className="group inline-flex items-center justify-center gap-4 bg-[#1C1917] text-[#FBF9F7] px-10 py-5 rounded-full text-xs font-black uppercase tracking-[0.2em] hover:bg-[#C85C1A] transition-all interactive-element">
+                        <Link to="/menu?restaurant=spice-lounge&table=1" className="group flex items-center justify-center gap-4 bg-[#1C1917] text-[#FBF9F7] px-12 py-5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.2)] active:scale-95">
                             Begin Journey <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                         </Link>
                     ) : (
-                        <button disabled className="inline-flex items-center justify-center bg-gray-200 text-gray-400 px-10 py-5 rounded-full text-xs font-black uppercase tracking-[0.2em] cursor-not-allowed">
+                        <button disabled className="flex items-center justify-center bg-gray-100 text-gray-400 px-12 py-5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] cursor-not-allowed">
                             Service Offline
                         </button>
                     )}
                 </div>
             </div>
 
-            <div className="flex justify-between items-end pb-8 stagger-reveal">
-                <div className="text-[10px] font-bold uppercase tracking-[0.4em] rotate-180" style={{ writingMode: 'vertical-rl' }}>
-                    Scroll to explore
+            <div className="absolute bottom-10 left-0 right-0 px-6 md:px-12 flex justify-between items-end pb-8 stagger-reveal pointer-events-none">
+                <div className="flex flex-col items-center gap-4 animate-bounce">
+                  <span className="text-[9px] font-black uppercase tracking-[0.4em] rotate-180" style={{ writingMode: 'vertical-rl' }}>
+                      Scroll
+                  </span>
                 </div>
                 <div className="text-right">
-                    <div className="text-[10px] font-bold uppercase tracking-[0.4em] mb-2 text-[#1C1917]/50">Location</div>
-                    <div className="font-fraunces italic font-bold">Center District, 0x41</div>
+                    <div className="text-[9px] font-black uppercase tracking-[0.4em] mb-2 text-[#C85C1A]/60">Node 0x41</div>
+                    <div className="font-fraunces italic font-black text-xs md:text-base">Center District</div>
                 </div>
             </div>
 
@@ -198,90 +202,98 @@ export default function Landing() {
         </section>
 
         {/* ── Signature Curations (Featured Menu) ── */}
-        <section id="menu" className="py-32 px-6 md:px-12 bg-white">
+        <section id="menu" className="py-24 md:py-40 px-6 md:px-12 bg-white">
           <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col md:flex-row justify-between items-end mb-20 stagger-reveal">
-              <div>
-                <h2 className="font-fraunces text-5xl md:text-7xl font-black tracking-tighter text-[#1C1917] leading-none mb-6">
+            <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-20 stagger-reveal text-center md:text-left">
+              <div className="flex flex-col items-center md:items-start">
+                <h2 className="font-fraunces text-5xl md:text-[6.5rem] font-black tracking-tighter text-[#1C1917] leading-[0.9] mb-8">
                   Signature <br/><span className="italic text-[#C85C1A]">Curations.</span>
                 </h2>
-                <div className="w-20 h-[1.5px] bg-[#C85C1A]"></div>
+                <div className="w-24 h-[1.5px] bg-[#C85C1A]"></div>
               </div>
-              <p className="max-w-md text-sm font-medium uppercase tracking-[0.2em] text-[#1C1917]/40 leading-relaxed mt-8 md:mt-0">
-                A preview of our daily ritual. Hand-selected ingredients, 
-                translated into cinematic textures. 
+              <p className="max-w-[280px] md:max-w-md text-[10px] md:text-sm font-black uppercase tracking-[0.3em] text-[#1C1917]/40 leading-relaxed mt-10 md:mt-0">
+                A daily ritual. Hand-selected ingredients, 
+                translated into cinematic textures for the modern palette. 
               </p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 md:gap-16">
               {[
                 { name: "Mango Lassi", img: "/images/mango_lassi.png", cat: "Beverages" },
                 { name: "Garlic Naan", img: "/images/garlic_naan.png", cat: "Mains" },
                 { name: "Signature Special", img: "/images/live_item.png", cat: "Live Selection" }
               ].map((item, i) => (
                 <div key={i} className="group cursor-pointer stagger-reveal">
-                  <div className="aspect-[4/5] overflow-hidden rounded-[2rem] mb-6 relative">
+                  <div className="aspect-[4/5] overflow-hidden rounded-[2.5rem] mb-8 relative shadow-sm transition-shadow hover:shadow-2xl">
                     <img 
                       src={item.img} 
                       alt={item.name} 
-                      className="w-full h-full object-cover grayscale-[0.2] transition-all duration-700 group-hover:scale-110 group-hover:grayscale-0" 
+                      className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110" 
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#1C1917]/20 to-transparent"></div>
-                    <div className="absolute top-6 left-6 px-4 py-1.5 bg-white/90 backdrop-blur rounded-full text-[8px] font-black uppercase tracking-[0.2em]">
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#1C1917]/40 to-transparent opacity-60"></div>
+                    <div className="absolute top-8 left-8 px-5 py-2 bg-white/95 backdrop-blur rounded-full text-[8px] font-black uppercase tracking-[0.3em] shadow-lg">
                       {item.cat}
                     </div>
                   </div>
-                  <h3 className="font-fraunces text-2xl font-black italic tracking-tight text-[#1C1917] group-hover:text-[#C85C1A] transition-colors">
-                    {item.name}
-                  </h3>
-                  <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#1C1917]/30 mt-2">Chef's Select Node 0x{i+1}</p>
+                  <div className="text-center md:text-left">
+                    <h3 className="font-fraunces text-3xl font-black italic tracking-tight text-[#1C1917] group-hover:text-[#C85C1A] transition-colors leading-none">
+                      {item.name}
+                    </h3>
+                    <div className="flex items-center justify-center md:justify-start gap-2 mt-4 text-[9px] font-black uppercase tracking-[0.4em] text-[#1C1917]/20">
+                      <Zap size={10} className="text-[#C85C1A] opacity-50" /> Protocol 0x{i+1}
+                    </div>
+                  </div>
                 </div>
               ))}
             </div>
 
-            <div className="mt-20 flex justify-center">
-               <Link to="/menu?restaurant=spice-lounge&table=1" className="group flex items-center gap-4 text-[10px] font-black uppercase tracking-[0.4em] text-[#1C1917] hover:text-[#C85C1A] transition-all">
-                  Access Full Repository <ArrowRight size={14} className="group-hover:translate-x-2 transition-transform" />
+            <div className="mt-24 md:mt-32 flex justify-center">
+               <Link to="/menu?restaurant=spice-lounge&table=1" className="group flex flex-col items-center gap-4 text-[10px] font-black uppercase tracking-[0.5em] text-[#1C1917] hover:text-[#C85C1A] transition-all">
+                  <span className="border-b border-transparent group-hover:border-[#C85C1A] transition-all pb-2">Access Repository</span>
+                  <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
                </Link>
             </div>
           </div>
         </section>
 
         {/* ── Ritual Schedule (Opening Times) ── */}
-        <section className="py-32 px-6 md:px-12 bg-[#FBF9F7] border-t border-[#1C1917]/5">
-           <div className="max-w-4xl mx-auto text-center stagger-reveal">
-              <div className="flex items-center justify-center gap-4 mb-10">
-                 <div className="w-12 h-[1px] bg-[#C85C1A]/30"></div>
-                 <span className="text-[10px] font-black uppercase tracking-[0.4em] text-[#C85C1A]">Temporal Matrix</span>
-                 <div className="w-12 h-[1px] bg-[#C85C1A]/30"></div>
+        <section className="py-24 md:py-40 px-6 md:px-12 bg-[#FBF9F7] border-t border-[#1C1917]/5 overflow-hidden">
+           <div className="max-w-5xl mx-auto text-center stagger-reveal">
+              <div className="flex items-center justify-center gap-6 mb-12">
+                 <div className="w-12 h-[1px] bg-[#C85C1A]/25"></div>
+                 <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#C85C1A]">Temporal Matrix</span>
+                 <div className="w-12 h-[1px] bg-[#C85C1A]/25"></div>
               </div>
-              <h2 className="font-fraunces text-6xl md:text-8xl font-black italic tracking-tighter text-[#1C1917] mb-16">
+              <h2 className="font-fraunces text-6xl md:text-[9rem] font-black italic tracking-tighter text-[#1C1917] mb-12 md:mb-20 leading-[0.85]">
                  Ritual <br/>Schedule.
               </h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-24">
-                 <div className="p-12 bg-white rounded-[3rem] shadow-sm border border-[#1C1917]/5 interactive-element">
-                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#1C1917]/30 mb-6">Culinary Flow</div>
-                    <div className="space-y-4">
-                       <div className="flex justify-between items-center border-b border-[#1C1917]/5 pb-4">
-                          <span className="font-bold text-sm">Mon — Fri</span>
-                          <span className="font-fraunces italic font-bold text-lg">11:00 — 23:00</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
+                 <div className="p-10 md:p-14 bg-white rounded-[3rem] shadow-[0_30px_60px_rgba(0,0,0,0.02)] border border-[#1C1917]/5 relative group">
+                    <div className="absolute top-10 right-10 text-zinc-100 group-hover:text-indigo-500/10 transition-colors">
+                      <Clock size={80} strokeWidth={1} />
+                    </div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#1C1917]/20 mb-10 text-left relative z-10">Weekly Flow</div>
+                    <div className="space-y-6 relative z-10">
+                       <div className="flex justify-between items-center border-b border-[#1C1917]/5 pb-6">
+                          <span className="font-black text-[10px] uppercase tracking-widest text-zinc-400">Weekdays</span>
+                          <span className="font-fraunces italic font-black text-xl md:text-2xl text-[#1C1917]">11:00 — 23:00</span>
                        </div>
-                       <div className="flex justify-between items-center border-b border-[#1C1917]/5 pb-4">
-                          <span className="font-bold text-sm">Sat — Sun</span>
-                          <span className="font-fraunces italic font-bold text-lg">10:00 — 00:00</span>
+                       <div className="flex justify-between items-center border-b border-[#1C1917]/5 pb-6">
+                          <span className="font-black text-[10px] uppercase tracking-widest text-[#C85C1A]/60">Weekend</span>
+                          <span className="font-fraunces italic font-black text-xl md:text-2xl text-[#1C1917]">10:00 — 00:00</span>
                        </div>
                     </div>
                  </div>
 
-                 <div className="p-12 bg-[#1C1917] text-[#FBF9F7] rounded-[3rem] shadow-2xl relative overflow-hidden interactive-element">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-[#C85C1A]/10 rounded-full blur-3xl"></div>
-                    <div className="text-[10px] font-black uppercase tracking-[0.3em] text-[#FBF9F7]/30 mb-6">Current Status</div>
-                    <div className="flex flex-col items-center gap-4">
-                       <div className="w-4 h-4 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_20px_rgba(16,185,129,0.5)]"></div>
-                       <div className="font-fraunces text-4xl font-black italic">Live Protocol</div>
-                       <p className="text-[10px] font-bold uppercase tracking-widest text-[#FBF9F7]/40 leading-relaxed max-w-[150px]">
-                          Node spice-lounge is currently operational.
+                 <div className="p-10 md:p-14 bg-[#1C1917] text-[#FBF9F7] rounded-[3rem] shadow-[0_50px_100px_rgba(0,0,0,0.15)] relative overflow-hidden group min-h-[320px] flex flex-col justify-center">
+                    <div className="absolute top-0 right-0 w-48 h-48 bg-[#C85C1A]/10 rounded-full blur-[100px] group-hover:bg-[#C85C1A]/20 transition-all duration-700"></div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FBF9F7]/20 mb-10 text-center relative z-10">Node Status</div>
+                    <div className="flex flex-col items-center gap-6 relative z-10">
+                       <div className="w-5 h-5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_30px_rgba(16,185,129,0.6)]"></div>
+                       <div className="font-fraunces text-4xl md:text-5xl font-black italic tracking-tighter">Live Session</div>
+                       <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[#FBF9F7]/40 leading-relaxed max-w-[200px] text-center">
+                          Network protocols are currently operational.
                        </p>
                     </div>
                  </div>

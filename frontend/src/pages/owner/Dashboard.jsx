@@ -7,8 +7,6 @@ import {
   UtensilsCrossed, 
   QrCode, 
   Users, 
-  Settings, 
-  Bell, 
   Search, 
   Globe, 
   ChevronRight, 
@@ -20,7 +18,6 @@ import AnalyticsView from './AnalyticsView';
 import MenuManagerView from './MenuManagerView';
 import TablesManagerView from './TablesManagerView';
 import OrderHistoryView from './OrderHistoryView';
-import SettingsView from './SettingsView';
 
 const OwnerDashboard = () => {
   const { user, logout } = useAuthStore();
@@ -38,7 +35,6 @@ const OwnerDashboard = () => {
     { path: '/owner/dashboard/orders', label: 'Ledger', icon: FileText },
     { path: '/owner/dashboard/menu', label: 'Cuisine', icon: UtensilsCrossed },
     { path: '/owner/dashboard/tables', label: 'Network', icon: QrCode },
-    { path: '/owner/dashboard/settings', label: 'Config', icon: Settings },
   ];
 
   const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
@@ -56,7 +52,6 @@ const OwnerDashboard = () => {
             <h1 className="font-syne text-lg font-black italic tracking-tighter">VINNOD CORE</h1>
          </div>
          <div className="flex items-center gap-4">
-            <button className="text-zinc-400"><Bell size={20} /></button>
             <button onClick={toggleSidebar} className="w-10 h-10 flex items-center justify-center rounded-xl bg-slate-50 border border-zinc-100">
                {isSidebarOpen ? <X size={20} /> : <MenuIcon size={20} />}
             </button>
@@ -150,20 +145,11 @@ const OwnerDashboard = () => {
            </div>
 
            <div className="flex items-center gap-6">
-              <div className="flex flex-col items-end mr-6 border-r border-zinc-100 pr-8">
+              <div className="flex flex-col items-end">
                  <span className="text-[8px] font-black text-zinc-300 uppercase tracking-[0.2em] mb-1 italic">Network Status</span>
                  <div className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     <span className="text-[10px] font-black text-slate-900 italic tracking-widest leading-none">SECURE-LIVE</span>
-                 </div>
-              </div>
-
-              <div className="flex items-center gap-3">
-                 <button className="w-11 h-11 rounded-xl bg-zinc-50 border border-zinc-100 flex items-center justify-center text-zinc-300 hover:text-slate-900 hover:bg-white transition-all">
-                    <Bell size={18} />
-                 </button>
-                 <div className="w-11 h-11 rounded-xl bg-slate-900 flex items-center justify-center text-white shadow-xl cursor-pointer">
-                    <Settings size={18} />
                  </div>
               </div>
            </div>
@@ -179,7 +165,6 @@ const OwnerDashboard = () => {
               <Route path="/menu" element={<MenuManagerView />} />
               <Route path="/tables" element={<TablesManagerView />} />
               <Route path="/staff" element={<div className="p-12 text-zinc-300 uppercase font-black tracking-[0.3em] text-center border-2 border-dashed border-zinc-100 rounded-[3rem] italic animate-pulse">Staff Matrix Coming Soon</div>} />
-              <Route path="/settings" element={<SettingsView />} />
             </Routes>
           </div>
         </main>

@@ -4,7 +4,7 @@ import { useAuthStore } from '../../store';
 import api from '../../api/axios';
 import { socket } from '../../api/socket';
 import OrderCard from '../../components/chef/OrderCard';
-import { LogOut, Bell, Timer, ChefHat, Activity, Coffee, Clock, AlertCircle, ChevronDown, Flame } from 'lucide-react';
+import { LogOut, Bell, Timer, ChefHat, Coffee, Clock, AlertCircle, Flame } from 'lucide-react';
 
 const ChefDashboard = () => {
   const { user, logout } = useAuthStore();
