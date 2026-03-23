@@ -156,7 +156,7 @@ const AnalyticsView = () => {
                <span className="text-[9px] font-black text-zinc-300 uppercase tracking-widest">Orders</span>
             </div>
           </div>
-          <div className="h-64 lg:h-80 w-full group">
+          <div className="h-64 lg:h-80 w-full group" style={{ minHeight: '320px' }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={data?.chart_data || []}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#F8FAFC" vertical={false} />
@@ -197,7 +197,7 @@ const AnalyticsView = () => {
         <div className="bg-slate-900 text-white rounded-[2.5rem] p-10 flex flex-col items-center shadow-2xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 w-40 h-40 bg-indigo-500/20 rounded-full blur-3xl -mr-10 -mt-10"></div>
             <h3 className="text-lg font-black text-white font-syne mb-10 italic w-full text-left relative z-10">Traffic Vector</h3>
-            <div className="h-48 w-full relative z-10">
+            <div className="h-48 w-full relative z-10" style={{ minHeight: '200px' }}>
                <ResponsiveContainer width="100%" height="100%">
                  <PieChart>
                     <Pie

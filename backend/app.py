@@ -78,11 +78,10 @@ def create_app(config_class=Config):
         except Exception as e:
             app.logger.error(f"❌ Database auto-migration failed: {e}")
 
-    # SocketIO init with gevent async mode + Redis message queue for scaling
     socketio.init_app(
         app, 
         async_mode="gevent", 
-        cors_allowed_origins="*", 
+        cors_allowed_origins=allowed_origins, 
         message_queue=app.config.get('REDIS_URL')
     )
 
