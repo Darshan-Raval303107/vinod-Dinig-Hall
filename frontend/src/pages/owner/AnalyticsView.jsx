@@ -135,7 +135,7 @@ const AnalyticsView = () => {
         <div className="lg:col-span-2 bg-white border border-zinc-100 rounded-[2.5rem] p-6 lg:p-10 shadow-sm relative overflow-hidden">
           <div className="flex justify-between items-center mb-10">
             <h3 className="text-lg font-black text-slate-900 font-syne italic">
-              Distribution Matrix
+              Order Distribution
             </h3>
             <div className="flex items-center gap-2">
                <div className="w-2 h-2 rounded-full bg-slate-900"></div>

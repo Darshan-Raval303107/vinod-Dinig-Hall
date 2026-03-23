@@ -32,8 +32,8 @@ const OwnerDashboard = () => {
 
   const navItems = [
     { path: '/owner/dashboard', label: 'Pulse', icon: LayoutDashboard },
-    { path: '/owner/dashboard/orders', label: 'Ledger', icon: FileText },
-    { path: '/owner/dashboard/menu', label: 'Cuisine', icon: UtensilsCrossed },
+    { path: '/owner/dashboard/orders', label: 'Orders', icon: FileText },
+    { path: '/owner/dashboard/menu', label: 'Menu', icon: UtensilsCrossed },
     { path: '/owner/dashboard/tables', label: 'Network', icon: QrCode },
   ];
 
@@ -69,7 +69,7 @@ const OwnerDashboard = () => {
             </div>
             <div>
               <h1 className="font-syne text-2xl font-black text-slate-900 italic tracking-tighter leading-none">Vinnod</h1>
-              <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1.5 opacity-50">Operations Matrix</p>
+              <p className="text-[8px] font-black text-slate-400 uppercase tracking-widest mt-1.5 opacity-50">Owner Dashboard</p>
             </div>
         </header>
 
@@ -112,7 +112,7 @@ const OwnerDashboard = () => {
                </div>
                <div className="flex-1 min-w-0">
                   <h4 className="text-[10px] font-black text-slate-900 uppercase tracking-widest truncate">{user?.name}</h4>
-                  <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest truncate mt-1">Matrix Owner</p>
+                  <p className="text-[8px] font-bold text-zinc-400 uppercase tracking-widest truncate mt-1">Admin</p>
                </div>
             </div>
             
@@ -139,7 +139,7 @@ const OwnerDashboard = () => {
               <Search size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-300" />
               <input 
                  type="text" 
-                 placeholder="Search Protocols..." 
+                 placeholder="Search..." 
                  className="w-full h-12 pl-14 pr-6 bg-zinc-50 border border-zinc-100 rounded-2xl text-[10px] font-bold uppercase tracking-widest text-slate-900 focus:outline-none focus:border-slate-900 transition-all placeholder:text-zinc-200"
               />
            </div>
@@ -164,7 +164,7 @@ const OwnerDashboard = () => {
               <Route path="/orders" element={<OrderHistoryView />} />
               <Route path="/menu" element={<MenuManagerView />} />
               <Route path="/tables" element={<TablesManagerView />} />
-              <Route path="/staff" element={<div className="p-12 text-zinc-300 uppercase font-black tracking-[0.3em] text-center border-2 border-dashed border-zinc-100 rounded-[3rem] italic animate-pulse">Staff Matrix Coming Soon</div>} />
+              <Route path="/staff" element={<div className="p-12 text-zinc-300 uppercase font-black tracking-[0.3em] text-center border-2 border-dashed border-zinc-100 rounded-[3rem] italic animate-pulse">Staff Management Coming Soon</div>} />
             </Routes>
           </div>
         </main>

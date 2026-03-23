@@ -75,7 +75,7 @@ const OrderCard = ({ order, onUpdateStatus }) => {
               </div>
               <div className="flex-1 min-w-0 pr-2">
                 <span className="text-[13px] md:text-sm font-bold text-slate-800 truncate block leading-tight">{item.name}</span>
-                <span className="text-[7.5px] md:text-[8px] font-black text-zinc-400 uppercase tracking-widest mt-0.5 block">KITCHEN PROTOCOL</span>
+                <span className="text-[7.5px] md:text-[8px] font-black text-zinc-400 uppercase tracking-widest mt-0.5 block">KITCHEN ORDER</span>
               </div>
             </div>
           ))}

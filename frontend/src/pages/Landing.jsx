@@ -152,12 +152,12 @@ export default function Landing() {
             <canvas ref={canvasRef} className="absolute inset-0 w-full h-full object-cover -z-10 mix-blend-multiply opacity-95" />
             
             <div className="stagger-reveal text-center md:text-left">
-                <div className="flex items-center justify-center md:justify-start gap-4 mb-4 md:mb-6">
+                <div className="flex items-center justify-center md:justify-start gap-4 mb-4 md:mb-6 select-none">
                     <div className="w-8 md:w-12 h-[1px] bg-[#1C1917]/30"></div>
                     <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.5em] text-[#C85C1A]">Est. 2007</span>
                 </div>
-                <h1 className="font-fraunces text-4xl sm:text-5xl md:text-[8rem] font-black leading-[0.9] tracking-tighter mb-4 md:mb-6 text-[#1C1917] drop-shadow-sm">
-                    The ritual of <span className="italic text-[#C85C1A]">dining.</span>
+                <h1 className="font-fraunces text-4xl sm:text-5xl md:text-[8rem] font-black leading-[0.9] tracking-tighter mb-4 md:mb-6 drop-shadow-[0_4px_10px_rgba(0,0,0,0.3)] select-none">
+                    <span className="inline-block bg-[linear-gradient(110deg,#FBF9F7,45%,#C85C1A,55%,#FBF9F7)] bg-[length:200%_100%] bg-clip-text text-transparent animate-text-shine">The ritual of</span> <span className="italic text-[#FBF9F7] bg-clip-text bg-gradient-to-r from-[#C85C1A] to-[#E85C1A] text-transparent drop-shadow-xl">dining.</span>
                 </h1>
                 {!isLoginEnabled && (
                   <div className="mt-6 inline-flex items-center gap-3 bg-red-50 text-red-700 px-6 py-4 rounded-full border border-red-100 shadow-sm">

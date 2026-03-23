@@ -72,7 +72,7 @@ const ChefDashboard = () => {
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#F8FAFC] text-slate-900">
       <div className="w-12 h-12 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-6 shadow-xl"></div>
-      <p className="font-syne text-[10px] tracking-[0.5em] font-black uppercase opacity-40 italic animate-pulse">Syncing Kitchen Matrix</p>
+      <p className="font-syne text-[10px] tracking-[0.5em] font-black uppercase opacity-40 italic animate-pulse">Syncing Orders</p>
     </div>
   );
 
@@ -107,7 +107,7 @@ const ChefDashboard = () => {
                  <Clock size={14} strokeWidth={3} />
                  {currentTime.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: false })}
               </div>
-              <span className="text-[9px] font-bold text-zinc-300 uppercase tracking-[0.2em] mt-1">Matrix Time</span>
+              <span className="text-[9px] font-bold text-zinc-300 uppercase tracking-[0.2em] mt-1">Current Time</span>
            </div>
            <button onClick={handleLogout} className="flex items-center justify-center gap-2 p-3 md:px-6 md:py-3 rounded-[1rem] md:rounded-xl bg-red-50 text-red-500 border border-red-100 font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all shadow-sm hover:bg-red-100">
               <LogOut size={16} /> <span className="hidden md:inline">LOGOUT</span>

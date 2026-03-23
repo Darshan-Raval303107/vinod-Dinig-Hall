@@ -79,7 +79,7 @@ const Login = () => {
                Digital <br/> <span className="text-customer-accent">Hospitality</span> <br/> Redefined.
              </h2>
              <p className="max-w-md text-white/40 font-bold uppercase tracking-[0.3em] text-[10px] leading-loose">
-               Connecting physical dining spaces with advanced digital matrix controls.
+               Connecting your dining experience with digital ordering.
              </p>
           </main>
 

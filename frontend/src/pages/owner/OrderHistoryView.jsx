@@ -34,14 +34,14 @@ const OrderHistoryView = () => {
         setLoading(false);
       })
       .catch(err => {
-        setError('Synchronicity failure. Orders ledger offline.');
+        setError('Error. Order history offline.');
         setLoading(false);
       });
   };
 
   useEffect(() => {
     fetchOrders();
-    gsap.fromTo('.ledger-row', { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.8, stagger: 0.05, ease: 'back.out(1.7)' });
+    gsap.fromTo('.order-row', { opacity: 0, x: -20 }, { opacity: 1, x: 0, duration: 0.8, stagger: 0.05, ease: 'back.out(1.7)' });
 
     if (user?.restaurant_id) {
       socket.connect();
@@ -95,7 +95,7 @@ const OrderHistoryView = () => {
   if (loading) return (
      <div className="flex flex-col items-center justify-center p-24 text-zinc-300">
         <div className="w-10 h-10 border-2 border-slate-900 border-t-transparent rounded-full animate-spin"></div>
-        <p className="mt-8 text-[10px] font-black uppercase tracking-[0.4em] italic animate-pulse">Syncing Operational Ledger...</p>
+        <p className="mt-8 text-[10px] font-black uppercase tracking-[0.4em] italic animate-pulse">Loading Order History...</p>
      </div>
   );
 
@@ -105,7 +105,7 @@ const OrderHistoryView = () => {
       {/* HEADER NODES */}
       <div className="flex flex-col md:flex-row justify-between items-end mb-12 gap-8">
          <div className="space-y-4">
-            <h2 className="font-fraunces text-5xl md:text-7xl font-black italic tracking-tighter text-slate-900 leading-none">Global <br /><span className="text-zinc-300">Ledger.</span></h2>
+            <h2 className="font-fraunces text-5xl md:text-7xl font-black italic tracking-tighter text-slate-900 leading-none">Order <br /><span className="text-zinc-300">History.</span></h2>
             <div className="flex items-center gap-3">
                <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse"></div>
                <span className="text-[10px] font-black text-indigo-500 uppercase tracking-widest italic">Live Sequence Monitor</span>
@@ -129,7 +129,7 @@ const OrderHistoryView = () => {
          </div>
       </div>
 
-      {/* LEDGER GRID */}
+      {/* ORDER GRID */}
       <div className="space-y-4 mb-20">
          {filteredOrders.length === 0 ? (
             <div className="p-20 text-center border-2 border-dashed border-zinc-100 rounded-[3rem] opacity-30">
@@ -138,8 +138,8 @@ const OrderHistoryView = () => {
             </div>
          ) : (
             filteredOrders.map((order, idx) => (
-               <div key={order.id} className="ledger-row overflow-hidden group">
-                  {/* Ledger Header Row */}
+               <div key={order.id} className="order-row overflow-hidden group">
+                  {/* Order Header Row */}
                   <div 
                     onClick={() => toggleOrder(order.id)}
                     className={`flex flex-col md:flex-row items-center justify-between p-6 px-4 md:px-10 rounded-[2rem] border transition-all duration-500 cursor-pointer
@@ -201,7 +201,7 @@ const OrderHistoryView = () => {
                            </div>
                            <div className="flex items-center gap-3 px-6 py-2.5 bg-white rounded-2xl border border-zinc-100 shadow-sm">
                                <CreditCard size={14} className="text-zinc-300" />
-                               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Validated Settlement via R-Pay</span>
+                               <span className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-400">Payment Verified via R-Pay</span>
                            </div>
                         </div>
 
@@ -209,7 +209,7 @@ const OrderHistoryView = () => {
                            <div className="flex text-[9px] font-black text-zinc-300 uppercase tracking-[0.4em] pb-3 border-b border-zinc-200">
                               <div className="flex-1">Consumable Selection</div>
                               <div className="w-16 text-center">Unit</div>
-                              <div className="w-24 text-right">Valuation</div>
+                              <div className="w-24 text-right">Price</div>
                            </div>
                            {order.items.map((item, i) => (
                               <div key={i} className="flex items-center text-sm">

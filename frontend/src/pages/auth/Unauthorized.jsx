@@ -24,7 +24,7 @@ const Unauthorized = () => {
            <h1 className="font-syne text-5xl font-black text-slate-900 italic tracking-tighter leading-none mb-6">Unauthorized Node Access</h1>
            <p className="text-slate-400 font-medium text-sm leading-relaxed max-w-xs mx-auto">
              Your current security clearance (User Identity) is insufficient to interface with this operational level. 
-             Contact the <span className="text-slate-900 font-bold italic">Matrix Administrator</span> for elevated permissions.
+             Contact the <span className="text-slate-900 font-bold italic">System Administrator</span> for elevated permissions.
            </p>
         </header>
 
@@ -52,9 +52,9 @@ const Unauthorized = () => {
 
         <footer className="mt-20 pt-10 border-t border-slate-100 flex flex-col items-center gap-4">
            <div className="flex items-center gap-3 opacity-20">
-              <span className="text-[9px] font-black text-slate-900 uppercase tracking-[0.3em]">Protocol Error: 403-FORBIDDEN</span>
+              <span className="text-[9px] font-black text-slate-900 uppercase tracking-[0.3em]">Error: 403-FORBIDDEN</span>
            </div>
-           <p className="text-[8px] text-slate-300 font-bold uppercase tracking-[0.4em] italic leading-none">Vinnod Network Security Matrix v4.1</p>
+           <p className="text-[8px] text-slate-300 font-bold uppercase tracking-[0.4em] italic leading-none">Vinnod Secure System</p>
         </footer>
       </div>
     </div>

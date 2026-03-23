@@ -119,10 +119,10 @@ const SettingsView = () => {
                  <div className="w-12 h-12 rounded-[1.25rem] bg-white/5 border border-white/10 flex items-center justify-center text-white/40">
                     <Lock size={20} />
                  </div>
-                 <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] italic">Security Protocol</span>
+                 <span className="text-[10px] font-black text-white/40 uppercase tracking-[0.4em] italic">Security Settings</span>
               </div>
               <p className="text-sm font-bold text-white/60 leading-relaxed mb-8 italic">
-                Advanced matrix isolation is active. This toggle acts as a physical air-gap simulation for the digital storefront. 
+                Advanced security is active. This toggle restricts customer ordering while maintaining management access. 
                 Use only during maintenance windows or emergency shutdowns.
               </p>
            </div>
@@ -142,7 +142,7 @@ const SettingsView = () => {
            <Zap size={28} />
         </div>
         <div className="text-center sm:text-left">
-           <h4 className="text-lg font-black text-red-500 font-syne uppercase tracking-widest mb-2 italic">Cautionary Protocol</h4>
+           <h4 className="text-lg font-black text-red-500 font-syne uppercase tracking-widest mb-2 italic">Danger Zone</h4>
            <p className="text-[10px] text-red-500/40 font-black uppercase tracking-widest leading-relaxed max-w-2xl italic">
               This switch overrides all customer-facing interfaces. Any unsaved baskets or pending customer queries will be purged from the volatile memory upon deactivation.
            </p>

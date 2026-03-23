@@ -162,7 +162,7 @@ const TablesManagerView = () => {
                     </span>
                  </div>
                  <div className="flex flex-col">
-                    <span className="text-[8px] font-black text-zinc-300 uppercase tracking-widest">Protocol Status</span>
+                    <span className="text-[8px] font-black text-zinc-300 uppercase tracking-widest">Status</span>
                     <div className="flex items-center gap-1.5 mt-1.5">
                        <div className={`w-1.5 h-1.5 rounded-full ${table.is_active ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'bg-red-500'}`}></div>
                        <span className={`text-[9px] font-black ${table.is_active ? 'text-emerald-500' : 'text-red-500'} italic uppercase tracking-widest`}>
@@ -253,7 +253,7 @@ const TablesManagerView = () => {
                     style={{ paddingTop: 'calc(var(--safe-top) + 2rem)' }}>
               <div>
                 <h3 className="text-2xl font-black text-slate-900 font-syne italic leading-none">Initialize Station</h3>
-                <p className="text-[10px] font-black text-zinc-300 uppercase tracking-widest mt-2">Node Assignment Protocol</p>
+                <p className="text-[10px] font-black text-zinc-300 uppercase tracking-widest mt-2">Table Assignment</p>
               </div>
               <button onClick={closeAdd} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white border border-zinc-100 text-zinc-300 hover:text-slate-900 transition-all">
                 <X size={24} />
@@ -297,7 +297,7 @@ const TablesManagerView = () => {
                   onClick={closeAdd}
                   className="text-[9px] font-black text-zinc-300 uppercase tracking-widest hover:text-slate-900 transition-all underline underline-offset-8 italic"
                 >
-                  Abort Protocol
+                  Cancel Edit
                 </button>
               </div>
             </form>

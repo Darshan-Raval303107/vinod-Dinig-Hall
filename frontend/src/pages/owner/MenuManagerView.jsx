@@ -165,8 +165,8 @@ const MenuManagerView = () => {
             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
             <span className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.4em]">Inventory Hub</span>
           </div>
-          <h2 className="text-4xl lg:text-5xl font-black font-syne text-slate-900 tracking-tighter italic">Cuisine Vault</h2>
-          <p className="text-[10px] font-black text-zinc-300 uppercase tracking-widest mt-2 italic">Maintain the culinary matrix.</p>
+          <h2 className="text-4xl lg:text-5xl font-black font-syne text-slate-900 tracking-tighter italic">Menu Items</h2>
+          <p className="text-[10px] font-black text-zinc-300 uppercase tracking-widest mt-2 italic">Manage your restaurant's menu items.</p>
         </div>
         
         <button
@@ -188,7 +188,7 @@ const MenuManagerView = () => {
           <Search size={18} className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-slate-900" />
           <input 
             type="text" 
-            placeholder="Search Protocol ID or Name..." 
+            placeholder="Search Menu Items..." 
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full h-16 pl-16 pr-6 bg-zinc-50 border border-zinc-100 rounded-[1.5rem] text-[10px] font-bold uppercase tracking-widest text-slate-900 focus:outline-none focus:border-slate-900 focus:bg-white transition-all placeholder:text-zinc-200 shadow-inner"
@@ -220,12 +220,12 @@ const MenuManagerView = () => {
              <div className="mb-6 flex-1">
                 <span className="text-[8px] font-black text-indigo-500 uppercase tracking-widest mb-1 block italic">{item.category_icon} {item.category_name}</span>
                 <h3 className="text-xl font-black text-slate-900 uppercase tracking-tighter leading-tight italic line-clamp-1">{item.name}</h3>
-                <p className="text-[10px] font-bold text-zinc-300 mt-2 line-clamp-2 italic leading-relaxed">{item.description || 'CORE ENTRY WITHOUT PROTOCOL DETAILS.'}</p>
+                <p className="text-[10px] font-bold text-zinc-300 mt-2 line-clamp-2 italic leading-relaxed">{item.description || 'NO DESCRIPTION ADDED.'}</p>
              </div>
 
              <div className="flex items-center justify-between pt-6 border-t border-zinc-50">
                 <div className="flex flex-col">
-                   <span className="text-[8px] font-black text-zinc-300 uppercase tracking-widest">Valuation</span>
+                   <span className="text-[8px] font-black text-zinc-300 uppercase tracking-widest">Price</span>
                    <span className="text-2xl font-black text-slate-900 italic tracking-tighter">₹{item.price.toFixed(0)}</span>
                 </div>
                 
@@ -260,7 +260,7 @@ const MenuManagerView = () => {
                      style={{ paddingTop: 'calc(var(--safe-top) + 2rem)' }}>
                 <div>
                   <h3 className="text-2xl font-black text-slate-900 font-syne italic leading-none">{editingItem ? 'Edit Entry' : 'New Entry'}</h3>
-                  <p className="text-[10px] font-black text-zinc-300 uppercase tracking-widest mt-2">Inventory Management Protocol</p>
+                  <p className="text-[10px] font-black text-zinc-300 uppercase tracking-widest mt-2">Menu Item Management</p>
                 </div>
                 <button onClick={closeModal} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white border border-zinc-100 text-zinc-300 hover:text-slate-900 transition-all">
                   <X size={24} />
@@ -274,7 +274,7 @@ const MenuManagerView = () => {
                      value={form.name}
                      onChange={(e) => setForm(f => ({ ...f, name: e.target.value }))}
                      className="w-full h-14 bg-zinc-50 border border-zinc-100 rounded-2xl px-6 text-[10px] font-bold uppercase tracking-widest focus:outline-none focus:border-slate-900 focus:bg-white transition-all shadow-inner"
-                     placeholder="ID: CUISINE_NAME"
+                     placeholder="ID: ITEM_NAME"
                      required
                    />
                 </div>
@@ -293,7 +293,7 @@ const MenuManagerView = () => {
                       </select>
                    </div>
                    <div className="space-y-2">
-                      <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Valuation (INR)</label>
+                      <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Price (INR)</label>
                       <input
                         value={form.price}
                         onChange={(e) => setForm(f => ({ ...f, price: e.target.value }))}
@@ -384,7 +384,7 @@ const MenuManagerView = () => {
              <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-xl shadow-red-500/10">
                 <Trash2 size={32} />
              </div>
-             <h3 className="text-2xl font-black italic text-slate-900 tracking-tighter mb-4">Purge Protocol</h3>
+             <h3 className="text-2xl font-black italic text-slate-900 tracking-tighter mb-4">Delete Item</h3>
              <p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest leading-relaxed mb-10">
                Confirm irreversible deletion of item <br/>
                <span className="text-red-500 bg-red-50 px-2 py-0.5 rounded italic break-all">"{deletingItem.name}"</span>
