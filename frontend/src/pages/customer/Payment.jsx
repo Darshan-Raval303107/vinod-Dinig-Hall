@@ -85,17 +85,27 @@ const Payment = () => {
         order_id: paymentData.razorpay_order_id,
         handler: async function (response) {
           try {
-            await api.post('/payments/verify', {
+            setProcessing(true);
+            const verifyRes = await api.post('/payments/verify', {
               razorpay_payment_id: response.razorpay_payment_id,
               razorpay_order_id: response.razorpay_order_id,
               razorpay_signature: response.razorpay_signature,
               order_id: orderId 
             });
 
+            const pickupCode = verifyRes.data.pickup_code;
+            
             setPaymentSuccess(true);
+            
+            if (pickupCode) {
+              alert(`🎉 PAYMENT SUCCESSFUL!\n\nYOUR PICKUP CODE: ${pickupCode}\n\nPlease show this code at the counter to collect your order.`);
+            } else {
+              alert("🎉 Payment Successful! Your order is being prepared.");
+            }
+
             setTimeout(() => {
               navigate(`/bill/${orderId}`);
-            }, 2500);
+            }, 1500);
           } catch (verifyErr) {
             console.error("Verification error:", verifyErr);
             setError(verifyErr.response?.data?.error || "Payment appears successful but verification failed locally. Contact support.");

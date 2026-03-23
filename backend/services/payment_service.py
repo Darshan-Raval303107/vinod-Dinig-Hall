@@ -142,12 +142,7 @@ def process_verify_payment(
             logger.warning(f"Payment record missing for razorpay_order_id: {razorpay_order_id}")
             return _err("Payment record not found", 404)
 
-        if payment.status in ("success", "captured", "paid"):
-            return _ok({
-                "message": "Payment already verified",
-                "order_id": payment.order_id
-            })
-
+        # 1. Verification of signature
         is_valid = verify_payment_signature(
             razorpay_order_id,
             razorpay_payment_id,
@@ -158,45 +153,67 @@ def process_verify_payment(
             logger.warning("Invalid payment signature")
             return _err("Invalid payment signature", 400)
 
-        # Mark success
+        # 2. Check if already processed to avoid double generation
+        if payment.status in ("success", "captured", "paid"):
+            logger.info(f"Payment {razorpay_payment_id} already success: {payment.status}")
+            order = Order.query.get(payment.order_id)
+            return _ok({
+                "message": "Payment already verified",
+                "order_id": payment.order_id,
+                "pickup_code": order.pickup_code if order and order.order_type == 'window' else None
+            })
+
+        # 3. Mark success
         payment.razorpay_payment_id = razorpay_payment_id
         payment.status = "success"
 
         linked_order = Order.query.get(payment.order_id)
+        pickup_code = None
+
         if linked_order:
-            # If it was a window order, it's now officially 'confirmed' for the kitchen
+            logger.info(f"Finalizing Order ID: {linked_order.id} | Type: {linked_order.order_type}")
+            
+            # Use current_app logger for visible Render logs if needed
+            print(f"DEBUG: Finalizing Order {linked_order.id} | Type: {linked_order.order_type}")
+
             if linked_order.order_type == 'window':
                 if not linked_order.pickup_code:
                     linked_order.pickup_code = generate_unique_window_code(db.session)
                     linked_order.status = 'confirmed'
-                    
-                    # Emit to kitchen now!
-                    socketio.emit('order:new', {
-                        'order_id': str(linked_order.id),
-                        'table_number': linked_order.table_number,
-                        'status': linked_order.status,
-                        'order_type': linked_order.order_type,
-                        'pickup_code': linked_order.pickup_code,
-                        'total_price': float(linked_order.total_price),
-                        'items_count': len(linked_order.items)
-                    }, room=str(linked_order.restaurant_id))
+                    pickup_code = linked_order.pickup_code
+                    logger.info(f"Generated Pickup Code: {pickup_code} for Window Order")
+                else:
+                    pickup_code = linked_order.pickup_code
+                
+                # Emit to kitchen now!
+                socketio.emit('order:new', {
+                    'order_id': str(linked_order.id),
+                    'table_number': linked_order.table_number,
+                    'status': linked_order.status,
+                    'order_type': linked_order.order_type,
+                    'pickup_code': linked_order.pickup_code,
+                    'total_price': float(linked_order.total_price),
+                    'items_count': len(linked_order.items)
+                }, room=str(linked_order.restaurant_id))
             else:
-                # Table orders are already confirmed, just mark as paid
+                # Table orders marked as paid (they were already confirmed)
                 linked_order.status = "paid"
+                logger.info(f"Table order {linked_order.id} marked as paid")
             
             linked_order.razorpay_payment_id = razorpay_payment_id
 
         db.session.commit()
-        logger.info(f"Payment successfully verified: {payment.id}")
+        logger.info(f"Payment successfully verified: {payment.id} | Order: {payment.order_id}")
 
         return _ok({
             "message": "Payment verified successfully",
             "order_id": payment.order_id,
+            "pickup_code": pickup_code
         })
 
     except Exception as e:
         db.session.rollback()
-        logger.exception("Verification failed")
+        logger.exception(f"Verification failed for {razorpay_order_id}")
         return _err(f"Verification failed: {str(e)}", 500)
 
 

@@ -172,7 +172,7 @@ const OrderHistoryView = () => {
                            </div>
                            <span className="font-syne font-bold text-base md:text-sm uppercase tracking-tight">
                              {order.order_type === 'window' 
-                               ? `TOKEN: ${order.pickup_code}` 
+                               ? (order.pickup_code ? `TOKEN: ${order.pickup_code}` : 'TOKEN: AWAITING PAYMENT')
                                : `STATION-${(order.table_number || 0).toString().padStart(2, '0')}`}
                            </span>
                         </div>
