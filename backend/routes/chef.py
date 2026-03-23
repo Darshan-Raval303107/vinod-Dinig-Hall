@@ -38,6 +38,9 @@ def get_chef_orders():
             'order_id': str(order.id),
             'table_number': order.table_number,
             'status': order.status,
+            'order_type': order.order_type,
+            'pickup_code': order.pickup_code,
+            'payment_status': order.payment.status if order.payment else 'pending',
             'created_at': order.created_at.isoformat(),
             'items': items
         })

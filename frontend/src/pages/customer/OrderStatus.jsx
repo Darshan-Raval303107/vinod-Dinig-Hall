@@ -89,7 +89,11 @@ const OrderStatus = () => {
         <div className="flex items-center gap-3 justify-center">
            <span className="text-[11px] font-black text-customer-text/30 uppercase tracking-[0.2em] italic underline underline-offset-4 decoration-customer-accent/20">Ref: #{order.order_id.substring(0,8).toUpperCase()}</span>
            {order.order_type === 'window' ? (
-             <span className="text-sm font-black text-white bg-customer-accent px-4 py-1.5 rounded-lg shadow-lg">PICKUP CODE: {order.pickup_code}</span>
+             order.pickup_code ? (
+               <span className="text-sm font-black text-white bg-customer-accent px-4 py-1.5 rounded-lg shadow-lg">PICKUP CODE: {order.pickup_code}</span>
+             ) : (
+               <span className="text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg border border-red-100 animate-pulse">AWAITING PAYMENT</span>
+             )
            ) : (
              <span className="text-xs font-bold text-customer-accent bg-customer-accent/5 px-3 py-1 rounded-lg">TABLE {order.table_number}</span>
            )}
@@ -206,26 +210,32 @@ const OrderStatus = () => {
                 </div>
               )}
               
-              <button 
+               <button 
                 onClick={() => navigate(`/payment/${orderId}`)}
                 className={`group relative w-full h-20 rounded-[2.5rem] shadow-[0_40px_80px_-20px_rgba(31,31,31,0.2)] flex items-center justify-between px-3 overflow-hidden transition-all active:scale-[0.98] border border-white/5 
-                  ${order.status === 'served' ? 'bg-customer-text text-white' : 'bg-white border-customer-surface/30'}`}
+                  ${order.status === 'served' || (order.order_type === 'window' && !order.pickup_code) ? 'bg-customer-text text-white' : 'bg-white border-customer-surface/30'}`}
               >
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
                 
-                <div className={`h-14 rounded-[2rem] px-8 flex items-center gap-3 transition-all ${order.status === 'served' ? 'bg-customer-accent shadow-[0_8px_25px_rgba(200,92,26,0.3)]' : 'bg-[#FBF7F0] border border-customer-surface/10'}`}>
-                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${order.status === 'served' ? 'bg-white/20 animate-bounce text-white' : 'bg-customer-accent/10 text-customer-accent'}`}>
+                <div className={`h-14 rounded-[2rem] px-8 flex items-center gap-3 transition-all ${order.status === 'served' || (order.order_type === 'window' && !order.pickup_code) ? 'bg-customer-accent shadow-[0_8px_25px_rgba(200,92,26,0.3)]' : 'bg-[#FBF7F0] border border-customer-surface/10'}`}>
+                  <div className={`w-6 h-6 rounded-full flex items-center justify-center ${order.status === 'served' || (order.order_type === 'window' && !order.pickup_code) ? 'bg-white/20 animate-bounce text-white' : 'bg-customer-accent/10 text-customer-accent'}`}>
                     <CreditCard size={14} />
                   </div>
+<<<<<<< HEAD
+                  <span className={`text-[10px] font-black uppercase tracking-[0.2em] italic ${order.status === 'served' || (order.order_type === 'window' && !order.pickup_code) ? 'text-white' : 'text-customer-text/40'}`}>
+                    {order.status === 'served' ? 'Final Settlement' : (order.order_type === 'window' && !order.pickup_code) ? 'Pay to Start Order' : 'Pay Advance'}
+=======
                   <span className={`text-[10px] font-black uppercase tracking-[0.2em] italic ${order.status === 'served' ? 'text-white' : 'text-customer-text/40'}`}>
                     {order.status === 'served' ? 'Pay Now' : 'Pay Early'}
+>>>>>>> dabe0e871462274592c58f13602e0ab533aeaeac
                   </span>
                 </div>
 
-                <div className={`flex items-center gap-2 font-fraunces italic text-xl pr-6 transition-all group-hover:translate-x-1 ${order.status === 'served' ? 'text-white' : 'text-customer-text'}`}>
-                  ₹{order.total_price.toFixed(0)} <ChevronRight size={22} className={order.status === 'served' ? 'text-white' : 'text-customer-accent'} />
+                <div className={`flex items-center gap-2 font-fraunces italic text-xl pr-6 transition-all group-hover:translate-x-1 ${order.status === 'served' || (order.order_type === 'window' && !order.pickup_code) ? 'text-white' : 'text-customer-text'}`}>
+                  ₹{order.total_price.toFixed(0)} <ChevronRight size={22} className={order.status === 'served' || (order.order_type === 'window' && !order.pickup_code) ? 'text-white' : 'text-customer-accent'} />
                 </div>
               </button>
+
             </div>
           )}
         </div>

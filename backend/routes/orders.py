@@ -12,8 +12,11 @@ def create_order():
     table_number = data.get('table_number')
     items = data.get('items') # list of dicts: { menu_item_id, quantity }
 
-    if not restaurant_id or not table_number or not items:
+    if not restaurant_id or not items:
         return jsonify(msg="Missing required fields"), 400
+
+    if not table_number:
+        return jsonify(msg="Table number is required for dine-in orders"), 400
 
     try:
         new_order = Order(
@@ -83,6 +86,7 @@ def get_order_status(order_id):
         'table_number': order.table_number,
         'order_type': order.order_type,
         'pickup_code': order.pickup_code,
+        'payment_status': order.payment.status if order.payment else 'pending',
         'total_price': float(order.total_price),
         'created_at': order.created_at.isoformat() if order.created_at else None,
         'items': items_data

@@ -4,9 +4,12 @@ from datetime import datetime, timedelta
 from flask import Blueprint, request, jsonify, url_for, current_app
 from flask_jwt_extended import get_jwt, verify_jwt_in_request
 from werkzeug.utils import secure_filename
+from sqlalchemy import func
+from sqlalchemy.exc import IntegrityError
+from typing import Optional, Dict
+
 from extensions import db
 from models import Order, MenuItem, MenuCategory, RestaurantTable, Restaurant
-from sqlalchemy import func
 from utils import role_required
 
 owner_bp = Blueprint('owner_bp', __name__)
@@ -28,7 +31,7 @@ def _is_allowed_image_filename(filename: str) -> bool:
     return ext in ALLOWED_IMAGE_EXTENSIONS
 
 
-def _save_menu_item_image(file_storage, restaurant_id: str) -> str:
+def _save_menu_item_image(file_storage, restaurant_id: str) -> Optional[str]:
     """
     Save uploaded menu image to backend/static/uploads/menu/<restaurant_id>/.
     Returns the public URL path (starting with /static/...).
@@ -99,7 +102,7 @@ def get_analytics():
         orders = base_query.filter(Order.created_at >= start_date).all()
         
         # Daily counts for last 30 days
-        daily_counts = {}
+        daily_counts: Dict[str, int] = {}
         for i in range(30):
             d = (start_date + timedelta(days=i)).strftime("%b %d")
             daily_counts[d] = 0
@@ -127,7 +130,7 @@ def get_analytics():
     else: # all-time
         orders = base_query.all()
         # Yearly counts
-        yearly_counts = {}
+        yearly_counts: Dict[str, int] = {}
         for o in orders:
             y_str = o.created_at.strftime("%Y")
             yearly_counts[y_str] = yearly_counts.get(y_str, 0) + 1
@@ -262,7 +265,6 @@ def update_menu_item(item_id):
         return jsonify(msg="Insufficient permissions"), 403
     
     if request.method == 'DELETE':
-        from sqlalchemy.exc import IntegrityError
         try:
             db.session.delete(item)
             db.session.commit()
@@ -436,7 +438,7 @@ def generate_qr(table_id):
     if table.table_number == 0:
         data_url = f"{frontend_url}/window"
     else:
-        data_url = f"{frontend_url}/menu?restaurant={restaurant.slug}&table={table.table_number}"
+        data_url = f"{frontend_url}/table/{table.table_number}"
     
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
     qr.add_data(data_url)
@@ -484,6 +486,7 @@ def get_all_orders():
             "order_type": order.order_type,
             "pickup_code": order.pickup_code,
             "status": order.status,
+            "payment_status": order.payment.status if order.payment else 'pending',
             "total_price": float(order.total_price),
             "created_at": order.created_at.isoformat() if order.created_at else None,
             "items": items_data
