@@ -16,5 +16,3 @@ eventlet
 razorpay
 psycopg2-binary
 requests
-
-
