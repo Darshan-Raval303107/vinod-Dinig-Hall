@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { socket } from '../../api/socket';
-import { CheckCircle2, Clock, ChefHat, CheckSquare, CreditCard, ChevronRight, Activity, Bell, Info, ArrowLeft, Trash2 } from 'lucide-react';
+import { CheckCircle2, Clock, ChefHat, CheckSquare, CreditCard, ChevronRight, Activity, Bell, Info, ArrowLeft, Trash2, Ticket } from 'lucide-react';
 
 const STATUS_STEPS = [
   { id: 'pending', label: 'Order Received', icon: Clock, desc: 'Our kitchen has received your order' },
