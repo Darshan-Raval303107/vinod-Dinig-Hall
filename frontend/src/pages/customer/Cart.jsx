@@ -78,7 +78,6 @@ const Cart = () => {
           <div>
             <h1 className="font-fraunces text-2xl font-black text-customer-text leading-none italic">Cart</h1>
             <p className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.2em] mt-1.5 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-customer-accent animate-pulse"></span> Table {tableNumber}
             </p>
           </div>
         </div>

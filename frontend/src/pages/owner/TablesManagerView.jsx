@@ -90,17 +90,43 @@ const TablesManagerView = () => {
     setIsAddOpen(false);
   };
 
+  const handleDeployWindow = async () => {
+    setCreating(true);
+    setError('');
+    try {
+      const existingWindow = tables.find(t => t.table_number === 0);
+      if (existingWindow) {
+        // Just trigger QR generation
+        api.post(`/owner/tables/${existingWindow.id}/qr`)
+          .then(() => fetchTables())
+          .finally(() => setCreating(false));
+        return;
+      }
+      // Create new table 0 (backend handles QR on creation)
+      await api.post('/owner/tables', { table_number: 0 });
+      fetchTables();
+    } catch (err) {
+      setError(err?.response?.data?.msg || 'Failed to initialize window node');
+    } finally {
+      if (!tables.find(t => t.table_number === 0)) setCreating(false);
+    }
+  };
+
   const createTable = async (e) => {
     e.preventDefault();
     setCreating(true);
     setError('');
     try {
-      const payload = newTableNumber.trim() === '' ? {} : { table_number: Number(newTableNumber) };
+      // Normal tables should not use 0 here (handled by handleDeployWindow)
+      const num = Number(newTableNumber);
+      if (num <= 0) throw new Error("Station identifier must be 1 or greater.");
+      
+      const payload = { table_number: num };
       await api.post('/owner/tables', payload);
       setIsAddOpen(false);
       fetchTables();
     } catch (err) {
-      setError(err?.response?.data?.msg || 'Failed to initialize table node');
+      setError(err.message || err?.response?.data?.msg || 'Failed to initialize table node');
     } finally {
       setCreating(false);
     }
@@ -126,14 +152,14 @@ const TablesManagerView = () => {
         </div>
         
         <div className="mt-8 lg:mt-0 flex flex-col sm:flex-row gap-4 w-full lg:w-auto">
-          {!tables.some(t => t.table_number === 0) && (
-            <button
-              onClick={() => { setNewTableNumber('0'); setIsAddOpen(true); }}
-              className="h-16 px-10 bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-sm hover:bg-emerald-100 transition-all flex items-center justify-center gap-3"
-            >
-              <Zap size={18} /> Deploy Window Station
-            </button>
-          )}
+          <button
+            onClick={handleDeployWindow}
+            className="h-16 px-10 bg-emerald-50 text-emerald-600 border border-emerald-100 text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-sm hover:bg-emerald-100 transition-all flex items-center justify-center gap-3 active:scale-95"
+          >
+            <Zap size={18} className={creating && !isAddOpen ? "animate-spin" : ""} /> 
+            {creating && !isAddOpen ? "SYNCING..." : "Deploy Window Station"}
+          </button>
+          
           <button
             onClick={openAdd}
             className="h-16 px-10 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-3"

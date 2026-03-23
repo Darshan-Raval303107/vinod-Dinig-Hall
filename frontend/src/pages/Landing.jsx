@@ -12,7 +12,7 @@ export default function Landing() {
   const isTableOrder = !!tableNumber;
   const menuPath = isTableOrder 
     ? `/menu?restaurant=spice-lounge&table=${tableNumber}` 
-    : '/menu?restaurant=spice-lounge';
+    : '/menu';
   const [isLoginEnabled, setIsLoginEnabled] = useState(true);
   const canvasRef = useRef(null);
   const heroScrollRef = useRef(null);

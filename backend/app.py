@@ -246,6 +246,18 @@ def create_app(config_class=Config):
 # Instantiate the app for Gunicorn
 app = create_app()
 
+@app.route('/setup-database-now')
+def setup_db_manual():
+    from sqlalchemy import text
+    try:
+        # SQL for adding missing columns
+        db.session.execute(text(""))
+        db.session.commit()
+        return "✅ Database updated successfully! is_updated column added."
+    except Exception as e:
+        db.session.rollback()
+        return f"❌ Error: {str(e)}"
+
 if __name__ == '__main__':
     # Use socketio.run for robust WebSocket support (Production and Development)
     port = int(os.getenv('PORT', 5000))
