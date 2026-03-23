@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useSearchParams, useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../../api/axios';
 import { 
   Printer, 
@@ -10,12 +10,15 @@ import {
   Hash, 
   ArrowDownToLine,
   Share2,
-  Utensils
+  Utensils,
+  Ticket
 } from 'lucide-react';
 import gsap from 'gsap';
 
 const Bill = () => {
   const { orderId } = useParams();
+  const [searchParams] = useSearchParams();
+  const urlPickupCode = searchParams.get('code');
   const navigate = useNavigate();
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -89,11 +92,26 @@ const Bill = () => {
       <main className="px-6 max-w-lg mx-auto">
         
         {/* SUCCESS BADGE */}
-        <div className="flex flex-col items-center mb-10 receipt-reveal print:hidden">
+        <div className="flex flex-col items-center mb-10 receipt-reveal print:hidden text-center">
              <div className="w-16 h-16 bg-emerald-500/10 border-2 border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-500 mb-4 shadow-xl shadow-emerald-500/5">
                 <CheckCircle2 size={32} />
              </div>
              <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em] italic">Payment Successful</p>
+             
+             {/* Pickup Code Display */}
+             {(urlPickupCode || order?.pickup_code) && (
+               <div className="mt-8 p-8 bg-customer-accent text-white rounded-[2.5rem] shadow-2xl shadow-customer-accent/20 relative overflow-hidden group">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-1000"></div>
+                  <div className="relative z-10">
+                    <span className="text-[9px] font-black uppercase tracking-[0.4em] block mb-3 text-white/60 leading-none">Your Pickup Code</span>
+                    <span className="font-fraunces text-6xl font-black italic tracking-tighter leading-none block">{urlPickupCode || order.pickup_code}</span>
+                    <div className="mt-4 flex items-center justify-center gap-2">
+                        <Ticket size={12} className="text-white/40" />
+                        <p className="text-[8px] font-bold uppercase tracking-widest text-white/60">Collect at the counter</p>
+                    </div>
+                  </div>
+               </div>
+             )}
         </div>
 
         {/* RECEIPT BOX */}

@@ -113,19 +113,19 @@ const Payment = () => {
             });
 
             console.log("Payment verification result:", verifyRes.data);
-            const pickupCode = verifyRes.data.pickup_code;
+            const pickup_code = verifyRes.data.pickup_code;
+            const order_id = verifyRes.data.order_id || orderId;
             
             setPaymentSuccess(true);
             
-            if (pickupCode) {
-              alert(`🎉 PAYMENT SUCCESSFUL!\n\nYOUR PICKUP CODE: ${pickupCode}\n\nPlease show this code at the counter to collect your order.`);
-            } else {
-              alert("🎉 Payment Successful! Your order is being prepared.");
-            }
-
+            // On mobile, state updates can be unreliable if the browser is closing the modal.
+            // Forced redirect is much more robust.
             setTimeout(() => {
-              navigate(`/bill/${orderId}`);
-            }, 1500);
+              const successUrl = `/bill/${order_id}${pickup_code ? `?code=${pickup_code}` : ''}`;
+              console.log("Redirecting to:", successUrl);
+              window.location.replace(successUrl);
+            }, 1000);
+
           } catch (verifyErr) {
             console.error("Local verification error:", verifyErr);
             setError(verifyErr.response?.data?.error || "Payment appears successful but verification failed locally. Contact support.");
@@ -149,6 +149,17 @@ const Payment = () => {
       console.log("Executing rzp.open()...");
       const rzp = new window.Razorpay(options);
       
+      // Safety timeout for mobile: If stuck in "Processing..." for > 30s, reset
+      setTimeout(() => {
+        setProcessing(current => {
+          if (current) {
+            console.warn("Payment flow safety timeout reached. Resetting UI.");
+            return false;
+          }
+          return current;
+        });
+      }, 30000);
+
       rzp.on('payment.failed', function (response) {
         console.error("Razorpay Payment Failed:", response.error);
         setError(`Payment failed: ${response.error.description}`);
