@@ -163,21 +163,23 @@ def process_verify_payment(
         linked_order = Order.query.get(payment.order_id)
         if linked_order:
             # If it was a window order, it's now officially 'confirmed' for the kitchen
-            if linked_order.order_type == 'window' and not linked_order.pickup_code:
-                linked_order.pickup_code = generate_unique_window_code(db.session)
-                linked_order.status = 'confirmed'
-                
-                # Emit to kitchen now!
-                socketio.emit('order:new', {
-                    'order_id': str(linked_order.id),
-                    'table_number': linked_order.table_number,
-                    'status': linked_order.status,
-                    'order_type': linked_order.order_type,
-                    'pickup_code': linked_order.pickup_code,
-                    'total_price': float(linked_order.total_price),
-                    'items_count': len(linked_order.items)
-                }, room=str(linked_order.restaurant_id))
+            if linked_order.order_type == 'window':
+                if not linked_order.pickup_code:
+                    linked_order.pickup_code = generate_unique_window_code(db.session)
+                    linked_order.status = 'confirmed'
+                    
+                    # Emit to kitchen now!
+                    socketio.emit('order:new', {
+                        'order_id': str(linked_order.id),
+                        'table_number': linked_order.table_number,
+                        'status': linked_order.status,
+                        'order_type': linked_order.order_type,
+                        'pickup_code': linked_order.pickup_code,
+                        'total_price': float(linked_order.total_price),
+                        'items_count': len(linked_order.items)
+                    }, room=str(linked_order.restaurant_id))
             else:
+                # Table orders are already confirmed, just mark as paid
                 linked_order.status = "paid"
             
             linked_order.razorpay_payment_id = razorpay_payment_id
@@ -272,22 +274,23 @@ def process_webhook_event(event_data: dict):
         order = Order.query.get(payment.order_id)
         if order:
             if new_status in ("captured", "success"):
-                # Handle window order confirmation on webhook success too
-                if order.order_type == 'window' and not order.pickup_code:
-                    order.pickup_code = generate_unique_window_code(db.session)
-                    order.status = 'confirmed'
-                    
-                    # Notify kitchen
-                    socketio.emit('order:new', {
-                        'order_id': str(order.id),
-                        'table_number': order.table_number,
-                        'status': order.status,
-                        'order_type': order.order_type,
-                        'pickup_code': order.pickup_code,
-                        'total_price': float(order.total_price),
-                        'items_count': len(order.items)
-                    }, room=str(order.restaurant_id))
+                if order.order_type == 'window':
+                    if not order.pickup_code:
+                        order.pickup_code = generate_unique_window_code(db.session)
+                        order.status = 'confirmed'
+                        
+                        # Notify kitchen
+                        socketio.emit('order:new', {
+                            'order_id': str(order.id),
+                            'table_number': order.table_number,
+                            'status': order.status,
+                            'order_type': order.order_type,
+                            'pickup_code': order.pickup_code,
+                            'total_price': float(order.total_price),
+                            'items_count': len(order.items)
+                        }, room=str(order.restaurant_id))
                 else:
+                    # For table orders, just mark as paid (they were already confirmed)
                     order.status = "paid"
                 order.razorpay_payment_id = rz_payment_id
             elif new_status == "failed" and order.status != "paid":

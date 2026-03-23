@@ -434,11 +434,13 @@ def generate_qr(table_id):
     
     frontend_url = os.environ.get('FRONTEND_URL', 'https://vinod-dinig-hall.vercel.app').rstrip('/')
     
-    # URL encoded in the QR code
+    # URL encoded in the QR code - including slug for robustness
     if table.table_number == 0:
-        data_url = f"{frontend_url}/window"
+        data_url = f"{frontend_url}/window?restaurant={restaurant.slug}"
     else:
-        data_url = f"{frontend_url}/table/{table.table_number}"
+        # We use the clean /table/:num path as per App.jsx, 
+        # but the landing page will redirect/handle query params.
+        data_url = f"{frontend_url}/table/{table.table_number}?restaurant={restaurant.slug}"
     
     qr = qrcode.QRCode(version=1, box_size=10, border=5)
     qr.add_data(data_url)

@@ -10,7 +10,9 @@ gsap.registerPlugin(ScrollTrigger);
 export default function Landing() {
   const { tableNumber } = useParams();
   const isTableOrder = !!tableNumber;
-  const menuPath = isTableOrder ? `/menu?table=${tableNumber}` : '/menu';
+  const menuPath = isTableOrder 
+    ? `/menu?restaurant=spice-lounge&table=${tableNumber}` 
+    : '/menu?restaurant=spice-lounge';
   const [isLoginEnabled, setIsLoginEnabled] = useState(true);
   const canvasRef = useRef(null);
   const heroScrollRef = useRef(null);

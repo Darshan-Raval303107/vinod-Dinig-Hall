@@ -66,7 +66,12 @@ const OrderStatus = () => {
       {/* Top Header with Back Button */}
       <div className="flex items-center justify-between mb-8">
         <button
-          onClick={() => navigate('/menu?restaurant=spice-lounge&table=1')}
+          onClick={() => {
+            const path = order.order_type === 'window' 
+              ? '/menu?restaurant=spice-lounge' 
+              : `/menu?restaurant=spice-lounge&table=${order.table_number}`;
+            navigate(path);
+          }}
           className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-customer-surface/20 text-customer-text/60 shadow-sm active:scale-95 transition-all"
         >
           <ArrowLeft size={18} />
