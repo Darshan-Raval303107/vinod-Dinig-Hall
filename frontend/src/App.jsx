@@ -7,6 +7,7 @@ import Menu from './pages/customer/Menu';
 import Cart from './pages/customer/Cart';
 import OrderStatus from './pages/customer/OrderStatus';
 import Payment from './pages/customer/Payment';
+import Success from './pages/customer/Success';
 import Bill from './pages/customer/Bill';
 import QRPreview from './pages/customer/QRPreview';
 
@@ -28,6 +29,7 @@ function App() {
             <Route path="/cart" element={<Cart />} />
             <Route path="/order-status/:orderId" element={<OrderStatus />} />
             <Route path="/payment/:orderId" element={<Payment />} />
+            <Route path="/success" element={<Success />} />
             <Route path="/bill/:orderId" element={<Bill />} />
             <Route path="/qr-preview" element={<QRPreview />} />
 

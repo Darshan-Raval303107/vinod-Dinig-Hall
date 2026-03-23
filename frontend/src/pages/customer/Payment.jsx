@@ -118,13 +118,12 @@ const Payment = () => {
             
             setPaymentSuccess(true);
             
-            // On mobile, state updates can be unreliable if the browser is closing the modal.
-            // Forced redirect is much more robust.
+            // On mobile, hard window.location.replace is required for highest reliability
             setTimeout(() => {
-              const successUrl = `/bill/${order_id}${pickup_code ? `?code=${pickup_code}` : ''}`;
-              console.log("Redirecting to:", successUrl);
+              const successUrl = `/success?order_id=${order_id}&code=${pickup_code || ''}`;
+              console.log("Redirecting to Pro Success Page:", successUrl);
               window.location.replace(successUrl);
-            }, 1000);
+            }, 500);
 
           } catch (verifyErr) {
             console.error("Local verification error:", verifyErr);
@@ -149,16 +148,17 @@ const Payment = () => {
       console.log("Executing rzp.open()...");
       const rzp = new window.Razorpay(options);
       
-      // Safety timeout for mobile: If stuck in "Processing..." for > 30s, reset
+      // Safety timeout for mobile: If stuck in "Processing..." for > 10s without callback, reset
       setTimeout(() => {
         setProcessing(current => {
           if (current) {
-            console.warn("Payment flow safety timeout reached. Resetting UI.");
+            console.warn("Payment flow safety timeout reached. Redirecting to status as fallback.");
+            window.location.href = `/order-status/${orderId}`;
             return false;
           }
           return current;
         });
-      }, 30000);
+      }, 15000);
 
       rzp.on('payment.failed', function (response) {
         console.error("Razorpay Payment Failed:", response.error);

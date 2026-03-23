@@ -189,7 +189,7 @@ const OrderStatus = () => {
       </div>
 
       {/* Info Card Overlay */}
-      <div className="p-6 md:p-8 bg-white border border-customer-surface/40 rounded-[2.5rem] shadow-sm flex items-start gap-4 mb-20 relative overflow-hidden group">
+      <div className="p-6 md:p-8 bg-white border border-customer-surface/40 rounded-[2.5rem] shadow-sm flex items-start gap-4 mb-8 relative overflow-hidden group">
         <div className="absolute top-0 right-0 w-32 h-32 bg-customer-accent/5 rounded-full blur-3xl -mr-10 -mt-10"></div>
         <div className="w-10 h-10 md:w-12 md:h-12 bg-customer-accent/5 rounded-2xl flex items-center justify-center flex-shrink-0 text-customer-accent relative z-10">
           <Info size={20} />
@@ -200,6 +200,22 @@ const OrderStatus = () => {
             Quality takes time. Your meal is being freshly prepared by our kitchen team.
           </p>
         </div>
+      </div>
+
+      {/* Need Help Section */}
+      <div className="bg-white/40 border border-white p-6 rounded-[2.5rem] flex items-center justify-between mb-20 backdrop-blur-sm">
+        <div className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-customer-text rounded-2xl flex items-center justify-center text-white">
+                <Bell size={18} />
+            </div>
+            <div>
+                <h4 className="text-[10px] font-black text-customer-text uppercase tracking-widest">Need Help?</h4>
+                <p className="text-[9px] font-bold text-customer-text/40 uppercase tracking-widest">Call Restaurant</p>
+            </div>
+        </div>
+        <a href="tel:+919999999999" className="h-10 px-6 bg-white border border-customer-surface/30 rounded-full flex items-center justify-center text-[9px] font-black text-customer-accent uppercase tracking-widest shadow-sm active:scale-95 transition-all">
+            Contact
+        </a>
       </div>
 
       {/* Floating Dynamic Bottom Action Bar */}
