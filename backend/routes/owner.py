@@ -478,7 +478,7 @@ def get_table_qr_image(table_id):
     img = qr.make_image(fill_color="black", back_color="white")
     
     buffer = BytesIO()
-    img.save(buffer, format="PNG")
+    img.save(buffer)
     buffer.seek(0)
     
     return send_file(
