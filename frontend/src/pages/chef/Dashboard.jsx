@@ -22,7 +22,7 @@ const ChefDashboard = () => {
         setLoading(false);
       })
       .catch(err => {
-        setError('Synchronicity failure. Retrying node connection...');
+        setError('Connection error. Retrying...');
         setLoading(false);
       });
   };
@@ -91,9 +91,9 @@ const ChefDashboard = () => {
               <ChefHat size={20} className="md:w-6 md:h-6" />
            </div>
            <div>
-              <h1 className="font-syne text-xl md:text-2xl font-black italic tracking-tighter text-slate-900 leading-none">ALPHA KITCHEN</h1>
+              <h1 className="font-syne text-xl md:text-2xl font-black italic tracking-tighter text-slate-900 leading-none">KITCHEN</h1>
               <p className="hidden md:flex text-[10px] font-black text-zinc-300 uppercase tracking-widest mt-2 items-center gap-2 leading-none italic">
-                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> {user?.name?.toUpperCase() || 'CHEF'} / SESSION MASTER
+                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> {user?.name?.toUpperCase() || 'CHEF'} / HEAD CHEF
               </p>
               <p className="md:hidden text-[9px] font-black text-emerald-500 uppercase tracking-widest mt-1 flex items-center gap-1 leading-none italic">
                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE
@@ -188,7 +188,7 @@ const ChefDashboard = () => {
               <div className="flex-1 space-y-4 md:space-y-6 md:overflow-y-auto md:pr-2 custom-scrollbar pb-24 md:pb-0">
                  {cookingOrders.length > 0 ? (
                     cookingOrders.map(order => <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />)
-                 ) : <EmptyState icon={<Timer size={48} />} text="Stations Cold" />}
+                 ) : <EmptyState icon={<Timer size={48} />} text="All Clear" />}
               </div>
            </div>
 
@@ -206,7 +206,7 @@ const ChefDashboard = () => {
               <div className="flex-1 space-y-4 md:space-y-6 md:overflow-y-auto md:pr-2 custom-scrollbar pb-24 md:pb-0">
                  {readyOrders.length > 0 ? (
                     readyOrders.map(order => <OrderCard key={order.order_id} order={order} onUpdateStatus={handleUpdateStatus} />)
-                 ) : <EmptyState icon={<Coffee size={48} />} text="Wait-Station Empty" />}
+                 ) : <EmptyState icon={<Coffee size={48} />} text="No Orders Ready" />}
               </div>
            </div>
 

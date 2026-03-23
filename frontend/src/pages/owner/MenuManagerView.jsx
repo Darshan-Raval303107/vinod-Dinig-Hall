@@ -173,7 +173,7 @@ const MenuManagerView = () => {
           onClick={openCreateModal}
           className="mt-8 lg:mt-0 w-full lg:w-auto h-16 px-10 bg-slate-900 text-white text-[10px] font-black uppercase tracking-[0.2em] rounded-2xl shadow-2xl active:scale-95 transition-all flex items-center justify-center gap-3"
         >
-          <Plus size={18} /> New Formulation
+          <Plus size={18} /> New Item
         </button>
       </header>
 

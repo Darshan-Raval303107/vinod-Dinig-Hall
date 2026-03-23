@@ -85,14 +85,14 @@ const Login = () => {
 
           <footer className="hidden lg:flex items-center gap-8 border-t border-white/5 pt-10">
              <div className="flex flex-col">
-                <span className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">Infrastructure</span>
+                <span className="text-[9px] font-black text-white/30 uppercase tracking-widest mb-1">System Status</span>
                 <div className="flex items-center gap-2">
                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                   <span className="text-[10px] font-black text-white italic">NODE-01 LIVE</span>
+                   <span className="text-[10px] font-black text-white italic">System Active</span>
                 </div>
              </div>
              <div className="h-10 w-[1px] bg-white/10"></div>
-             <p className="text-[10px] font-bold text-white/20 italic tracking-widest uppercase">System Core v4.2</p>
+             <p className="text-[10px] font-bold text-white/20 italic tracking-widest uppercase">Vinod Dining Hall</p>
           </footer>
         </div>
       </div>
@@ -103,10 +103,10 @@ const Login = () => {
           <header className="mb-10">
             <div className="flex items-center gap-2 mb-4">
               <ShieldCheck className="text-slate-900" size={20} />
-              <span className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.4em]">Security Interface</span>
+              <span className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.4em]">Staff Portal</span>
             </div>
             <h3 className="text-2xl lg:text-3xl font-black text-slate-900 font-syne tracking-tighter italic">Staff Login</h3>
-            <p className="text-zinc-400 font-bold text-[10px] uppercase tracking-widest mt-2 italic">Authentication Required for Node Access.</p>
+            <p className="text-zinc-400 font-bold text-[10px] uppercase tracking-widest mt-2 italic">Enter your credentials to continue.</p>
           </header>
 
           {error && (
@@ -117,7 +117,7 @@ const Login = () => {
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-2">
-               <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Credential ID</label>
+               <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Email Address</label>
                <div className="relative group">
                  <input 
                    type="email" 
@@ -132,7 +132,7 @@ const Login = () => {
             </div>
 
             <div className="space-y-2">
-               <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Access Key</label>
+               <label className="text-[9px] font-black text-zinc-400 uppercase tracking-widest ml-1 block italic">Password</label>
                <div className="relative group">
                  <input 
                    type="password" 
@@ -158,7 +158,7 @@ const Login = () => {
                  ) : (
                     <ShieldCheck size={18} className="text-emerald-500 group-hover:scale-110 transition-transform" />
                  )}
-                 <span className="text-[10px] font-black uppercase tracking-[0.2em] italic">{isLoading ? 'Syncing...' : 'Enter Dashboard'}</span>
+                 <span className="text-[10px] font-black uppercase tracking-[0.2em] italic">{isLoading ? 'Signing in...' : 'Sign In'}</span>
               </div>
             </button>
           </form>

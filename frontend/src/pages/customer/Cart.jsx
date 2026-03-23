@@ -38,7 +38,7 @@ const Cart = () => {
       // Show progress first as requested
       navigate(`/order-status/${res.data.order_id}`);
     } catch (err) {
-      setError(err.response?.data?.msg || 'System constraint: Order creation failed.');
+      setError(err.response?.data?.msg || 'Could not place order. Please try again.');
       setIsSubmitting(false);
     }
   };
@@ -52,7 +52,7 @@ const Cart = () => {
         </div>
         <h2 className="font-fraunces text-4xl font-bold mb-3 text-customer-text tracking-tight italic">Cart is empty</h2>
         <p className="text-zinc-400 mb-10 text-center font-bold max-w-xs leading-relaxed uppercase text-[10px] tracking-widest italic">
-          Your culinary selection is currently void. 
+          Your cart is empty. Browse the menu to add items.
         </p>
         <button 
           onClick={() => navigate('/menu?restaurant=spice-lounge&table=1')}
@@ -94,13 +94,13 @@ const Cart = () => {
       <div className="px-6 mt-8 space-y-10 animate-in slide-in-from-bottom-4 duration-500">
         {error && (
           <div className="p-4 bg-red-50 text-red-600 rounded-2xl text-[10px] font-black uppercase tracking-widest flex items-center gap-3 border border-red-100 italic">
-            <Info size={14} /> Error node: {error}
+            <Info size={14} /> {error}
           </div>
         )}
 
         {/* Item List - Modern Cards */}
         <div className="space-y-4">
-          <h3 className="text-[10px] font-black text-zinc-300 uppercase tracking-[0.3em] ml-1 mb-6 italic">Selected Works</h3>
+          <h3 className="text-[10px] font-black text-zinc-300 uppercase tracking-[0.3em] ml-1 mb-6 italic">Your Items</h3>
           
           <div className="space-y-4">
             {items.map(item => (
@@ -155,14 +155,14 @@ const Cart = () => {
             </div>
             
             <div className="flex justify-between items-start pb-6 border-b border-white/5 opacity-40">
-              <span className="text-[9px] font-black uppercase tracking-[0.2em]">Service Protocol</span>
-              <span className="text-[9px] font-bold italic tracking-widest">TBD AT SETTLEMENT</span>
+              <span className="text-[9px] font-black uppercase tracking-[0.2em]">Service Charge</span>
+              <span className="text-[9px] font-bold italic tracking-widest">Calculated at checkout</span>
             </div>
 
             <div className="flex justify-between items-end pt-2">
               <div className="flex flex-col">
-                <span className="text-xs font-fraunces font-bold italic text-customer-accent">Total Valuation</span>
-                <span className="text-[8px] font-black opacity-20 uppercase tracking-[0.2em]">Live Est.</span>
+                <span className="text-xs font-fraunces font-bold italic text-customer-accent">Total</span>
+                <span className="text-[8px] font-black opacity-20 uppercase tracking-[0.2em]">Estimated</span>
               </div>
               <span className="font-fraunces text-4xl font-black italic">₹{totalAmount.toFixed(0)}</span>
             </div>
@@ -172,7 +172,7 @@ const Cart = () => {
         <div className="flex flex-col items-center gap-4 text-center px-10 opacity-30">
           <div className="flex items-center gap-2">
             <CreditCard size={12} />
-            <span className="text-[8px] font-black uppercase tracking-[0.3em]">SECURE CHECKOUT NODE</span>
+            <span className="text-[8px] font-black uppercase tracking-[0.3em]">SECURE CHECKOUT</span>
           </div>
         </div>
       </div>
@@ -191,7 +191,7 @@ const Cart = () => {
               ) : (
                 <ShoppingBag size={18} />
               )}
-              <span className="text-xs font-black uppercase tracking-[0.2em]">{isSubmitting ? 'Syncing...' : 'Review & Pay'}</span>
+              <span className="text-xs font-black uppercase tracking-[0.2em]">{isSubmitting ? 'Placing Order...' : 'Review & Pay'}</span>
             </div>
 
             <div className="flex items-center gap-2 font-fraunces italic text-xl pr-6 transition-all group-hover:translate-x-1">

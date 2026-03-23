@@ -141,8 +141,8 @@ export default function Landing() {
             <a href="#top" className="font-fraunces text-2xl tracking-tight italic font-black hover:text-[#C85C1A] transition-colors">Vinnod</a>
         </div>
         <div className="hidden md:flex gap-8 text-[10px] font-black uppercase tracking-[0.3em]">
-            <a href="#experience" className="hover:text-[#C85C1A] transition-colors">Philosophy</a>
-            <a href="#menu" className="hover:text-[#C85C1A] transition-colors">Curations</a>
+            <a href="#experience" className="hover:text-[#C85C1A] transition-colors">About Us</a>
+            <a href="#menu" className="hover:text-[#C85C1A] transition-colors">Menu</a>
             <Link to="/login" className="hover:text-[#C85C1A] transition-colors">Staff Portal</Link>
         </div>
       </nav>
@@ -165,7 +165,7 @@ export default function Landing() {
                 {!isLoginEnabled && (
                   <div className="mt-6 inline-flex items-center gap-3 bg-red-50 text-red-700 px-6 py-4 rounded-full border border-red-100 shadow-sm">
                     <ShieldAlert size={16} />
-                    <span className="text-[9px] font-black uppercase tracking-widest">Operations Halted</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">Currently Closed</span>
                   </div>
                 )}
             </div>
@@ -174,11 +174,11 @@ export default function Landing() {
                 <div className="flex flex-col md:flex-row gap-6 w-full md:w-auto justify-center">
                     {isLoginEnabled ? (
                         <Link to={menuPath} className="group flex items-center justify-center gap-6 bg-[#1C1917] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95">
-                            Begin Journey <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+                            Order Online <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
                         </Link>
                     ) : (
                         <button disabled className="flex items-center justify-center bg-gray-100 text-gray-400 px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] cursor-not-allowed">
-                            Service Offline
+                            We're Closed
                         </button>
                     )}
                 </div>
@@ -190,8 +190,8 @@ export default function Landing() {
                       </span>
                     </div>
                     <div className="text-right">
-                        <div className="text-[9px] font-black uppercase tracking-[0.4em] mb-2 text-[#C85C1A]/60">Node 0x41</div>
-                        <div className="font-fraunces italic font-black text-xs md:text-base">Center District</div>
+                        <div className="text-[9px] font-black uppercase tracking-[0.4em] mb-2 text-[#C85C1A]/60">Est. 2007</div>
+                        <div className="font-fraunces italic font-black text-xs md:text-base">Upleta, Gujarat</div>
                     </div>
                 </div>
             </div>
@@ -205,13 +205,13 @@ export default function Landing() {
             <div className="flex flex-col md:flex-row justify-between items-center md:items-end mb-20 stagger-reveal text-center md:text-left">
               <div className="flex flex-col items-center md:items-start">
                 <h2 className="font-fraunces text-5xl md:text-[6.5rem] font-black tracking-tighter text-[#1C1917] leading-[0.9] mb-8">
-                  Signature <br/><span className="italic text-[#C85C1A]">Curations.</span>
+                  Our <br/><span className="italic text-[#C85C1A]">Specialties.</span>
                 </h2>
                 <div className="w-24 h-[1.5px] bg-[#C85C1A]"></div>
               </div>
               <p className="max-w-[280px] md:max-w-md text-[10px] md:text-sm font-black uppercase tracking-[0.3em] text-[#1C1917]/40 leading-relaxed mt-10 md:mt-0">
-                A daily ritual. Hand-selected ingredients, 
-                translated into cinematic textures for the modern palette. 
+                Fresh, hand-picked ingredients prepared daily 
+                with love and tradition for your table.
               </p>
             </div>
 
@@ -238,7 +238,7 @@ export default function Landing() {
                       {item.name}
                     </h3>
                     <div className="flex items-center justify-center md:justify-start gap-2 mt-4 text-[9px] font-black uppercase tracking-[0.4em] text-[#1C1917]/20">
-                      <Zap size={10} className="text-[#C85C1A] opacity-50" /> Protocol 0x{i+1}
+                      <Zap size={10} className="text-[#C85C1A] opacity-50" /> Chef's Pick
                     </div>
                   </div>
                 </div>
@@ -247,7 +247,7 @@ export default function Landing() {
 
             <div className="mt-24 md:mt-32 flex justify-center">
                <Link to="/window" className="group flex flex-col items-center gap-4 text-[10px] font-black uppercase tracking-[0.5em] text-[#1C1917] hover:text-[#C85C1A] transition-all">
-                  <span className="border-b border-transparent group-hover:border-[#C85C1A] transition-all pb-2">Access Repository</span>
+                  <span className="border-b border-transparent group-hover:border-[#C85C1A] transition-all pb-2">Explore Menu</span>
                   <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
                </Link>
             </div>
@@ -259,11 +259,11 @@ export default function Landing() {
            <div className="max-w-5xl mx-auto text-center stagger-reveal">
               <div className="flex items-center justify-center gap-6 mb-12">
                  <div className="w-12 h-[1px] bg-[#C85C1A]/25"></div>
-                 <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#C85C1A]">Temporal Matrix</span>
+                 <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[#C85C1A]">Our Hours</span>
                  <div className="w-12 h-[1px] bg-[#C85C1A]/25"></div>
               </div>
               <h2 className="font-fraunces text-6xl md:text-[9rem] font-black italic tracking-tighter text-[#1C1917] mb-12 md:mb-20 leading-[0.85]">
-                 Ritual <br/>Schedule.
+                 Opening <br/>Hours.
               </h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16 items-center">
@@ -271,7 +271,7 @@ export default function Landing() {
                     <div className="absolute top-10 right-10 text-zinc-100 group-hover:text-indigo-500/10 transition-colors">
                       <Clock size={80} strokeWidth={1} />
                     </div>
-                    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#1C1917]/20 mb-10 text-left relative z-10">Weekly Flow</div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#1C1917]/20 mb-10 text-left relative z-10">Weekly Schedule</div>
                     <div className="space-y-6 relative z-10">
                        <div className="flex justify-between items-center border-b border-[#1C1917]/5 pb-6">
                           <span className="font-black text-[10px] uppercase tracking-widest text-zinc-400">Weekdays</span>
@@ -286,12 +286,12 @@ export default function Landing() {
 
                  <div className="p-10 md:p-14 bg-[#1C1917] text-[#FBF9F7] rounded-[3rem] shadow-[0_50px_100px_rgba(0,0,0,0.15)] relative overflow-hidden group min-h-[320px] flex flex-col justify-center">
                     <div className="absolute top-0 right-0 w-48 h-48 bg-[#C85C1A]/10 rounded-full blur-[100px] group-hover:bg-[#C85C1A]/20 transition-all duration-700"></div>
-                    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FBF9F7]/20 mb-10 text-center relative z-10">Node Status</div>
+                    <div className="text-[10px] font-black uppercase tracking-[0.4em] text-[#FBF9F7]/20 mb-10 text-center relative z-10">Restaurant Status</div>
                     <div className="flex flex-col items-center gap-6 relative z-10">
                        <div className="w-5 h-5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_30px_rgba(16,185,129,0.6)]"></div>
-                       <div className="font-fraunces text-4xl md:text-5xl font-black italic tracking-tighter">Live Session</div>
+                       <div className="font-fraunces text-4xl md:text-5xl font-black italic tracking-tighter">Now Open</div>
                        <p className="text-[9px] font-black uppercase tracking-[0.3em] text-[#FBF9F7]/40 leading-relaxed max-w-[200px] text-center">
-                          Network protocols are currently operational.
+                          We are currently welcoming guests.
                        </p>
                     </div>
                  </div>
