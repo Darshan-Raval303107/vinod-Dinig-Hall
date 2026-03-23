@@ -45,7 +45,7 @@ const Bill = () => {
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-vh-100 bg-white">
       <div className="w-12 h-12 border-4 border-customer-accent border-t-transparent rounded-full animate-spin"></div>
-      <p className="mt-8 font-fraunces text-2xl text-customer-accent animate-pulse font-bold italic">Generating Digital Ledger...</p>
+      <p className="mt-8 font-fraunces text-2xl text-customer-accent animate-pulse font-bold italic">Loading Invoice...</p>
     </div>
   );
 
@@ -74,7 +74,7 @@ const Bill = () => {
           <div>
             <h1 className="font-fraunces text-2xl font-black text-customer-text italic leading-none">Invoice</h1>
             <p className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.2em] mt-1.5 flex items-center gap-1.5 leading-none">
-               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Settlement Confirmed
+               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Paid
             </p>
           </div>
         </div>
@@ -93,7 +93,7 @@ const Bill = () => {
              <div className="w-16 h-16 bg-emerald-500/10 border-2 border-emerald-500/20 rounded-full flex items-center justify-center text-emerald-500 mb-4 shadow-xl shadow-emerald-500/5">
                 <CheckCircle2 size={32} />
              </div>
-             <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em] italic">Transation Node verified</p>
+             <p className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.3em] italic">Payment Successful</p>
         </div>
 
         {/* RECEIPT BOX */}
@@ -109,29 +109,29 @@ const Bill = () => {
                 <div className="text-center mb-14">
                     <h2 className="font-fraunces text-4xl font-black text-customer-text italic tracking-tighter leading-none mb-4">Vinnod.</h2>
                     <div className="flex items-center justify-center gap-2 text-[8px] font-black text-zinc-300 uppercase tracking-[0.4em]">
-                        <Utensils size={10} strokeWidth={3} /> Cinematic Dining flow
+                        <Utensils size={10} strokeWidth={3} /> Fine Dining Experience
                     </div>
                 </div>
 
                 {/* Metadata Grid */}
                 <div className="grid grid-cols-2 gap-y-10 mb-12 border-y border-zinc-100/50 py-10">
                     <div className="space-y-1.5">
-                        <span className="text-[9px] font-black text-zinc-300 uppercase tracking-widest block">Establishment</span>
-                        <span className="font-bold text-xs text-customer-text">Spice Lounge, Zone 0x41</span>
+                        <span className="text-[9px] font-black text-zinc-300 uppercase tracking-widest block">Restaurant</span>
+                        <span className="font-bold text-xs text-customer-text">Vinod Dining Hall</span>
                     </div>
                     <div className="space-y-1.5 text-right">
                         <span className="text-[9px] font-black text-zinc-300 uppercase tracking-widest block">Reference</span>
                         <span className="font-bold text-xs text-customer-accent uppercase italic">Table {order.table_number}</span>
                     </div>
                     <div className="space-y-1.5">
-                        <span className="text-[9px] font-black text-zinc-300 uppercase tracking-widest block">Session Date</span>
+                        <span className="text-[9px] font-black text-zinc-300 uppercase tracking-widest block">Date</span>
                         <div className="flex flex-col">
                             <span className="font-bold text-xs text-customer-text">{orderDate.toLocaleDateString('en-GB')}</span>
                             <span className="text-[9px] font-bold text-zinc-400 font-mono mt-1">{orderDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', hour12: true })}</span>
                         </div>
                     </div>
                     <div className="space-y-1.5 text-right">
-                        <span className="text-[9px] font-black text-zinc-300 uppercase tracking-widest block">Sequence ID</span>
+                        <span className="text-[9px] font-black text-zinc-300 uppercase tracking-widest block">Order ID</span>
                         <span className="font-bold text-xs text-customer-text uppercase font-mono">#{order.order_id.slice(-8).toUpperCase()}</span>
                     </div>
                 </div>
@@ -139,9 +139,9 @@ const Bill = () => {
                 {/* Items List */}
                 <div className="space-y-8 mb-12">
                     <div className="flex text-[9px] font-black text-zinc-300 uppercase tracking-[0.4em] pb-4 border-b border-zinc-100/50">
-                        <div className="flex-1">Selection Matrix</div>
+                        <div className="flex-1">Items Ordered</div>
                         <div className="w-12 text-center">Qty</div>
-                        <div className="w-24 text-right">Valuation</div>
+                        <div className="w-24 text-right">Amount</div>
                     </div>
                     
                     {order.items.map((item, i) => (
@@ -163,7 +163,7 @@ const Bill = () => {
                 {/* Totals Section */}
                 <div className="space-y-4 pt-10 border-t-2 border-dashed border-zinc-100">
                     <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-400">
-                        <span>Subtotal Hierarchy</span>
+                        <span>Subtotal</span>
                         <span className="text-customer-text">₹{subtotal.toFixed(2)}</span>
                     </div>
                     <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest text-zinc-400">
@@ -174,7 +174,7 @@ const Bill = () => {
                     <div className="pt-6 mt-4 flex justify-between items-end">
                         <div className="flex flex-col">
                             <span className="text-[10px] font-black text-customer-accent uppercase tracking-[0.3em] italic leading-none mb-2">Total Payable</span>
-                            <span className="text-[8px] font-bold text-zinc-300 uppercase tracking-widest leading-none">Settlement Verified</span>
+                            <span className="text-[8px] font-bold text-zinc-300 uppercase tracking-widest leading-none">Paid</span>
                         </div>
                         <span className="font-fraunces text-4xl font-black italic text-customer-text tracking-tighter leading-none">
                             ₹{total.toFixed(0)}
@@ -188,9 +188,9 @@ const Bill = () => {
                         <Smartphone size={32} strokeWidth={1} />
                     </div>
                     <p className="text-[8px] font-black text-zinc-200 uppercase tracking-[0.5em] text-center leading-relaxed">
-                        THIS IS A DIGITALLY SIGNED LEDGER.<br />
-                        AUTHENTICATED SECURELY VIA <br />
-                        VINNOD PROTOCOL v2.0
+                        THIS IS A DIGITAL RECEIPT.<br />
+                        VINOD DINING HALL<br />
+                        THANK YOU FOR DINING WITH US
                     </p>
                 </div>
             </div>
@@ -214,7 +214,7 @@ const Bill = () => {
             </div>
             
             <button className="w-full py-4 text-[9px] font-black text-zinc-300 uppercase tracking-[0.3em] hover:text-customer-accent transition-colors">
-                Archived in Digital Ledger 0x{orderId.slice(0, 6)}
+                Order Receipt Saved
             </button>
         </div>
 

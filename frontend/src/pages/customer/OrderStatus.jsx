@@ -5,12 +5,12 @@ import { socket } from '../../api/socket';
 import { CheckCircle2, Clock, ChefHat, CheckSquare, CreditCard, ChevronRight, Activity, Bell, Info, ArrowLeft } from 'lucide-react';
 
 const STATUS_STEPS = [
-  { id: 'pending', label: 'Order Registered', icon: Clock, desc: 'Kitchen node processing arrival' },
-  { id: 'accepted', label: 'Chef Confirmed', icon: CheckSquare, desc: 'Station assigned and ready' },
-  { id: 'cooking', label: 'In Formulation', icon: ChefHat, desc: 'Cuisine being crafted now' },
-  { id: 'ready', label: 'Ready for Service', icon: Bell, desc: 'Quality check completed' },
-  { id: 'served', label: 'Delivered', icon: CheckCircle2, desc: 'Order at station T-Table' },
-  { id: 'paid', label: 'Finalized', icon: CreditCard, desc: 'Transaction complete' },
+  { id: 'pending', label: 'Order Received', icon: Clock, desc: 'Our kitchen has received your order' },
+  { id: 'accepted', label: 'Chef Confirmed', icon: CheckSquare, desc: 'Your order has been confirmed' },
+  { id: 'cooking', label: 'Being Prepared', icon: ChefHat, desc: 'Chef is preparing your meal' },
+  { id: 'ready', label: 'Ready for Service', icon: Bell, desc: 'Your meal is ready!' },
+  { id: 'served', label: 'Delivered', icon: CheckCircle2, desc: 'Enjoy your meal!' },
+  { id: 'paid', label: 'Paid', icon: CreditCard, desc: 'Thank you for dining with us' },
 ];
 
 const OrderStatus = () => {
@@ -55,7 +55,7 @@ const OrderStatus = () => {
   if (loading || !order) return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#FBF7F0] p-8 text-center">
       <div className="w-16 h-16 border-4 border-customer-accent border-t-transparent rounded-full animate-spin"></div>
-      <p className="mt-6 text-[10px] font-black text-customer-accent uppercase tracking-widest animate-pulse">Synchronizing Tracking Node</p>
+      <p className="mt-6 text-[10px] font-black text-customer-accent uppercase tracking-widest animate-pulse">Loading your order...</p>
     </div>
   );
 
@@ -72,8 +72,8 @@ const OrderStatus = () => {
           <ArrowLeft size={18} />
         </button>
         <div className="flex flex-col items-end">
-          <span className="text-[8px] font-black text-customer-text/20 uppercase tracking-[0.3em]">Status Matrix</span>
-          <span className="text-[10px] font-bold text-customer-accent italic">v2.4.0 Live</span>
+          <span className="text-[8px] font-black text-customer-text/20 uppercase tracking-[0.3em]">Order Tracking</span>
+          <span className="text-[10px] font-bold text-customer-accent italic">Live Update</span>
         </div>
       </div>
 
@@ -82,10 +82,10 @@ const OrderStatus = () => {
         <div className="flex items-center gap-3 px-6 py-2.5 bg-white border border-customer-surface/30 rounded-full shadow-sm mb-6 relative overflow-hidden group">
           <div className="absolute inset-0 bg-gradient-to-r from-transparent via-customer-accent/5 to-transparent translate-x-[-150%] animate-[shine_3s_infinite]"></div>
           <Activity size={16} className="text-customer-accent animate-pulse" />
-          <span className="text-[10px] font-black text-customer-text/40 uppercase tracking-[0.3em]">Live Matrix Tracking</span>
+          <span className="text-[10px] font-black text-customer-text/40 uppercase tracking-[0.3em]">Chef is preparing your meal</span>
         </div>
         
-        <h1 className="font-fraunces text-5xl font-black italic text-customer-text tracking-tighter leading-tight mb-2 uppercase">Progress</h1>
+        <h1 className="font-fraunces text-5xl font-black italic text-customer-text tracking-tighter leading-tight mb-2 uppercase">Your Order</h1>
         <div className="flex items-center gap-3 justify-center">
            <span className="text-[11px] font-black text-customer-text/30 uppercase tracking-[0.2em] italic underline underline-offset-4 decoration-customer-accent/20">Ref: #{order.order_id.substring(0,8).toUpperCase()}</span>
            {order.order_type === 'window' ? (
@@ -142,7 +142,7 @@ const OrderStatus = () => {
       <div className="mb-12">
         <div className="flex items-center gap-3 mb-6">
            <div className="w-8 h-[1.5px] bg-customer-accent/30"></div>
-           <h3 className="text-[10px] font-black text-customer-text/30 uppercase tracking-[0.3em] font-syne">Curations in Progress</h3>
+           <h3 className="text-[10px] font-black text-customer-text/30 uppercase tracking-[0.3em] font-syne">Your Order Items</h3>
         </div>
         
         <div className="grid grid-cols-1 gap-3">
@@ -168,9 +168,9 @@ const OrderStatus = () => {
             <Info size={20} />
          </div>
          <div className="flex-1 relative z-10">
-            <h4 className="text-sm font-bold text-customer-text italic font-fraunces mb-1">Ritual Protocol</h4>
+            <h4 className="text-sm font-bold text-customer-text italic font-fraunces mb-1">Good to Know</h4>
             <p className="text-[9px] md:text-[10px] text-customer-text/40 font-medium uppercase tracking-widest leading-relaxed">
-               Crafting perfection takes time. Your selection is currently being handled by our elite kitchen squad.
+               Quality takes time. Your meal is being freshly prepared by our kitchen team.
             </p>
          </div>
       </div>
@@ -188,8 +188,8 @@ const OrderStatus = () => {
                      <CheckCircle2 size={24} />
                   </div>
                   <div className="flex flex-col items-start text-left">
-                     <span className="text-xs font-black uppercase tracking-widest leading-none">Status Finalized</span>
-                     <span className="text-[9px] font-bold text-emerald-600/60 uppercase tracking-widest mt-1">Transaction Node Verified</span>
+                     <span className="text-xs font-black uppercase tracking-widest leading-none">Payment Complete</span>
+                     <span className="text-[9px] font-bold text-emerald-600/60 uppercase tracking-widest mt-1">Thank you!</span>
                   </div>
                </div>
                <div className="flex items-center gap-2 font-fraunces italic text-lg pr-2 group-hover:translate-x-1 transition-transform">
@@ -205,7 +205,7 @@ const OrderStatus = () => {
                      onClick={() => navigate(`/payment/${orderId}`)}
                      className="text-[9px] font-black text-customer-accent uppercase tracking-[0.2em] italic hover:underline underline-offset-4 opacity-60 hover:opacity-100 transition-all mb-1"
                    >
-                     Skip queue & Settle Bill Now? 
+                     Want to pay now? 
                    </button>
                 </div>
               )}
@@ -221,8 +221,13 @@ const OrderStatus = () => {
                   <div className={`w-6 h-6 rounded-full flex items-center justify-center ${order.status === 'served' || (order.order_type === 'window' && !order.pickup_code) ? 'bg-white/20 animate-bounce text-white' : 'bg-customer-accent/10 text-customer-accent'}`}>
                     <CreditCard size={14} />
                   </div>
+<<<<<<< HEAD
                   <span className={`text-[10px] font-black uppercase tracking-[0.2em] italic ${order.status === 'served' || (order.order_type === 'window' && !order.pickup_code) ? 'text-white' : 'text-customer-text/40'}`}>
                     {order.status === 'served' ? 'Final Settlement' : (order.order_type === 'window' && !order.pickup_code) ? 'Pay to Start Order' : 'Pay Advance'}
+=======
+                  <span className={`text-[10px] font-black uppercase tracking-[0.2em] italic ${order.status === 'served' ? 'text-white' : 'text-customer-text/40'}`}>
+                    {order.status === 'served' ? 'Pay Now' : 'Pay Early'}
+>>>>>>> dabe0e871462274592c58f13602e0ab533aeaeac
                   </span>
                 </div>
 

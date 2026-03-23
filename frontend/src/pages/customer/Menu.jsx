@@ -38,7 +38,7 @@ const Menu = () => {
         setLoading(false);
       })
       .catch(err => {
-        setError(err.response?.data?.msg || 'Connectivity Failure: Unable to synchronize with the menu node.');
+        setError(err.response?.data?.msg || 'Unable to load the menu. Please try again.');
         setLoading(false);
       });
   }, [restaurantSlug, table, setContext]);
@@ -65,7 +65,7 @@ const Menu = () => {
   if (loading) return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-white">
       <div className="w-12 h-12 border-4 border-customer-accent border-t-transparent rounded-full animate-spin"></div>
-      <p className="mt-8 font-fraunces text-2xl text-customer-accent animate-pulse font-bold italic">Curating Experience...</p>
+      <p className="mt-8 font-fraunces text-2xl text-customer-accent animate-pulse font-bold italic">Loading Menu...</p>
     </div>
   );
 
@@ -74,9 +74,9 @@ const Menu = () => {
       <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mb-8">
         <Info size={32} className="text-red-500" />
       </div>
-      <h2 className="text-3xl font-fraunces font-black italic mb-4 text-customer-text">Sync Failure</h2>
+      <h2 className="text-3xl font-fraunces font-black italic mb-4 text-customer-text">Something Went Wrong</h2>
       <p className="text-[10px] font-black uppercase tracking-widest text-red-500/60 mb-10 max-w-xs">{error}</p>
-      <button onClick={() => window.location.reload()} className="px-10 py-4 bg-customer-text text-white rounded-2xl font-black text-[10px] uppercase tracking-widest italic shadow-xl active:scale-95 transition-all">Retry Handshake</button>
+      <button onClick={() => window.location.reload()} className="px-10 py-4 bg-customer-text text-white rounded-2xl font-black text-[10px] uppercase tracking-widest italic shadow-xl active:scale-95 transition-all">Try Again</button>
     </div>
   );
 
@@ -113,7 +113,7 @@ const Menu = () => {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-300" size={16} />
             <input 
                 type="text" 
-                placeholder="Find a creation..." 
+                placeholder="Search dishes..." 
                 className="w-full h-14 bg-zinc-50 border border-zinc-100 rounded-2xl pl-12 pr-4 text-xs font-bold focus:outline-none focus:ring-4 focus:ring-customer-accent/5 focus:border-customer-accent/30 transition-all placeholder:text-zinc-300"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -233,8 +233,8 @@ const Menu = () => {
                   <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-customer-accent rounded-full border-2 border-customer-text"></span>
                 </div>
                 <div className="flex flex-col items-start">
-                  <span className="text-xs font-black uppercase tracking-widest">{totalCartItems} Selections</span>
-                  <span className="text-[8px] font-bold uppercase tracking-[0.2em] opacity-30 italic">View My Table</span>
+                  <span className="text-xs font-black uppercase tracking-widest">{totalCartItems} Items</span>
+                  <span className="text-[8px] font-bold uppercase tracking-[0.2em] opacity-30 italic">View Cart</span>
                 </div>
               </div>
 

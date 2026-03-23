@@ -132,7 +132,7 @@ const Payment = () => {
       <div className="flex flex-col items-center justify-center min-h-screen bg-[#FBF7F0] p-8">
         <Loader2 className="w-12 h-12 text-customer-accent animate-spin" />
         <p className="mt-6 text-[10px] font-black text-customer-accent uppercase tracking-widest animate-pulse">
-          Establishing Secure Transaction
+          Preparing your bill...
         </p>
       </div>
     );
@@ -148,7 +148,7 @@ const Payment = () => {
           Payment Success
         </h1>
         <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest italic">
-          Redirecting to status matrix...
+          Redirecting to your receipt...
         </p>
       </div>
     );
@@ -189,10 +189,10 @@ const Payment = () => {
           </button>
           <div>
             <h1 className="font-fraunces text-2xl font-black text-customer-text italic leading-none">
-              Settlement
+              Payment
             </h1>
             <p className="text-[9px] font-black text-zinc-300 uppercase tracking-[0.2em] mt-1.5 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Virtual Protocol
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> Secure Payment
             </p>
           </div>
         </div>
@@ -203,7 +203,7 @@ const Payment = () => {
         <div className="bg-zinc-50 rounded-[2.5rem] p-8 border border-zinc-100 relative overflow-hidden">
           <div className="flex items-center gap-3 mb-8 opacity-40">
             <Smartphone size={16} />
-            <span className="text-[9px] font-black uppercase tracking-[0.3em]">Billing Component</span>
+            <span className="text-[9px] font-black uppercase tracking-[0.3em]">Bill Summary</span>
           </div>
 
           <div className="space-y-6">
