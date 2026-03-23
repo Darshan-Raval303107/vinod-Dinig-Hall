@@ -9,7 +9,6 @@ import OrderStatus from './pages/customer/OrderStatus';
 import Payment from './pages/customer/Payment';
 import Bill from './pages/customer/Bill';
 import QRPreview from './pages/customer/QRPreview';
-import WindowRedirect from './pages/customer/WindowRedirect';
 
 import Login from './pages/auth/Login';
 import Unauthorized from './pages/auth/Unauthorized';
@@ -22,14 +21,15 @@ function App() {
       <div className="flex flex-col min-h-screen">
         <div className="flex-1">
           <Routes>
-            <Route path="/" element={<Landing />} />
+            <Route path="/" element={<Navigate to="/window" replace />} />
+            <Route path="/window" element={<Landing />} />
+            <Route path="/table/:tableNumber" element={<Landing />} />
             <Route path="/menu" element={<Menu />} />
             <Route path="/cart" element={<Cart />} />
             <Route path="/order-status/:orderId" element={<OrderStatus />} />
             <Route path="/payment/:orderId" element={<Payment />} />
             <Route path="/bill/:orderId" element={<Bill />} />
             <Route path="/qr-preview" element={<QRPreview />} />
-            <Route path="/window" element={<WindowRedirect />} />
 
             <Route path="/login" element={<Login />} />
             <Route path="/unauthorized" element={<Unauthorized />} />

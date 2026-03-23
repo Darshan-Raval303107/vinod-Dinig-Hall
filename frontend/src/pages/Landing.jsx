@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import api from '../api/axios';
 import { ChefHat, ArrowRight, ShieldAlert, Star, MapPin, Info, Smartphone, Clock, Zap } from 'lucide-react';
 import gsap from 'gsap';
@@ -8,6 +8,9 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Landing() {
+  const { tableNumber } = useParams();
+  const isTableOrder = !!tableNumber;
+  const menuPath = isTableOrder ? `/menu?table=${tableNumber}` : '/menu';
   const [isLoginEnabled, setIsLoginEnabled] = useState(true);
   const canvasRef = useRef(null);
   const heroScrollRef = useRef(null);
@@ -170,7 +173,7 @@ export default function Landing() {
             <div className="w-full flex flex-col items-center gap-8 md:gap-12 stagger-reveal">
                 <div className="flex flex-col md:flex-row gap-6 w-full md:w-auto justify-center">
                     {isLoginEnabled ? (
-                        <Link to="/window" className="group flex items-center justify-center gap-6 bg-[#1C1917] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95">
+                        <Link to={menuPath} className="group flex items-center justify-center gap-6 bg-[#1C1917] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95">
                             Begin Journey <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
                         </Link>
                     ) : (

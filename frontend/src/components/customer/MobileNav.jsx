@@ -7,20 +7,22 @@ const MobileNav = () => {
   const { items, restaurantId, tableNumber } = useCartStore();
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
 
-  const menuLink = tableNumber === '0' || tableNumber === 0 
-    ? '/window' 
-    : `/menu?restaurant=${restaurantId || 'spice-lounge'}&table=${tableNumber || '1'}`;
+  const isWindowUser = !tableNumber || tableNumber === '0' || tableNumber === 0;
+  const menuLink = isWindowUser ? '/menu' : `/menu?table=${tableNumber}`;
+  const homeLink = isWindowUser ? '/window' : `/table/${tableNumber}`;
 
   // Only show on customer pages
-  const customerPages = ['/menu', '/cart', '/order-status'];
-  const showNav = customerPages.some(page => location.pathname.startsWith(page)) || location.pathname === '/';
+  const customerPages = ['/menu', '/cart', '/order-status', '/window', '/table'];
+  const showNav = customerPages.some(page => location.pathname.startsWith(page));
 
   if (!showNav) return null;
 
+  const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
+
   const getLinkClass = (path) => {
-    const isActive = location.pathname === path;
+    const active = isActive(path);
     return `flex flex-col items-center justify-center w-full h-full gap-1 transition-all duration-300 ${
-      isActive ? 'text-customer-accent scale-110' : 'text-customer-text/40 hover:text-customer-text'
+      active ? 'text-customer-accent scale-110' : 'text-customer-text/40 hover:text-customer-text'
     }`;
   };
 
@@ -29,14 +31,14 @@ const MobileNav = () => {
          style={{ paddingBottom: 'calc(var(--safe-bottom) + 1.5rem)' }}>
       <nav className="glass-panel rounded-[2.2rem] h-20 w-full flex items-center justify-around px-4 pointer-events-auto shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border-white/40 bg-white/90 backdrop-blur-xl">
 
-        <Link to="/" className={getLinkClass('/')}>
-          <Home size={22} strokeWidth={isActive('/') ? 2.5 : 2} />
+        <Link to={homeLink} className={getLinkClass(homeLink)}>
+          <Home size={22} strokeWidth={isActive(homeLink) ? 2.5 : 2} />
           <span className="text-[10px] font-black uppercase tracking-widest">Home</span>
         </Link>
         
-        <Link to={menuLink} className={getLinkClass(menuLink.split('?')[0])}>
+        <Link to={menuLink} className={getLinkClass('/menu')}>
           <div className="relative">
-            <User size={22} strokeWidth={(isActive('/menu') || isActive('/window')) ? 2.5 : 2} />
+            <User size={22} strokeWidth={isActive('/menu') ? 2.5 : 2} />
           </div>
           <span className="text-[10px] font-black uppercase tracking-widest">Menu</span>
         </Link>
@@ -61,11 +63,6 @@ const MobileNav = () => {
     </div>
   );
 };
-
-// Helper inside component to avoid closure issues if used outside
-function isActive(path, locationPath) {
-  return locationPath === path;
-}
 
 // Redefining helper for exportable logic if needed
 const NavItem = ({ to, icon: Icon, label, isActive, totalItems }) => (
