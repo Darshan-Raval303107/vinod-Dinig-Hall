@@ -1,7 +1,8 @@
 import os
 import qrcode
+from io import BytesIO
 from datetime import datetime, timedelta
-from flask import Blueprint, request, jsonify, url_for, current_app
+from flask import Blueprint, request, jsonify, url_for, current_app, send_file
 from flask_jwt_extended import get_jwt, verify_jwt_in_request
 from werkzeug.utils import secure_filename
 from sqlalchemy import func
@@ -447,18 +448,44 @@ def generate_qr(table_id):
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white")
     
-    filename = f"qr_{secure_filename(restaurant.slug)}_table_{table.table_number}.png"
-    qr_dir = os.path.join(current_app.root_path, 'static', 'qrcodes')
-    _ensure_dir(qr_dir)
-    filepath = os.path.join(qr_dir, filename)
-    img.save(filepath)
-    
-    # Store the static path in DB
-    qr_image_url = f"/static/qrcodes/{filename}"
+    # Store the dynamic path in DB (no file saving needed)
+    qr_image_url = f"/api/owner/tables/{table.id}/qr-image"
     table.qr_code_url = qr_image_url
     db.session.commit()
     
     return jsonify(msg="QR Code generated successfully", url=qr_image_url), 200
+
+
+@owner_bp.route('/owner/tables/<table_id>/qr-image', methods=['GET'])
+def get_table_qr_image(table_id):
+    """
+    Returns the QR code image directly for a table.
+    Publicly accessible so images can be loaded in <img> tags.
+    """
+    table = RestaurantTable.query.get_or_404(table_id)
+    restaurant = Restaurant.query.get(table.restaurant_id)
+    
+    frontend_url = os.environ.get('FRONTEND_URL', 'https://vinod-dinig-hall.vercel.app').rstrip('/')
+    
+    if table.table_number == 0:
+        data_url = f"{frontend_url}/window"
+    else:
+        data_url = f"{frontend_url}/table/{table.table_number}?restaurant={restaurant.slug}"
+    
+    qr = qrcode.QRCode(version=1, box_size=10, border=5)
+    qr.add_data(data_url)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white")
+    
+    buffer = BytesIO()
+    img.save(buffer, format="PNG")
+    buffer.seek(0)
+    
+    return send_file(
+        buffer,
+        mimetype="image/png",
+        as_attachment=False
+    )
 
 
 @owner_bp.route('/owner/orders', methods=['GET'])

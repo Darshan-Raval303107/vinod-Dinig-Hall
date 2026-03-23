@@ -59,15 +59,14 @@ const TablesManagerView = () => {
     }
   };
 
-  const getQrFullUrl = (qrUrl) => {
-    if (!qrUrl) return '';
-    if (qrUrl.startsWith('http')) return qrUrl;
-    return `${API_ORIGIN}${qrUrl}`;
+  const getQrFullUrl = (tableId) => {
+    if (!tableId) return '';
+    return `${API_ORIGIN}/api/owner/tables/${tableId}/qr-image`;
   };
 
-  const handleDownloadQR = async (qrUrl, tableNumber) => {
-    if (!qrUrl) return;
-    const fullUrl = getQrFullUrl(qrUrl);
+  const handleDownloadQR = async (tableId, tableNumber) => {
+    if (!tableId) return;
+    const fullUrl = getQrFullUrl(tableId);
     const res = await fetch(fullUrl);
     const blob = await res.blob();
     const url = window.URL.createObjectURL(blob);
@@ -210,7 +209,7 @@ const TablesManagerView = () => {
                {table.qr_code_url ? (
                  <div className="relative z-10 p-3 bg-white rounded-2xl shadow-xl transition-transform duration-500 group-hover/qr:scale-110 group-hover/qr:rotate-2">
                    <img
-                     src={`${getQrFullUrl(table.qr_code_url)}?t=${Date.now()}`}
+                     src={`${getQrFullUrl(table.id)}?t=${Date.now()}`}
                      alt={`Node T${table.table_number}`}
                      className="w-24 h-24 object-contain grayscale-[0.3] group-hover/qr:grayscale-0 transition-all"
                    />
@@ -242,7 +241,7 @@ const TablesManagerView = () => {
               </button>
               
               <button 
-                onClick={() => handleDownloadQR(table.qr_code_url, table.table_number)}
+                onClick={() => handleDownloadQR(table.id, table.table_number)}
                 disabled={!table.qr_code_url}
                 className="w-14 h-14 flex items-center justify-center bg-zinc-50 border border-zinc-100 text-zinc-300 hover:text-slate-900 rounded-2xl transition-all active:scale-95 disabled:opacity-20"
               >
