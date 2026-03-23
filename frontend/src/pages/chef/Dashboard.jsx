@@ -50,6 +50,11 @@ const ChefDashboard = () => {
       } catch (e) {}
       fetchOrders(); 
     });
+
+    socket.on('order:updated', (data) => {
+      console.log('Order items added/removed:', data.order_id);
+      fetchOrders();
+    });
     
     socket.on('order:status_update_chef', (data) => {
       setOrders(prev => prev.map(o => o.order_id === data.orderId ? { ...o, status: data.status } : o));

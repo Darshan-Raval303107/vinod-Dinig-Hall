@@ -72,6 +72,7 @@ class Order(db.Model):
     status = db.Column(db.String(50), nullable=False, default='pending') # states: pending, accepted, cooking, ready, served, cancelled, paid, picked_up
     total_price = db.Column(db.Numeric(10, 2), nullable=False, default=0.0)
     razorpay_payment_id = db.Column(db.String(255), nullable=True)
+    is_updated = db.Column(db.Boolean, default=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 

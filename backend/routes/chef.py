@@ -42,6 +42,7 @@ def get_chef_orders():
             'pickup_code': order.pickup_code,
             'payment_status': order.payment.status if order.payment else 'pending',
             'created_at': order.created_at.isoformat(),
+            'is_updated': order.is_updated,
             'items': items
         })
 
@@ -81,5 +82,10 @@ def update_order_status(order_id):
         'orderId': str(order.id),
         'status': order.status
     }, room=str(restaurant_id))
+
+    # Reset is_updated flag when chef takes action
+    if order.is_updated:
+        order.is_updated = False
+        db.session.commit()
 
     return jsonify(msg="Order updated", status=order.status), 200

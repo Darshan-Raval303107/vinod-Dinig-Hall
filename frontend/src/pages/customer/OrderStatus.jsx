@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { socket } from '../../api/socket';
-import { CheckCircle2, Clock, ChefHat, CheckSquare, CreditCard, ChevronRight, Activity, Bell, Info, ArrowLeft } from 'lucide-react';
+import { CheckCircle2, Clock, ChefHat, CheckSquare, CreditCard, ChevronRight, Activity, Bell, Info, ArrowLeft, Trash2 } from 'lucide-react';
 
 const STATUS_STEPS = [
   { id: 'pending', label: 'Order Received', icon: Clock, desc: 'Our kitchen has received your order' },
@@ -162,9 +162,26 @@ const OrderStatus = () => {
                 <div className={`w-1.5 h-1.5 rounded-full ${item.is_veg ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
                 <span className="text-xs font-bold text-customer-text uppercase tracking-tight">{item.name}</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-[9px] font-black text-customer-text/20 uppercase tracking-widest leading-none">Qty.</span>
-                <span className="font-fraunces italic font-bold text-customer-accent">{item.quantity}</span>
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span className="text-[9px] font-black text-customer-text/20 uppercase tracking-widest leading-none">Qty.</span>
+                  <span className="font-fraunces italic font-bold text-customer-accent">{item.quantity}</span>
+                </div>
+                
+                {order.status === 'pending' && order.order_type === 'table' && (
+                  <button 
+                    onClick={() => {
+                      if(confirm(`Remove ${item.name}?`)) {
+                        api.delete(`/orders/${orderId}/items/${item.menu_item_id}`)
+                          .then(() => fetchStatus())
+                          .catch(err => alert(err.response?.data?.msg || "Failed to remove item"));
+                      }
+                    }}
+                    className="p-2 text-red-300 hover:text-red-500 transition-colors"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                )}
               </div>
             </div>
           ))}

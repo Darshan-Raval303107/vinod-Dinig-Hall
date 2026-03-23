@@ -436,7 +436,7 @@ def generate_qr(table_id):
     
     # URL encoded in the QR code - including slug for robustness
     if table.table_number == 0:
-        data_url = f"{frontend_url}/window?restaurant={restaurant.slug}"
+        data_url = f"{frontend_url}/window"
     else:
         # We use the clean /table/:num path as per App.jsx, 
         # but the landing page will redirect/handle query params.

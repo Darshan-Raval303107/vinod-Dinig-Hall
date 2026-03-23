@@ -19,46 +19,70 @@ def create_order():
         return jsonify(msg="Table number is required for dine-in orders"), 400
 
     try:
-        new_order = Order(
-            restaurant_id=restaurant_id,
-            table_number=table_number,
-            status='pending',
-            total_price=0
-        )
-        db.session.add(new_order)
+        # CHECK FOR EXISTING ACTIVE TABLE ORDER
+        existing_order = Order.query.filter(
+            Order.restaurant_id == restaurant_id,
+            Order.table_number == table_number,
+            Order.order_type == 'table',
+            Order.status.in_(['pending', 'accepted', 'cooking'])
+        ).first()
+
+        if existing_order:
+            order = existing_order
+            order.is_updated = True
+            msg = "Order updated"
+            event_type = 'order:updated'
+        else:
+            order = Order(
+                restaurant_id=restaurant_id,
+                table_number=table_number,
+                status='pending',
+                total_price=0,
+                order_type='table'
+            )
+            db.session.add(order)
+            msg = "Order created"
+            event_type = 'order:new'
+
         db.session.flush() # get ID
 
-        total_price = 0
+        new_total = float(order.total_price)
         for item in items:
             menu_item = MenuItem.query.get(item['menu_item_id'])
             if not menu_item:
                 continue
 
-            order_item = OrderItem(
-                order_id=new_order.id,
-                menu_item_id=menu_item.id,
-                quantity=item['quantity'],
-                unit_price=menu_item.price
-            )
-            db.session.add(order_item)
-            total_price += float(menu_item.price) * item['quantity']
+            # Check if item already exists in this order to update quantity
+            existing_oi = OrderItem.query.filter_by(order_id=order.id, menu_item_id=menu_item.id).first()
+            if existing_oi:
+                existing_oi.quantity += item['quantity']
+            else:
+                order_item = OrderItem(
+                    order_id=order.id,
+                    menu_item_id=menu_item.id,
+                    quantity=item['quantity'],
+                    unit_price=menu_item.price
+                )
+                db.session.add(order_item)
+            
+            new_total += float(menu_item.price) * item['quantity']
         
-        new_order.total_price = total_price
+        order.total_price = new_total
         db.session.commit()
 
         # Emit to chef room for this restaurant
-        socketio.emit('order:new', {
-            'order_id': str(new_order.id),
-            'table_number': new_order.table_number,
-            'status': new_order.status,
-            'total_price': float(new_order.total_price),
-            'items_count': len(items)
+        socketio.emit(event_type, {
+            'order_id': str(order.id),
+            'table_number': order.table_number,
+            'status': order.status,
+            'total_price': float(order.total_price),
+            'is_updated': order.is_updated
         }, room=str(restaurant_id))
 
         return jsonify({
-            'msg': 'Order created',
-            'order_id': new_order.id,
-            'status': new_order.status
+            'msg': msg,
+            'order_id': order.id,
+            'status': order.status
         }), 201
 
     except Exception as e:

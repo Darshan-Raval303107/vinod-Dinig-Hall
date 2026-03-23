@@ -66,6 +66,15 @@ const OrderCard = ({ order, onUpdateStatus }) => {
           <KitchenTimer createdAt={order.created_at} status={order.status} />
         </header>
 
+        {/* Updated Order Warning */}
+        {order.is_updated && (
+          <div className="mb-4 p-3 bg-red-600 rounded-2xl animate-pulse shadow-lg shadow-red-600/20 border border-red-500">
+            <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] flex items-center justify-center gap-2 italic">
+              <AlertCircle size={14} className="animate-bounce" /> ORDER UPDATED BY CUSTOMER
+            </p>
+          </div>
+        )}
+
         {/* Payment Warning for Table Orders */}
         {order.order_type === 'table' && order.payment_status !== 'success' && order.payment_status !== 'paid' && (
           <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 animate-pulse">
