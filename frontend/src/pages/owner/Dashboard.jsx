@@ -30,6 +30,15 @@ const OwnerDashboard = () => {
     navigate('/login');
   };
 
+  useEffect(() => {
+    if (user?.restaurant_id) {
+      import('../../api/socket').then(({ socket }) => {
+        socket.connect();
+        socket.emit('owner:join', { restaurantId: user.restaurant_id });
+      });
+    }
+  }, [user]);
+
   const navItems = [
     { path: '/owner/dashboard', label: 'Pulse', icon: LayoutDashboard },
     { path: '/owner/dashboard/orders', label: 'Orders', icon: FileText },

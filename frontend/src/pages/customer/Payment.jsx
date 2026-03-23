@@ -181,12 +181,16 @@ const Payment = () => {
       {/* Header */}
       <header className="px-6 pt-12 pb-8 flex items-center justify-between sticky top-0 backdrop-blur-xl bg-white/90 z-50 border-b border-zinc-100">
         <div className="flex items-center gap-4">
-          <button
-            onClick={() => navigate(-1)}
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-50 border border-zinc-200 text-customer-text/60 active:scale-90 transition-all"
-          >
-            <ArrowLeft size={20} />
-          </button>
+          {paymentData?.order_type !== 'window' ? (
+            <button
+              onClick={() => navigate(-1)}
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-zinc-50 border border-zinc-200 text-customer-text/60 active:scale-90 transition-all"
+            >
+              <ArrowLeft size={20} />
+            </button>
+          ) : (
+            <div className="w-10 h-10" /> /* Locked for window orders */
+          )}
           <div>
             <h1 className="font-fraunces text-2xl font-black text-customer-text italic leading-none">
               Payment

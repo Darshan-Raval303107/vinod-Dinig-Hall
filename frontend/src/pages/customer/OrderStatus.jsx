@@ -65,17 +65,22 @@ const OrderStatus = () => {
     <div className="theme-customer min-h-screen font-jakarta bg-[#FBF7F0] flex flex-col pt-12 pb-40 px-6 animate-in fade-in duration-1000">
       {/* Top Header with Back Button */}
       <div className="flex items-center justify-between mb-8">
-        <button
-          onClick={() => {
-            const path = order.order_type === 'window' 
-              ? '/menu?restaurant=spice-lounge' 
-              : `/menu?restaurant=spice-lounge&table=${order.table_number}`;
-            navigate(path);
-          }}
-          className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-customer-surface/20 text-customer-text/60 shadow-sm active:scale-95 transition-all"
-        >
-          <ArrowLeft size={18} />
-        </button>
+        {/* Dynamic Back Button - Hidden for unpaid window orders to enforce payment */}
+        {!(order.order_type === 'window' && !order.pickup_code) ? (
+          <button
+            onClick={() => {
+              const path = order.order_type === 'window' 
+                ? '/menu?restaurant=spice-lounge' 
+                : `/menu?restaurant=spice-lounge&table=${order.table_number}`;
+              navigate(path);
+            }}
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-customer-surface/20 text-customer-text/60 shadow-sm active:scale-95 transition-all"
+          >
+            <ArrowLeft size={18} />
+          </button>
+        ) : (
+          <div className="w-10 h-10" /> /* Spacer to maintain layout */
+        )}
         <div className="flex flex-col items-end">
           <span className="text-[8px] font-black text-customer-text/20 uppercase tracking-[0.3em]">Order Tracking</span>
           <span className="text-[10px] font-bold text-customer-accent italic">Live Update</span>

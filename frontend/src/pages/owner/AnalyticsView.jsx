@@ -51,6 +51,20 @@ const AnalyticsView = () => {
 
   useEffect(() => {
     fetchAnalytics(timeframe);
+
+    // Listen for new orders to refresh the pulse
+    import('../../api/socket').then(({ socket }) => {
+      socket.on('order:new', () => {
+        console.log('Pulse: New order detected, refreshing...');
+        fetchAnalytics(timeframe);
+      });
+    });
+
+    return () => {
+      import('../../api/socket').then(({ socket }) => {
+        socket.off('order:new');
+      });
+    };
   }, [timeframe]);
 
   const pieData = [

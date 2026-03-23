@@ -45,7 +45,13 @@ const OrderHistoryView = () => {
 
     if (user?.restaurant_id) {
       socket.connect();
-      socket.emit('chef:join', { restaurantId: user.restaurant_id });
+      
+      const joinRoom = () => {
+        socket.emit('owner:join', { restaurantId: user.restaurant_id });
+      };
+
+      socket.on('connect', joinRoom);
+      joinRoom();
       
       socket.on('order:new', () => {
         try {
@@ -61,13 +67,14 @@ const OrderHistoryView = () => {
       socket.on('order:status_update_chef', (data) => {
         setOrders(prev => prev.map(o => o.id === data.orderId ? { ...o, status: data.status } : o));
       });
-    }
 
-    return () => {
-      socket.off('order:new');
-      socket.off('order:status_update');
-      socket.off('order:status_update_chef');
-    };
+      return () => {
+        socket.off('connect', joinRoom);
+        socket.off('order:new');
+        socket.off('order:status_update');
+        socket.off('order:status_update_chef');
+      };
+    }
   }, [user]);
 
   const toggleOrder = (id) => {

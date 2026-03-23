@@ -77,6 +77,7 @@ def process_create_order(order_id: str):
                 "amount_paise": amount_paise,
                 "currency": "INR",
                 "order_id": order.id,
+                "order_type": order.order_type,
                 "razorpay_key_id": current_app.config.get("RAZORPAY_KEY_ID")
             })
 
@@ -116,6 +117,7 @@ def process_create_order(order_id: str):
             "amount_paise": amount_paise,
             "currency": "INR",
             "order_id": order.id,
+            "order_type": order.order_type,
             "razorpay_key_id": current_app.config.get("RAZORPAY_KEY_ID")
         })
 

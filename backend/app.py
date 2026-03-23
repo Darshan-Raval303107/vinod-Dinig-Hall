@@ -1,5 +1,5 @@
 import monkey  # MUST BE FIRST for Gevent patching
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import logging
 
@@ -101,7 +101,18 @@ def create_app(config_class=Config):
         restaurant_id = data.get('restaurantId')
         if restaurant_id:
             join_room(str(restaurant_id))
-            app.logger.info(f"Chef joined room: {restaurant_id}")
+            app.logger.info(f"🟢 Chef joined room: {restaurant_id} (SID: {request.sid if hasattr(request, 'sid') else 'unknown'})")
+
+    @socketio.on('owner:join')
+    def on_owner_join(data):
+        restaurant_id = data.get('restaurantId')
+        if restaurant_id:
+            join_room(str(restaurant_id))
+            app.logger.info(f"💎 Owner joined room: {restaurant_id}")
+
+    @socketio.on('disconnect')
+    def on_disconnect():
+        app.logger.info(f"🔴 Socket disconnected: {request.sid if hasattr(request, 'sid') else 'unknown'}")
 
 
     # Logger – assuming it's ok

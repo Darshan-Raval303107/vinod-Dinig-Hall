@@ -32,7 +32,16 @@ const ChefDashboard = () => {
     const clockInt = setInterval(() => setCurrentTime(new Date()), 1000);
 
     socket.connect();
-    socket.emit('chef:join', { restaurantId: user.restaurant_id });
+    
+    const joinRoom = () => {
+      if (user?.restaurant_id) {
+        socket.emit('chef:join', { restaurantId: user.restaurant_id });
+        console.log('Chef re-joined room:', user.restaurant_id);
+      }
+    };
+
+    socket.on('connect', joinRoom);
+    joinRoom(); // Initial join
     
     socket.on('order:new', (data) => {
       try {

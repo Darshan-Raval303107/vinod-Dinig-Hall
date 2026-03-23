@@ -1,19 +1,35 @@
 import { create } from 'zustand'
 
-export const useAuthStore = create((set) => ({
-  user: JSON.parse(localStorage.getItem('user')) || null,
-  token: localStorage.getItem('token') || null,
-  setAuth: (user, token) => {
-    localStorage.setItem('token', token)
-    localStorage.setItem('user', JSON.stringify(user))
-    set({ user, token })
-  },
-  logout: () => {
-    localStorage.removeItem('token')
-    localStorage.removeItem('user')
-    set({ user: null, token: null })
-  }
-}))
+export const useAuthStore = create((set) => {
+  // Helper to safely get from localStorage
+  const getSafe = (key) => {
+    const val = localStorage.getItem(key);
+    if (!val || val === 'undefined' || val === 'null') return null;
+    try {
+      return key === 'user' ? JSON.parse(val) : val;
+    } catch (e) {
+      console.error(`AuthStore: Error parsing ${key}`, e);
+      return null;
+    }
+  };
+
+  return {
+    user: getSafe('user'),
+    token: getSafe('token'),
+    setAuth: (user, token) => {
+      if (!token || !user) return;
+      localStorage.setItem('token', token)
+      localStorage.setItem('user', JSON.stringify(user))
+      set({ user, token })
+    },
+    logout: () => {
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
+      set({ user: null, token: null })
+      // Optional: Clear any other persistent state if needed
+    }
+  };
+})
 
 export const useCartStore = create((set) => ({
   items: [],
