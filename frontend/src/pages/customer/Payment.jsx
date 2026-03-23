@@ -64,17 +64,35 @@ const Payment = () => {
           resolve();
           return;
         }
+        
+        console.log("Injecting Razorpay script dynamically...");
         const script = document.createElement("script");
         script.src = "https://checkout.razorpay.com/v1/checkout.js";
         script.async = true;
-        script.onload = () => resolve();
-        script.onerror = () => reject(new Error("Razorpay SDK failed to load"));
+        
+        const timeout = setTimeout(() => {
+          reject(new Error("Razorpay SDK timed out. Possible CSP or Network issue."));
+        }, 8000);
+
+        script.onload = () => {
+          clearTimeout(timeout);
+          console.log("Razorpay SDK loaded successfully.");
+          resolve();
+        };
+        script.onerror = () => {
+          clearTimeout(timeout);
+          reject(new Error("Razorpay SDK failed to load (Check CSP/Network)"));
+        };
         document.body.appendChild(script);
       });
     };
 
     try {
       await loadRazorpay();
+
+      if (!window.Razorpay) {
+        throw new Error("Razorpay object not found even after script load.");
+      }
 
       const options = {
         key: paymentData.razorpay_key_id,
@@ -84,6 +102,7 @@ const Payment = () => {
         description: `Premium Dining Receipt #${orderId.slice(-6).toUpperCase()}`,
         order_id: paymentData.razorpay_order_id,
         handler: async function (response) {
+          console.log("Razorpay payment success callback triggered:", response);
           try {
             setProcessing(true);
             const verifyRes = await api.post('/payments/verify', {
@@ -93,6 +112,7 @@ const Payment = () => {
               order_id: orderId 
             });
 
+            console.log("Payment verification result:", verifyRes.data);
             const pickupCode = verifyRes.data.pickup_code;
             
             setPaymentSuccess(true);
@@ -107,7 +127,7 @@ const Payment = () => {
               navigate(`/bill/${orderId}`);
             }, 1500);
           } catch (verifyErr) {
-            console.error("Verification error:", verifyErr);
+            console.error("Local verification error:", verifyErr);
             setError(verifyErr.response?.data?.error || "Payment appears successful but verification failed locally. Contact support.");
             setProcessing(false);
           }
@@ -120,17 +140,17 @@ const Payment = () => {
         theme: { color: "#C85C1A" },
         modal: {
           ondismiss: function () {
-            console.log("Checkout modal closed by user");
+            console.log("Checkout modal dismissed by user.");
             setProcessing(false);
           }
         }
       };
 
-      console.log("Razorpay options initialized:", options);
+      console.log("Executing rzp.open()...");
       const rzp = new window.Razorpay(options);
       
       rzp.on('payment.failed', function (response) {
-        console.error("Payment Step Failed:", response.error);
+        console.error("Razorpay Payment Failed:", response.error);
         setError(`Payment failed: ${response.error.description}`);
         setProcessing(false);
       });
@@ -138,8 +158,8 @@ const Payment = () => {
       rzp.open();
 
     } catch (err) {
-      console.error("Razorpay init failed:", err);
-      setError("Failed to open payment gateway. Please ensure popups and scripts are allowed.");
+      console.error("Critical Payment Error:", err);
+      setError(`Critical Error: ${err.message}. Please ensure popups and scripts are allowed.`);
       setProcessing(false);
     }
   };
