@@ -58,15 +58,20 @@ const Payment = () => {
       currency: paymentData.currency || "INR"
     });
 
-    const loadRazorpay = () =>
-      new Promise((resolve, reject) => {
-        if (window.Razorpay) return resolve(true);
-        const script = document.createElement('script');
-        script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-        script.onload = () => resolve(true);
-        script.onerror = () => reject(new Error('Failed to load Razorpay'));
+    const loadRazorpay = () => {
+      return new Promise((resolve, reject) => {
+        if (window.Razorpay) {
+          resolve();
+          return;
+        }
+        const script = document.createElement("script");
+        script.src = "https://checkout.razorpay.com/v1/checkout.js";
+        script.async = true;
+        script.onload = () => resolve();
+        script.onerror = () => reject(new Error("Razorpay SDK failed to load"));
         document.body.appendChild(script);
       });
+    };
 
     try {
       await loadRazorpay();
@@ -74,21 +79,17 @@ const Payment = () => {
       const options = {
         key: paymentData.razorpay_key_id,
         amount: paymentData.amount_paise,
-        currency: paymentData.currency || 'INR',
+        currency: paymentData.currency || "INR",
+        name: "Vinnod Dining Hall",
+        description: `Premium Dining Receipt #${orderId.slice(-6).toUpperCase()}`,
         order_id: paymentData.razorpay_order_id,
-        name: 'Vinnod Dining',
-        description: `Order #${orderId}`,
-        config: {
-          display: {
-            hide: [{ method: "paylater" }] // optional
-          }
-        },
         handler: async function (response) {
           try {
             await api.post('/payments/verify', {
-              razorpay_order_id: response.razorpay_order_id,
               razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+              order_id: orderId 
             });
 
             setPaymentSuccess(true);
@@ -96,33 +97,39 @@ const Payment = () => {
               navigate(`/bill/${orderId}`);
             }, 2500);
           } catch (verifyErr) {
-            setError(
-              verifyErr.response?.data?.error ||
-              'Payment appears successful but verification failed. Contact support.'
-            );
+            console.error("Verification error:", verifyErr);
+            setError(verifyErr.response?.data?.error || "Payment appears successful but verification failed locally. Contact support.");
             setProcessing(false);
           }
         },
         prefill: {
-          name: '',
-          email: '',
-          contact: ''
+          name: "Guest",
+          email: "guest@vinnod.com",
+          contact: ""
         },
-        theme: {
-          color: '#000000'
-        },
+        theme: { color: "#C85C1A" },
         modal: {
-          ondismiss: () => {
-            console.log("Razorpay modal dismissed by user");
+          ondismiss: function () {
+            console.log("Checkout modal closed by user");
             setProcessing(false);
           }
         }
       };
 
+      console.log("Razorpay options initialized:", options);
       const rzp = new window.Razorpay(options);
+      
+      rzp.on('payment.failed', function (response) {
+        console.error("Payment Step Failed:", response.error);
+        setError(`Payment failed: ${response.error.description}`);
+        setProcessing(false);
+      });
+
       rzp.open();
+
     } catch (err) {
-      setError('Failed to load payment gateway. Please try again.');
+      console.error("Razorpay init failed:", err);
+      setError("Failed to open payment gateway. Please ensure popups and scripts are allowed.");
       setProcessing(false);
     }
   };

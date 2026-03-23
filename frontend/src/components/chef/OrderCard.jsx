@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { ChefHat, Clock, CheckCircle2, Flame, User } from 'lucide-react';
+import { ChefHat, Clock, CheckCircle2, Flame, User, AlertCircle } from 'lucide-react';
 
 const KitchenTimer = ({ createdAt, status }) => {
   const [elapsed, setElapsed] = useState('');
