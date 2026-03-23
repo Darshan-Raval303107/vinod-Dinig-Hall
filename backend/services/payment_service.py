@@ -176,14 +176,16 @@ def process_verify_payment(
             # Use current_app logger for visible Render logs if needed
             print(f"DEBUG: Finalizing Order {linked_order.id} | Type: {linked_order.order_type}")
 
-            if linked_order.order_type == 'window':
+            # WINDOW ORDER LOGIC: Generate code if table_number is 0 or type is window
+            if linked_order.order_type == 'window' or linked_order.table_number == 0:
                 if not linked_order.pickup_code:
                     linked_order.pickup_code = generate_unique_window_code(db.session)
                     linked_order.status = 'confirmed'
                     pickup_code = linked_order.pickup_code
-                    logger.info(f"Generated Pickup Code: {pickup_code} for Window Order")
+                    logger.info(f"Generated Pickup Code: {pickup_code} for Window Order {linked_order.id}")
                 else:
                     pickup_code = linked_order.pickup_code
+                    logger.info(f"Re-using existing pickup code: {pickup_code}")
                 
                 # Emit to kitchen now!
                 socketio.emit('order:new', {
@@ -196,9 +198,13 @@ def process_verify_payment(
                     'items_count': len(linked_order.items)
                 }, room=str(linked_order.restaurant_id))
             else:
-                # Table orders marked as paid (they were already confirmed)
-                linked_order.status = "paid"
-                logger.info(f"Table order {linked_order.id} marked as paid")
+                # Table orders marked as paid (they were already confirmed by chef or pending)
+                # Keep status as 'confirmed' if it was accepted, or 'paid' if it was pending
+                if linked_order.status in ('pending', 'accepted'):
+                    linked_order.status = "confirmed"
+                else:
+                    linked_order.status = "paid"
+                logger.info(f"Table order {linked_order.id} status updated to {linked_order.status}")
             
             linked_order.razorpay_payment_id = razorpay_payment_id
 
@@ -293,10 +299,12 @@ def process_webhook_event(event_data: dict):
         order = Order.query.get(payment.order_id)
         if order:
             if new_status in ("captured", "success"):
-                if order.order_type == 'window':
+                # Handle window orders (Table 0)
+                if order.order_type == 'window' or order.table_number == 0:
                     if not order.pickup_code:
                         order.pickup_code = generate_unique_window_code(db.session)
                         order.status = 'confirmed'
+                        logger.info(f"Webhook generated pickup code: {order.pickup_code}")
                         
                         # Notify kitchen
                         socketio.emit('order:new', {

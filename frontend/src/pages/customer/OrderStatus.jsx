@@ -98,7 +98,7 @@ const OrderStatus = () => {
         <h1 className="font-fraunces text-5xl font-black italic text-customer-text tracking-tighter leading-tight mb-2 uppercase">Your Order</h1>
         <div className="flex items-center gap-3 justify-center">
           <span className="text-[11px] font-black text-customer-text/30 uppercase tracking-[0.2em] italic underline underline-offset-4 decoration-customer-accent/20">Ref: #{order.order_id.substring(0, 8).toUpperCase()}</span>
-          {order.order_type === 'window' ? (
+          {order.order_type === 'window' || order.table_number === 0 ? (
             order.pickup_code ? (
               <span className="text-sm font-black text-white bg-customer-accent px-4 py-1.5 rounded-lg shadow-lg">PICKUP CODE: {order.pickup_code}</span>
             ) : (
@@ -249,7 +249,7 @@ const OrderStatus = () => {
                     <CreditCard size={14} />
                   </div>
                   <span className={`text-[10px] font-black uppercase tracking-[0.2em] italic ${order.status === 'served' || (order.order_type === 'window' && !order.pickup_code) ? 'text-white' : 'text-customer-text/40'}`}>
-                    {order.status === 'served' ? 'Final Settlement' : (order.order_type === 'window' && !order.pickup_code) ? 'Pay to Start Order' : 'Pay Advance'}
+                    {order.status === 'served' ? 'Final Settlement' : (order.table_number === 0 && !order.pickup_code) ? 'Pay to Start Order' : 'Pay Advance'}
                     <span className={`text-[10px] font-black uppercase tracking-[0.2em] italic ${order.status === 'served' ? 'text-white' : 'text-customer-text/40'}`}>
                       {order.status === 'served' ? 'Pay Now' : 'Pay Early'}
                     </span>
