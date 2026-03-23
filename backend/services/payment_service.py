@@ -168,35 +168,21 @@ def process_verify_payment(
         payment.status = "success"
 
         linked_order = Order.query.get(payment.order_id)
-        pickup_code = None
-
+        
         if linked_order:
-            logger.info(f"Finalizing Order ID: {linked_order.id} | Type: {linked_order.order_type}")
+            logger.info(f"Finalizing Payment for Order ID: {linked_order.id} | Type: {linked_order.order_type}")
             
-            # Use current_app logger for visible Render logs if needed
-            print(f"DEBUG: Finalizing Order {linked_order.id} | Type: {linked_order.order_type}")
+            # Payment success notification to frontend (optional but good)
+            socketio.emit('payment:success', {
+                'order_id': str(linked_order.id),
+                'status': linked_order.status,
+                'pickup_code': linked_order.pickup_code
+            }, room=str(linked_order.restaurant_id))
 
-            # WINDOW ORDER LOGIC: Generate code if table_number is 0 or type is window
-            if linked_order.order_type == 'window' or linked_order.table_number == 0:
-                if not linked_order.pickup_code:
-                    linked_order.pickup_code = generate_unique_window_code(db.session)
-                    linked_order.status = 'confirmed'
-                    pickup_code = linked_order.pickup_code
-                    logger.info(f"Generated Pickup Code: {pickup_code} for Window Order {linked_order.id}")
-                else:
-                    pickup_code = linked_order.pickup_code
-                    logger.info(f"Re-using existing pickup code: {pickup_code}")
-                
-                # Emit to kitchen now!
-                socketio.emit('order:new', {
-                    'order_id': str(linked_order.id),
-                    'table_number': linked_order.table_number,
-                    'status': linked_order.status,
-                    'order_type': linked_order.order_type,
-                    'pickup_code': linked_order.pickup_code,
-                    'total_price': float(linked_order.total_price),
-                    'items_count': len(linked_order.items)
-                }, room=str(linked_order.restaurant_id))
+            # Table orders marked as paid (they were already confirmed by chef or pending)
+            # Keep status as 'confirmed' if it was accepted, or 'paid' if it was pending
+            if linked_order.status in ('pending', 'accepted'):
+                linked_order.status = "confirmed"
             else:
                 # Table orders marked as paid (they were already confirmed by chef or pending)
                 # Keep status as 'confirmed' if it was accepted, or 'paid' if it was pending

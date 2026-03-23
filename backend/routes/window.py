@@ -17,10 +17,9 @@ def create_window_order():
         return jsonify({"success": False, "error": "Missing restaurant_id or items"}), 400
 
     try:
-        # Use nested transaction / savepoint for safety
+        # Generate code IMMEDIATELY on "Proceed" as requested
         with db.session.begin_nested():
-            # We NO LONGER generate code here for 'payment-first' flow
-            # code = generate_unique_window_code(db.session)
+            code = generate_unique_window_code(db.session)
             
             new_order = Order(
                 restaurant_id=data['restaurant_id'],
@@ -29,7 +28,7 @@ def create_window_order():
                 status='pending',
                 total_price=float(data.get('total', 0)),
                 customer_name=data.get('customer_name', 'Walk-in'),
-                pickup_code=None # Code generated only after payment
+                pickup_code=code # Generated on "Proceed"
             )
             
             db.session.add(new_order)
@@ -46,17 +45,27 @@ def create_window_order():
                 )
                 db.session.add(order_item)
 
-        # Commit outside of the inner block (which just manages the SAVEPOINT)
+        # Commit everything
         db.session.commit()
 
-        # NO SOCKET EMIT HERE anymore for window orders.
-        # Kitchen only sees it after payment success.
+        # 🔥 IMMEDIATE NOTIFICATION: Inform chef as soon as "Proceed" is clicked
+        from extensions import socketio
+        socketio.emit('order:new', {
+            'order_id': str(new_order.id),
+            'table_number': 0,
+            'status': new_order.status,
+            'order_type': 'window',
+            'pickup_code': new_order.pickup_code,
+            'total_price': float(new_order.total_price),
+            'items_count': len(new_order.items)
+        }, room=str(new_order.restaurant_id))
             
         return jsonify({
             "success": True,
             "order_id": new_order.id,
-            "message": "✅ Order received! Please proceed to payment to start preparation.",
-            "customer_message": "Payment required to generate pickup code"
+            "pickup_code": new_order.pickup_code,
+            "message": "✅ Order placed successfully!",
+            "customer_message": f"Your pickup code is {new_order.pickup_code}. Please proceed to payment."
         }), 201
             
     except Exception as e:

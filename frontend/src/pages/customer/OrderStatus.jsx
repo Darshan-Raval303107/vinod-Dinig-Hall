@@ -96,17 +96,25 @@ const OrderStatus = () => {
         </div>
 
         <h1 className="font-fraunces text-5xl font-black italic text-customer-text tracking-tighter leading-tight mb-2 uppercase">Your Order</h1>
-        <div className="flex items-center gap-3 justify-center">
+        <div className="flex flex-col items-center gap-3">
           <span className="text-[11px] font-black text-customer-text/30 uppercase tracking-[0.2em] italic underline underline-offset-4 decoration-customer-accent/20">Ref: #{order.order_id.substring(0, 8).toUpperCase()}</span>
-          {order.order_type === 'window' || order.table_number === 0 ? (
-            order.pickup_code ? (
-              <span className="text-sm font-black text-white bg-customer-accent px-4 py-1.5 rounded-lg shadow-lg">PICKUP CODE: {order.pickup_code}</span>
+          <div className="flex items-center gap-2">
+            {order.table_number !== 0 && (
+              <span className="text-xs font-bold text-customer-accent bg-customer-accent/5 px-3 py-1 rounded-lg uppercase tracking-widest leading-none">TABLE {order.table_number}</span>
+            )}
+            {order.pickup_code ? (
+              <div className="flex flex-col items-center gap-1 scale-110">
+                <span className="text-xs font-black text-white bg-customer-accent px-6 py-2 rounded-xl shadow-[0_15px_30px_rgba(200,92,26,0.3)] flex items-center gap-2">
+                  <Ticket size={14} /> PICKUP CODE: {order.pickup_code}
+                </span>
+                {order.payment_status !== 'paid' && order.payment_status !== 'success' && (
+                  <span className="text-[7px] font-black text-customer-accent uppercase tracking-widest animate-pulse">Verification Pending</span>
+                )}
+              </div>
             ) : (
-              <span className="text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg border border-red-100 animate-pulse">AWAITING PAYMENT</span>
-            )
-          ) : (
-            <span className="text-xs font-bold text-customer-accent bg-customer-accent/5 px-3 py-1 rounded-lg">TABLE {order.table_number}</span>
-          )}
+              <span className="text-xs font-bold text-red-500 bg-red-50 px-3 py-1 rounded-lg border border-red-100 animate-pulse">GENERATING CODE...</span>
+            )}
+          </div>
         </div>
       </div>
 

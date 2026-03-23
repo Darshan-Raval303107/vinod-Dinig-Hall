@@ -1,7 +1,7 @@
 from flask import Blueprint, request, jsonify
 from extensions import db, socketio
 from models import Order, OrderItem, MenuItem
-import uuid
+from utils.order_utils import generate_unique_window_code
 
 orders_bp = Blueprint('orders_bp', __name__)
 
@@ -38,7 +38,8 @@ def create_order():
                 table_number=table_number,
                 status='pending',
                 total_price=0,
-                order_type='table'
+                order_type='table',
+                pickup_code=generate_unique_window_code(db.session) # Generate code for dine-in too
             )
             db.session.add(order)
             msg = "Order created"
@@ -75,6 +76,7 @@ def create_order():
             'order_id': str(order.id),
             'table_number': order.table_number,
             'status': order.status,
+            'pickup_code': order.pickup_code,
             'total_price': float(order.total_price),
             'is_updated': order.is_updated
         }, room=str(restaurant_id))
