@@ -10,9 +10,11 @@ from flask import current_app
 from extensions import db
 from models import Order, Payment, WebhookEvent
 from services.razorpay_service import (
-    create_razorpay_order,
     verify_payment_signature,
+    create_razorpay_order,
 )
+from utils.order_utils import generate_unique_window_code
+from extensions import socketio
 
 logger = logging.getLogger("dineflow.payment_service")
 
@@ -23,7 +25,9 @@ def _amount_to_paise(amount: Decimal) -> int:
     try:
         if amount is None or amount <= 0:
             return 0
-        return int(amount * 100)
+        # Ensure it's a Decimal for calculation
+        dec_amount = Decimal(str(amount))
+        return int(dec_amount * 100)
     except Exception as e:
         logger.error(f"Amount conversion error: {str(e)}")
         return 0
@@ -53,7 +57,7 @@ def process_create_order(order_id: str):
             return _err("Order not found in database", 404)
 
         # Always recalculate total server-side
-        total = sum(item.unit_price * item.quantity for item in order.items)
+        total = sum((Decimal(str(item.unit_price)) * item.quantity for item in order.items), Decimal('0'))
         logger.info(f"Calculated total: ₹{total} ({len(order.items)} items)")
 
         if total <= 0:
@@ -158,7 +162,24 @@ def process_verify_payment(
 
         linked_order = Order.query.get(payment.order_id)
         if linked_order:
-            linked_order.status = "paid"
+            # If it was a window order, it's now officially 'confirmed' for the kitchen
+            if linked_order.order_type == 'window' and not linked_order.pickup_code:
+                linked_order.pickup_code = generate_unique_window_code(db.session)
+                linked_order.status = 'confirmed'
+                
+                # Emit to kitchen now!
+                socketio.emit('order:new', {
+                    'order_id': str(linked_order.id),
+                    'table_number': linked_order.table_number,
+                    'status': linked_order.status,
+                    'order_type': linked_order.order_type,
+                    'pickup_code': linked_order.pickup_code,
+                    'total_price': float(linked_order.total_price),
+                    'items_count': len(linked_order.items)
+                }, room=str(linked_order.restaurant_id))
+            else:
+                linked_order.status = "paid"
+            
             linked_order.razorpay_payment_id = razorpay_payment_id
 
         db.session.commit()
@@ -212,11 +233,12 @@ def process_webhook_event(event_data: dict):
         )
         db.session.add(existing)
 
-    payload = event_data.get("payload", {})
-    payment_entity = payload.get("payment", {}).get("entity", {})
-    rz_order_id = payment_entity.get("order_id")
-    rz_payment_id = payment_entity.get("id")
-    method = payment_entity.get("method")
+    payload = event_data.get('payload', {})
+    payment_data = payload.get('payment', {})
+    entity_data = payment_data.get('entity', {})
+    rz_order_id = entity_data.get("order_id")
+    rz_payment_id = entity_data.get('id')
+    method = entity_data.get('method')
 
     if not rz_order_id:
         existing.processed = True
@@ -250,7 +272,23 @@ def process_webhook_event(event_data: dict):
         order = Order.query.get(payment.order_id)
         if order:
             if new_status in ("captured", "success"):
-                order.status = "paid"
+                # Handle window order confirmation on webhook success too
+                if order.order_type == 'window' and not order.pickup_code:
+                    order.pickup_code = generate_unique_window_code(db.session)
+                    order.status = 'confirmed'
+                    
+                    # Notify kitchen
+                    socketio.emit('order:new', {
+                        'order_id': str(order.id),
+                        'table_number': order.table_number,
+                        'status': order.status,
+                        'order_type': order.order_type,
+                        'pickup_code': order.pickup_code,
+                        'total_price': float(order.total_price),
+                        'items_count': len(order.items)
+                    }, room=str(order.restaurant_id))
+                else:
+                    order.status = "paid"
                 order.razorpay_payment_id = rz_payment_id
             elif new_status == "failed" and order.status != "paid":
                 order.status = "failed"

@@ -57,14 +57,23 @@ const OrderCard = ({ order, onUpdateStatus }) => {
         <header className="flex justify-between items-start mb-5 md:mb-6">
           <div className="flex flex-col">
             <span className="text-3xl md:text-4xl font-black text-slate-900 tracking-tighter italic leading-none drop-shadow-sm">
-              T{order.table_number || '?'}
+              {order.order_type === 'window' ? `PICKUP ${order.pickup_code || 'TBD'}` : `T${order.table_number || '?'}`}
             </span>
             <span className="text-[7.5px] md:text-[8px] font-black text-zinc-400 uppercase tracking-widest mt-1.5">
-              REF: {order.order_id.substring(0,8).toUpperCase()}
+              REF: {order.order_id.substring(0,8).toUpperCase()} | {order.order_type?.toUpperCase()}
             </span>
           </div>
           <KitchenTimer createdAt={order.created_at} status={order.status} />
         </header>
+
+        {/* Payment Warning for Table Orders */}
+        {order.order_type === 'table' && order.payment_status !== 'success' && order.payment_status !== 'paid' && (
+          <div className="mb-4 p-3 bg-red-50 border-l-4 border-red-500 text-red-700 animate-pulse">
+            <p className="text-[10px] font-black uppercase tracking-widest flex items-center gap-2">
+              <span className="text-sm">⚠️</span> PAYMENT PENDING – DO NOT HAND OVER
+            </p>
+          </div>
+        )}
 
         {/* ITEMS LIST - High Density */}
         <div className="space-y-2 md:space-y-3 mb-6 md:mb-8">

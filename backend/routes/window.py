@@ -9,25 +9,31 @@ window_bp = Blueprint('window_bp', __name__)
 @window_bp.route('/order', methods=['POST'])
 @limiter.limit("12 per minute")
 def create_window_order():
-    data = request.get_json()
+    data = request.get_json() or {}
+    restaurant_id = data.get('restaurant_id')
+    items_data = data.get('items', [])
+
+    if not restaurant_id or not items_data:
+        return jsonify({"success": False, "error": "Missing restaurant_id or items"}), 400
+
     try:
         # Use nested transaction / savepoint for safety
         with db.session.begin_nested():
-            # 100% concurrent safe 4-digit code generation
-            code = generate_unique_window_code(db.session)
+            # We NO LONGER generate code here for 'payment-first' flow
+            # code = generate_unique_window_code(db.session)
             
             new_order = Order(
                 restaurant_id=data['restaurant_id'],
-                table_number=0, # Using 0 as identifier for window walk-ins, though order_type handles distinguishing
+                table_number=0, 
                 order_type='window',
                 status='pending',
                 total_price=float(data.get('total', 0)),
                 customer_name=data.get('customer_name', 'Walk-in'),
-                pickup_code=code
+                pickup_code=None # Code generated only after payment
             )
             
             db.session.add(new_order)
-            db.session.flush() # flush to get the new_order.id
+            db.session.flush() 
 
             # Attach the order items
             items_data = data.get('items', [])
@@ -43,24 +49,14 @@ def create_window_order():
         # Commit outside of the inner block (which just manages the SAVEPOINT)
         db.session.commit()
 
-        # Emit to chef room for this restaurant so it shows up instantly on the dashboard
-        from extensions import socketio
-        socketio.emit('order:new', {
-            'order_id': str(new_order.id),
-            'table_number': new_order.table_number, # will be 0
-            'status': new_order.status,
-            'order_type': new_order.order_type,
-            'pickup_code': new_order.pickup_code,
-            'total_price': float(new_order.total_price),
-            'items_count': len(items_data)
-        }, room=str(new_order.restaurant_id))
+        # NO SOCKET EMIT HERE anymore for window orders.
+        # Kitchen only sees it after payment success.
             
         return jsonify({
             "success": True,
             "order_id": new_order.id,
-            "pickup_code": code,
-            "message": f"✅ Order placed successfully!\n\nYour Pickup Code: **{code}**\n\nShow this code at the counter to collect your order.",
-            "customer_message": f"Your code is {code} - Please show to staff"
+            "message": "✅ Order received! Please proceed to payment to start preparation.",
+            "customer_message": "Payment required to generate pickup code"
         }), 201
             
     except Exception as e:
