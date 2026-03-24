@@ -228,7 +228,7 @@ const Payment = () => {
   return (
     <div className="theme-customer min-h-screen bg-white font-jakarta pb-40 animate-in fade-in duration-500">
       {/* Header */}
-      <header className="px-6 pt-12 pb-8 flex items-center justify-between sticky top-0 backdrop-blur-xl bg-white/90 z-50 border-b border-zinc-100">
+      <header className="px-5 pt-8 pb-6 flex items-center justify-between sticky top-0 backdrop-blur-xl bg-white/90 z-50 border-b border-zinc-100">
         <div className="flex items-center gap-4">
           {paymentData?.order_type !== 'window' ? (
             <button
@@ -251,9 +251,9 @@ const Payment = () => {
         </div>
       </header>
 
-      <div className="px-6 mt-8 space-y-6 max-w-md mx-auto">
+      <div className="px-5 mt-6 space-y-5 max-w-md mx-auto">
         {/* Amount Card */}
-        <div className="bg-zinc-50 rounded-[2.5rem] p-8 border border-zinc-100 relative overflow-hidden">
+        <div className="bg-zinc-50 rounded-3xl p-6 border border-zinc-100 relative overflow-hidden">
           <div className="flex items-center gap-3 mb-8 opacity-40">
             <Smartphone size={16} />
             <span className="text-[9px] font-black uppercase tracking-[0.3em]">Bill Summary</span>
@@ -270,7 +270,7 @@ const Payment = () => {
                 </span>
               </div>
               <div className="flex items-baseline gap-1">
-                <span className="font-fraunces text-5xl font-black text-customer-text italic tracking-tighter">
+                <span className="font-fraunces text-4xl font-black text-customer-text italic tracking-tighter">
                   ₹{paymentData?.amount?.toFixed(0) || '—'}
                 </span>
               </div>
@@ -309,7 +309,7 @@ const Payment = () => {
           <button
             onClick={handleRazorpayPayment}
             disabled={processing || !paymentData}
-            className={`group relative w-full h-20 rounded-[2.2rem] shadow-[0_25px_50px_-12px_rgba(200,92,26,0.25)] flex items-center justify-between px-3 overflow-hidden transition-all active:scale-[0.98] active:shadow-none bg-customer-text text-white ${processing || !paymentData ? 'opacity-60 cursor-not-allowed' : ''
+            className={`group relative w-full h-16 rounded-2xl shadow-[0_20px_40px_-12px_rgba(200,92,26,0.25)] flex items-center justify-between px-2 overflow-hidden transition-all active:scale-[0.98] active:shadow-none bg-customer-text text-white ${processing || !paymentData ? 'opacity-60 cursor-not-allowed' : ''
               }`}
           >
             <div
@@ -317,22 +317,22 @@ const Payment = () => {
                 }`}
             ></div>
 
-            <div className="h-14 bg-white/10 rounded-[1.8rem] px-8 flex items-center gap-3 relative z-10">
+            <div className="h-12 bg-white/10 rounded-xl px-6 flex items-center gap-3 relative z-10">
               {processing ? (
-                <Loader2 size={20} className="animate-spin" />
+                <Loader2 size={18} className="animate-spin" />
               ) : (
-                <CreditCard size={18} />
+                <CreditCard size={16} />
               )}
-              <span className="text-xs font-black uppercase tracking-[0.2em]">
+              <span className="text-[10px] font-black uppercase tracking-[0.2em]">
                 {processing ? 'Processing...' : 'Pay Securely'}
               </span>
             </div>
 
             <div
-              className={`flex items-center gap-2 font-fraunces italic text-xl pr-6 transition-all relative z-10 ${processing ? 'translate-x-4 opacity-0' : 'group-hover:translate-x-1'
+              className={`flex items-center gap-2 font-fraunces italic text-lg pr-4 transition-all relative z-10 ${processing ? 'translate-x-4 opacity-0' : 'group-hover:translate-x-1'
                 }`}
             >
-              ₹{paymentData?.amount?.toFixed(0) || '—'} <ArrowRight size={22} className="text-customer-accent" />
+              ₹{paymentData?.amount?.toFixed(0) || '—'} <ArrowRight size={20} className="text-customer-accent" />
             </div>
           </button>
         </div>

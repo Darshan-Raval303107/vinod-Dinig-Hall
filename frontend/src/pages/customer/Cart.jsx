@@ -67,7 +67,7 @@ const Cart = () => {
   return (
     <div className="theme-customer min-h-screen pb-48 font-jakarta bg-white selection:bg-customer-accent/10">
       {/* Mobile-First Sticky Header */}
-      <header className="px-6 pt-12 pb-6 flex items-center justify-between sticky top-0 backdrop-blur-xl bg-white/90 z-50 border-b border-zinc-50">
+      <header className="px-5 pt-10 pb-4 flex items-center justify-between sticky top-0 backdrop-blur-xl bg-white/90 z-50 border-b border-zinc-50">
         <div className="flex items-center gap-4">
           <button 
             onClick={() => navigate(-1)} 
@@ -103,8 +103,8 @@ const Cart = () => {
           
           <div className="space-y-4">
             {items.map(item => (
-              <div key={item.id} className="relative flex items-center gap-4 p-4 rounded-[2rem] bg-zinc-50/50 border border-zinc-100 shadow-sm transition-all active:scale-[0.99]">
-                <div className="w-16 h-16 flex-shrink-0 rounded-2xl bg-white overflow-hidden relative shadow-inner border border-zinc-100">
+              <div key={item.id} className="relative flex items-center gap-3 p-3 rounded-2xl bg-zinc-50/50 border border-zinc-100 shadow-sm transition-all active:scale-[0.99]">
+                <div className="w-14 h-14 flex-shrink-0 rounded-xl bg-white overflow-hidden relative shadow-inner border border-zinc-100">
                   {item.image_url ? (
                     <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
                   ) : (
@@ -144,7 +144,7 @@ const Cart = () => {
         </div>
 
         {/* Financial Context */}
-        <div className="bg-zinc-950 text-white rounded-[2.5rem] p-8 shadow-xl relative overflow-hidden">
+        <div className="bg-zinc-950 text-white rounded-3xl p-6 shadow-xl relative overflow-hidden">
           <div className="absolute top-0 right-0 w-32 h-32 bg-customer-accent/10 rounded-full blur-3xl -mr-10 -mt-10"></div>
           
           <div className="space-y-6 relative z-10">
@@ -182,9 +182,9 @@ const Cart = () => {
           <button 
             onClick={handlePlaceOrder}
             disabled={isSubmitting}
-            className="group relative w-full h-20 bg-customer-text text-white rounded-[2.2rem] shadow-2xl flex items-center justify-between px-3 overflow-hidden transition-all active:scale-[0.98] active:shadow-none disabled:opacity-50"
+            className="group relative w-full h-16 bg-customer-text text-white rounded-2xl shadow-2xl flex items-center justify-between px-2 overflow-hidden transition-all active:scale-[0.98] active:shadow-none disabled:opacity-50"
           >
-            <div className="h-14 bg-white/10 rounded-[1.8rem] px-8 flex items-center gap-3">
+            <div className="h-12 bg-white/10 rounded-xl px-6 flex items-center gap-3">
               {isSubmitting ? (
                 <Loader2 size={18} className="animate-spin" />
               ) : (
@@ -193,8 +193,8 @@ const Cart = () => {
               <span className="text-xs font-black uppercase tracking-[0.2em]">{isSubmitting ? 'Placing Order...' : 'Review & Pay'}</span>
             </div>
 
-            <div className="flex items-center gap-2 font-fraunces italic text-xl pr-6 transition-all group-hover:translate-x-1">
-              PROCEED <ArrowRight size={22} className="text-customer-accent" />
+            <div className="flex items-center gap-2 font-fraunces italic text-lg pr-4 transition-all group-hover:translate-x-1">
+              PROCEED <ArrowRight size={20} className="text-customer-accent" />
             </div>
           </button>
         </div>

@@ -62,7 +62,7 @@ const OrderStatus = () => {
   const currentStepIndex = STATUS_STEPS.findIndex(s => s.id === order.status);
 
   return (
-    <div className="theme-customer min-h-screen font-jakarta bg-[#FBF7F0] flex flex-col pt-12 pb-40 px-6 animate-in fade-in duration-1000">
+    <div className="theme-customer min-h-screen font-jakarta bg-[#FBF7F0] flex flex-col pt-10 pb-36 px-5 animate-in fade-in duration-1000">
       {/* Top Header with Back Button */}
       <div className="flex items-center justify-between mb-8">
         {/* Dynamic Back Button - Hidden for unpaid window orders to enforce payment */}
@@ -119,7 +119,7 @@ const OrderStatus = () => {
       </div>
 
       {/* Modern High-End Vertical Timeline */}
-      <div className="bg-white rounded-[3rem] p-8 md:p-10 shadow-[0_40px_100px_-30px_rgba(0,0,0,0.06)] border border-customer-surface/20 relative mb-10 flex flex-col gap-8 md:gap-10 overflow-hidden">
+      <div className="bg-white rounded-[2.5rem] p-6 shadow-[0_40px_100px_-30px_rgba(0,0,0,0.06)] border border-customer-surface/20 relative mb-8 flex flex-col gap-6 md:gap-10 overflow-hidden">
         {/* Glowing track line */}
         <div className="absolute left-12 md:left-14 top-14 bottom-14 w-0.5 bg-customer-surface/20 -z-0">
           <div className="absolute top-0 left-0 w-full bg-customer-accent transition-all duration-[2000ms] shadow-[0_0_15px_rgba(200,92,26,0.3)]" style={{ height: `${(currentStepIndex / (STATUS_STEPS.length - 1)) * 100}%` }}></div>
@@ -232,19 +232,19 @@ const OrderStatus = () => {
           {order.status === 'paid' ? (
             <button
               onClick={() => navigate(`/bill/${orderId}`)}
-              className="w-full h-20 bg-emerald-600/10 border-2 border-emerald-500/20 text-emerald-600 rounded-[2.5rem] flex items-center justify-between gap-4 px-8 shadow-2xl backdrop-blur-md active:scale-95 transition-all group"
+              className="w-full h-16 bg-emerald-600/10 border-2 border-emerald-500/20 text-emerald-600 rounded-2xl flex items-center justify-between gap-3 px-6 shadow-2xl backdrop-blur-md active:scale-95 transition-all group"
             >
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
-                  <CheckCircle2 size={24} />
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-emerald-500 rounded-xl flex items-center justify-center text-white shadow-lg shadow-emerald-500/30">
+                  <CheckCircle2 size={20} />
                 </div>
                 <div className="flex flex-col items-start text-left">
-                  <span className="text-xs font-black uppercase tracking-widest leading-none">Payment Complete</span>
-                  <span className="text-[9px] font-bold text-emerald-600/60 uppercase tracking-widest mt-1">Thank you!</span>
+                  <span className="text-[10px] font-black uppercase tracking-widest leading-none">Payment Complete</span>
+                  <span className="text-[8px] font-bold text-emerald-600/60 uppercase tracking-widest mt-1">Thank you!</span>
                 </div>
               </div>
-              <div className="flex items-center gap-2 font-fraunces italic text-lg pr-2 group-hover:translate-x-1 transition-transform">
-                VIEW INVOICE <ChevronRight size={20} />
+              <div className="flex items-center gap-2 font-fraunces italic text-[15px] pr-1 group-hover:translate-x-1 transition-transform">
+                VIEW INVOICE <ChevronRight size={18} />
               </div>
             </button>
           ) : (

@@ -107,8 +107,8 @@ const Menu = () => {
     <div ref={containerRef} className="theme-customer min-h-screen pb-48 font-jakarta bg-white selection:bg-customer-accent/10">
       
       {/* MOBILE-FIRST HEADER: Optimized for one-hand use & safe areas */}
-      <header className="sticky top-0 z-[60] backdrop-blur-2xl bg-white/80 border-b border-zinc-100 px-6 pb-6 shadow-sm overflow-hidden" 
-              style={{ paddingTop: 'calc(var(--safe-top) + 2rem)' }}>
+      <header className="sticky top-0 z-[60] backdrop-blur-2xl bg-white/80 border-b border-zinc-100 px-5 pb-5 shadow-sm overflow-hidden" 
+              style={{ paddingTop: 'calc(var(--safe-top) + 1.5rem)' }}>
         
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-8">
           <div className="space-y-1">
@@ -116,7 +116,7 @@ const Menu = () => {
                 <span className="w-8 h-0.5 bg-customer-accent rounded-full"></span>
                 <span className="text-[8px] font-black uppercase tracking-[0.4em] text-zinc-400">Vinod Dining Experience</span>
              </div>
-             <h1 className="font-fraunces text-4xl md:text-6xl font-black tracking-tighter text-customer-text leading-tight italic">
+             <h1 className="font-fraunces text-3xl md:text-5xl font-black tracking-tighter text-customer-text leading-tight italic">
                The <span className="text-customer-accent">Ritual</span> of Selection.
              </h1>
           </div>
@@ -139,11 +139,11 @@ const Menu = () => {
         <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-6">
            {/* SEARCH: Deeply set for easy thumb reach */}
            <div className="relative flex-1 w-full group">
-               <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-customer-accent transition-colors" size={16} />
+               <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-300 group-focus-within:text-customer-accent transition-colors" size={14} />
                <input 
                    type="text" 
                    placeholder="Search our culinary library..." 
-                   className="w-full h-16 bg-white border border-zinc-100 rounded-[1.8rem] pl-16 pr-6 text-xs font-bold focus:outline-none focus:ring-8 focus:ring-customer-accent/5 focus:border-customer-accent/30 transition-all placeholder:text-zinc-200 shadow-sm"
+                   className="w-full h-14 bg-white border border-zinc-100 rounded-2xl pl-14 pr-5 text-[11px] font-bold focus:outline-none focus:ring-8 focus:ring-customer-accent/5 focus:border-customer-accent/30 transition-all placeholder:text-zinc-200 shadow-sm"
                    value={searchQuery}
                    onChange={(e) => setSearchQuery(e.target.value)}
                />
@@ -164,13 +164,13 @@ const Menu = () => {
                      window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
                    }
                  }}
-                 className={`whitespace-nowrap px-8 py-4 rounded-2xl text-[9px] font-black uppercase tracking-widest transition-all duration-500 border flex items-center gap-3 ${
+                 className={`whitespace-nowrap px-6 py-3 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all duration-500 border flex items-center gap-2.5 ${
                    activeCategory === cat.id 
-                     ? 'bg-customer-text border-customer-text text-white shadow-xl -translate-y-0.5' 
+                     ? 'bg-customer-text border-customer-text text-white shadow-lg -translate-y-0.5' 
                      : 'bg-white border-zinc-100 text-zinc-400'
                  }`}
                >
-                 <span className={`text-base transition-transform duration-500 ${activeCategory === cat.id ? 'scale-110' : 'grayscale opacity-50'}`}>{cat.icon}</span>
+                 <span className={`text-sm transition-transform duration-500 ${activeCategory === cat.id ? 'scale-110' : 'grayscale opacity-50'}`}>{cat.icon}</span>
                  {cat.name}
                </button>
              ))}
@@ -241,10 +241,10 @@ const Menu = () => {
                       {visibleItems.map((item) => (
                         <div 
                           key={item.id} 
-                          className="menu-item-card premium-card relative flex flex-col sm:flex-row gap-6 p-5 rounded-[2.5rem] bg-white border border-zinc-100 hover:border-customer-accent/20 shadow-sm active:scale-[0.98] overflow-hidden"
+                          className="menu-item-card premium-card relative flex flex-col sm:flex-row gap-5 p-4 rounded-3xl bg-white border border-zinc-100 hover:border-customer-accent/20 shadow-sm active:scale-[0.98] overflow-hidden"
                         >
                           {/* Item Media Container */}
-                          <div className="w-full sm:w-32 lg:w-36 h-48 sm:h-32 lg:h-36 flex-shrink-0 rounded-[2rem] bg-zinc-50 overflow-hidden relative border border-zinc-100/50 shadow-inner group/media">
+                          <div className="w-full sm:w-28 lg:w-32 h-44 sm:h-28 lg:h-32 flex-shrink-0 rounded-2xl bg-zinc-50 overflow-hidden relative border border-zinc-100/50 shadow-inner group/media">
                             {item.image_url ? (
                               <img 
                                   src={item.image_url.startsWith('http') ? item.image_url : `${api.defaults.baseURL.replace('/api', '')}${item.image_url}`} 
@@ -315,12 +315,12 @@ const Menu = () => {
           <div className="max-w-md mx-auto">
             <button 
               onClick={() => navigate('/cart')}
-              className="group relative w-full h-20 bg-customer-text text-white rounded-[2.2rem] shadow-[0_30px_60px_-10px_rgba(0,0,0,0.3)] flex items-center justify-between px-3 overflow-hidden transition-all active:scale-[0.98]"
+              className="group relative w-full h-16 bg-customer-text text-white rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.3)] flex items-center justify-between px-2 overflow-hidden transition-all active:scale-[0.98]"
             >
-              <div className="h-14 bg-white/10 rounded-[1.8rem] px-8 flex items-center gap-4">
+              <div className="h-12 bg-white/10 rounded-xl px-6 flex items-center gap-3">
                 <div className="relative">
-                  <ShoppingBag size={20} />
-                  <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-customer-accent rounded-full border-2 border-customer-text"></span>
+                  <ShoppingBag size={18} />
+                  <span className="absolute -top-1 -right-1 w-2 h-2 bg-customer-accent rounded-full border-2 border-customer-text"></span>
                 </div>
                 <div className="flex flex-col items-start">
                   <span className="text-xs font-black uppercase tracking-widest">{totalCartItems} Items</span>
@@ -328,7 +328,7 @@ const Menu = () => {
                 </div>
               </div>
 
-              <div className="flex items-center gap-2 font-fraunces italic text-lg pr-6">
+              <div className="flex items-center gap-2 font-fraunces italic text-lg pr-4">
                 CHECKOUT <ChevronRight size={20} className="text-customer-accent" />
               </div>
             </button>

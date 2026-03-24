@@ -44,9 +44,9 @@ const Success = () => {
       <div className="max-w-md w-full success-content relative z-10">
         
         {/* Animated Icon */}
-        <div className="success-icon w-24 h-24 bg-emerald-500 rounded-[2.5rem] flex items-center justify-center text-white shadow-[0_20px_50px_rgba(16,185,129,0.3)] mx-auto mb-10 relative">
-          <CheckCircle2 size={48} strokeWidth={2.5} />
-          <div className="absolute inset-0 rounded-[2.5rem] border-4 border-emerald-400/30 animate-ping"></div>
+        <div className="success-icon w-20 h-20 bg-emerald-500 rounded-3xl flex items-center justify-center text-white shadow-[0_20px_50px_rgba(16,185,129,0.3)] mx-auto mb-8 relative">
+          <CheckCircle2 size={40} strokeWidth={2.5} />
+          <div className="absolute inset-0 rounded-3xl border-4 border-emerald-400/30 animate-ping"></div>
         </div>
 
         <h1 className="font-fraunces text-4xl font-black italic text-customer-text tracking-tighter mb-4 uppercase">
@@ -59,14 +59,14 @@ const Success = () => {
 
         {/* Pickup Code Card (If applicable) */}
         {code && (
-          <div className="bg-white border border-zinc-100 rounded-[3rem] p-10 shadow-2xl shadow-zinc-200/50 mb-10 relative group overflow-hidden">
+          <div className="bg-white border border-zinc-100 rounded-[2.5rem] p-8 shadow-2xl shadow-zinc-200/50 mb-8 relative group overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-customer-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             
             <div className="relative z-10">
               <span className="text-[9px] font-black text-customer-accent uppercase tracking-[0.4em] mb-4 block">Store Pickup Code</span>
-              <div className="flex items-center justify-center gap-4">
+              <div className="flex items-center justify-center gap-3">
                 {code.split('').map((char, i) => (
-                  <div key={i} className="w-14 h-18 bg-zinc-50 border border-zinc-100 rounded-2xl flex items-center justify-center font-fraunces text-4xl font-black italic text-customer-text shadow-inner">
+                  <div key={i} className="w-12 h-16 bg-zinc-50 border border-zinc-100 rounded-xl flex items-center justify-center font-fraunces text-3xl font-black italic text-customer-text shadow-inner">
                     {char}
                   </div>
                 ))}
@@ -79,33 +79,33 @@ const Success = () => {
         )}
 
         {/* Info Grid */}
-        <div className="grid grid-cols-2 gap-4 mb-12">
-            <div className="bg-white/50 backdrop-blur-sm border border-white p-6 rounded-[2rem] flex flex-col items-center gap-2">
-                <Smartphone size={16} className="text-zinc-300" />
+        <div className="grid grid-cols-2 gap-3 mb-10">
+            <div className="bg-white/50 backdrop-blur-sm border border-white p-5 rounded-2xl flex flex-col items-center gap-2">
+                <Smartphone size={14} className="text-zinc-300" />
                 <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Order ID</span>
-                <span className="font-mono text-[10px] font-bold text-customer-text">#{orderId?.slice(-6).toUpperCase()}</span>
+                <span className="font-mono text-[9px] font-bold text-customer-text">#{orderId?.slice(-6).toUpperCase()}</span>
             </div>
-            <div className="bg-white/50 backdrop-blur-sm border border-white p-6 rounded-[2rem] flex flex-col items-center gap-2">
-                <Utensils size={16} className="text-zinc-300" />
+            <div className="bg-white/50 backdrop-blur-sm border border-white p-5 rounded-2xl flex flex-col items-center gap-2">
+                <Utensils size={14} className="text-zinc-300" />
                 <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Restaurant</span>
-                <span className="text-[10px] font-bold text-customer-text">Vinod Dining Hall</span>
+                <span className="text-[9px] font-bold text-customer-text">Vinod Dining Hall</span>
             </div>
         </div>
 
         {/* Action Button */}
         <button 
           onClick={() => window.location.replace(`/order-status/${orderId}`)}
-          className="group relative w-full h-20 bg-customer-text text-white rounded-[2.2rem] shadow-2xl flex items-center justify-between px-3 overflow-hidden transition-all active:scale-[0.98]"
+          className="group relative w-full h-16 bg-customer-text text-white rounded-2xl shadow-2xl flex items-center justify-between px-2 overflow-hidden transition-all active:scale-[0.98]"
         >
-          <div className="h-14 bg-emerald-500 rounded-[1.8rem] px-8 flex items-center gap-3 shadow-lg shadow-emerald-500/20">
-            <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center animate-pulse">
-                <ArrowRight size={14} />
+          <div className="h-12 bg-emerald-500 rounded-xl px-6 flex items-center gap-3 shadow-lg shadow-emerald-500/20">
+            <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center animate-pulse">
+                <ArrowRight size={12} />
             </div>
-            <span className="text-xs font-black uppercase tracking-[0.2em]">Track Live</span>
+            <span className="text-[11px] font-black uppercase tracking-[0.2em]">Track Live</span>
           </div>
 
-          <div className="flex items-center gap-2 font-fraunces italic text-xl pr-6 transition-all group-hover:translate-x-1">
-            CONTINUE <ArrowRight size={22} className="text-customer-accent" />
+          <div className="flex items-center gap-2 font-fraunces italic text-lg pr-4 transition-all group-hover:translate-x-1">
+            CONTINUE <ArrowRight size={20} className="text-customer-accent" />
           </div>
         </button>
 
