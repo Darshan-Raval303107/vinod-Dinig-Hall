@@ -163,7 +163,7 @@ def process_verify_payment(
                 "pickup_code": order.pickup_code if order and order.order_type == 'window' else None
             })
 
-        # 3. Mark success
+        # 3. Mark payment as success
         payment.razorpay_payment_id = razorpay_payment_id
         payment.status = "success"
 
@@ -172,27 +172,25 @@ def process_verify_payment(
         if linked_order:
             logger.info(f"Finalizing Payment for Order ID: {linked_order.id} | Type: {linked_order.order_type}")
             
-            # Payment success notification to frontend (optional but good)
+            # Generate pickup code for window orders if not already generated
+            if linked_order.order_type == 'window' or linked_order.table_number == 0:
+                if not linked_order.pickup_code:
+                    linked_order.pickup_code = generate_unique_window_code(db.session)
+                    logger.info(f"Verify generated pickup code: {linked_order.pickup_code}")
+
+            # Always mark order as paid after successful payment
+            linked_order.status = "paid"
+            linked_order.razorpay_payment_id = razorpay_payment_id
+            
+            logger.info(f"Order {linked_order.id} status updated to paid")
+
+            # Real-time notification to frontend & owner dashboard
             socketio.emit('payment:success', {
                 'order_id': str(linked_order.id),
                 'status': linked_order.status,
+                'payment_status': 'success',
                 'pickup_code': linked_order.pickup_code
             }, room=str(linked_order.restaurant_id))
-
-            # Table orders marked as paid (they were already confirmed by chef or pending)
-            # Keep status as 'confirmed' if it was accepted, or 'paid' if it was pending
-            if linked_order.status in ('pending', 'accepted'):
-                linked_order.status = "confirmed"
-            else:
-                # Table orders marked as paid (they were already confirmed by chef or pending)
-                # Keep status as 'confirmed' if it was accepted, or 'paid' if it was pending
-                if linked_order.status in ('pending', 'accepted'):
-                    linked_order.status = "confirmed"
-                else:
-                    linked_order.status = "paid"
-                logger.info(f"Table order {linked_order.id} status updated to {linked_order.status}")
-            
-            linked_order.razorpay_payment_id = razorpay_payment_id
 
         db.session.commit()
         logger.info(f"Payment successfully verified: {payment.id} | Order: {payment.order_id}")

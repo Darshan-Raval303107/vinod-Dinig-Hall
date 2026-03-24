@@ -43,11 +43,19 @@ const OrderStatus = () => {
       }
     });
 
+    // Listen for payment success → refresh entire order to get pickup_code, paid status
+    socket.on('payment:success', (data) => {
+      if (data.order_id === orderId) {
+        fetchStatus();
+      }
+    });
+
     const interval = setInterval(fetchStatus, 12000); // 12s fallback for high reliability
 
     return () => {
       clearInterval(interval);
       socket.off('order:status_update');
+      socket.off('payment:success');
       socket.disconnect();
     };
   }, [orderId]);

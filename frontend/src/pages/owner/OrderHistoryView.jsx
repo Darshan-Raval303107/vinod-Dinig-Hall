@@ -67,12 +67,22 @@ const OrderHistoryView = () => {
       socket.on('order:status_update_chef', (data) => {
         setOrders(prev => prev.map(o => o.id === data.orderId ? { ...o, status: data.status } : o));
       });
+      
+      // Live payment status update
+      socket.on('payment:success', (data) => {
+        setOrders(prev => prev.map(o => 
+          o.id === data.order_id 
+            ? { ...o, payment_status: 'success', status: data.status || o.status, pickup_code: data.pickup_code || o.pickup_code } 
+            : o
+        ));
+      });
 
       return () => {
         socket.off('connect', joinRoom);
         socket.off('order:new');
         socket.off('order:status_update');
         socket.off('order:status_update_chef');
+        socket.off('payment:success');
       };
     }
   }, [user]);
@@ -89,6 +99,15 @@ const OrderHistoryView = () => {
       case 'paid': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
       case 'served': return 'bg-sky-50 text-sky-600 border-sky-100';
       case 'cooking': return 'bg-amber-50 text-amber-600 border-amber-100';
+      default: return 'bg-zinc-50 text-zinc-400 border-zinc-100';
+    }
+  };
+
+  const getPaymentStyle = (status) => {
+    switch (status) {
+      case 'success': case 'captured': return 'bg-emerald-50 text-emerald-600 border-emerald-100';
+      case 'failed': return 'bg-red-50 text-red-500 border-red-100';
+      case 'authorized': return 'bg-amber-50 text-amber-600 border-amber-100';
       default: return 'bg-zinc-50 text-zinc-400 border-zinc-100';
     }
   };
@@ -194,6 +213,12 @@ const OrderHistoryView = () => {
                            <div className={`px-5 py-2.5 rounded-2xl border text-[9px] font-black uppercase tracking-widest flex items-center gap-2.5 transition-all duration-500 ${expandedOrders.has(order.id) ? 'bg-white/10 border-white/20 text-white' : getStatusStyle(order.status)}`}>
                               <div className={`w-1.5 h-1.5 rounded-full ${expandedOrders.has(order.id) ? 'bg-white shadow-[0_0_12px_rgba(255,255,255,0.8)]' : 'bg-current shadow-md'} animate-pulse`}></div>
                               {order.status}
+                           </div>
+                           
+                           {/* Payment Status Badge */}
+                           <div className={`px-4 py-2 rounded-xl border text-[8px] font-black uppercase tracking-widest flex items-center gap-2 transition-all duration-500 ${expandedOrders.has(order.id) ? 'bg-white/10 border-white/20 text-white' : getPaymentStyle(order.payment_status)}`}>
+                              <CreditCard size={10} />
+                              {order.payment_status === 'success' ? '₹ PAID' : order.payment_status?.toUpperCase() || 'UNPAID'}
                            </div>
 
                            <div className={`w-10 h-10 flex items-center justify-center rounded-full transition-all duration-500 ${expandedOrders.has(order.id) ? 'bg-white/10 rotate-180' : 'bg-zinc-50 text-zinc-300'}`}>
