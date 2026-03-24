@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 const Cart = () => {
   const navigate = useNavigate();
-  const { items, restaurantId, tableNumber, updateQuantity, clearCart } = useCartStore();
+  const { items, restaurantId, restaurantSlug, tableNumber, updateQuantity, clearCart, setActiveOrder } = useCartStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -34,6 +34,8 @@ const Cart = () => {
         alert(res.data.message); // Show code immediately after ordering
       }
 
+      // Link this order to the session
+      setActiveOrder(res.data.order_id);
       clearCart();
       // Show progress first as requested
       navigate(`/order-status/${res.data.order_id}`);

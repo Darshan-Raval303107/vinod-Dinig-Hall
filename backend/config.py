@@ -7,8 +7,9 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-secret-key-change-in-prod')
     db_url = os.environ.get('DATABASE_URL')
     if not db_url:
-        raise RuntimeError("DATABASE_URL environment variable is required (PostgreSQL only)")
+        raise RuntimeError("DATABASE_URL environment variable is required (PostgreSQL / Neon DB)")
         
+    # Normalize Neon/Heroku-style postgres:// → postgresql://
     if db_url.startswith('postgres://'):
         db_url = db_url.replace('postgres://', 'postgresql://', 1)
         
@@ -18,6 +19,11 @@ class Config:
         "pool_pre_ping": True,
         "pool_size": 5,
         "max_overflow": 10,
+        "pool_recycle": 300,         # Recycle connections every 5 min (Neon drops idle connections)
+        "connect_args": {
+            "sslmode": "require",    # Neon DB requires SSL
+            "connect_timeout": 10,
+        },
     }
     JWT_SECRET_KEY = os.environ.get('JWT_SECRET_KEY', 'jwt-secret-key-change-in-prod')
 

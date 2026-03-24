@@ -1,13 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import api from '../api/axios';
-import { ChefHat, ArrowRight, ShieldAlert, Star, MapPin, Info, Smartphone, Clock, Zap } from 'lucide-react';
+import { useCartStore } from '../store';
+import { ChefHat, ArrowRight, ShieldAlert, Star, MapPin, Info, Smartphone, Clock, Zap, RotateCcw } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Landing() {
+  const navigate = useNavigate();
   const { tableNumber } = useParams();
   const isTableOrder = !!tableNumber;
   const menuPath = isTableOrder 
@@ -16,6 +18,18 @@ export default function Landing() {
   const [isLoginEnabled, setIsLoginEnabled] = useState(true);
   const canvasRef = useRef(null);
   const heroScrollRef = useRef(null);
+
+  const { isSessionValid, activeOrderId, restaurantSlug, tableNumber: sessionTable, destroySession } = useCartStore();
+  const hasValidSession = isSessionValid();
+  const hasActiveOrder = hasValidSession && !!activeOrderId;
+
+  // Auto-destroy expired sessions on mount
+  useEffect(() => {
+    const { sessionCreatedAt, restaurantId } = useCartStore.getState();
+    if (sessionCreatedAt && restaurantId && !isSessionValid()) {
+      destroySession();
+    }
+  }, []);
 
   // Status Check
   useEffect(() => {
@@ -175,9 +189,35 @@ export default function Landing() {
             <div className="w-full flex flex-col items-center gap-8 md:gap-12 stagger-reveal">
                 <div className="flex flex-col md:flex-row gap-6 w-full md:w-auto justify-center">
                     {isLoginEnabled ? (
-                        <Link to={menuPath} className="group flex items-center justify-center gap-6 bg-[#1C1917] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95">
+                      <>
+                        {/* Primary CTA — session-aware */}
+                        {hasActiveOrder ? (
+                          <button 
+                            onClick={() => navigate(`/order-status/${activeOrderId}`)} 
+                            className="group flex items-center justify-center gap-6 bg-[#C85C1A] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#1C1917] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95"
+                          >
+                            Resume Your Order <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+                          </button>
+                        ) : hasValidSession ? (
+                          <Link to={`/menu?restaurant=${restaurantSlug || 'spice-lounge'}&table=${sessionTable || '0'}`} className="group flex items-center justify-center gap-6 bg-[#1C1917] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95">
+                            Continue to Menu <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
+                          </Link>
+                        ) : (
+                          <Link to={menuPath} className="group flex items-center justify-center gap-6 bg-[#1C1917] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95">
                             Order Online <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
-                        </Link>
+                          </Link>
+                        )}
+
+                        {/* Secondary: New Session (only if session exists) */}
+                        {hasValidSession && (
+                          <button 
+                            onClick={() => { destroySession(); navigate(menuPath); }}
+                            className="group flex items-center justify-center gap-4 bg-transparent border-2 border-[#1C1917]/10 text-[#1C1917]/50 px-10 py-5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:border-[#C85C1A]/30 hover:text-[#C85C1A] transition-all active:scale-95"
+                          >
+                            <RotateCcw size={14} /> New Session
+                          </button>
+                        )}
+                      </>
                     ) : (
                         <button disabled className="flex items-center justify-center bg-gray-100 text-gray-400 px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] cursor-not-allowed">
                             We're Closed

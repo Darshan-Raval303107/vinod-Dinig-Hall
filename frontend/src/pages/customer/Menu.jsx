@@ -22,15 +22,21 @@ const Menu = () => {
   const [searchQuery, setSearchQuery] = useState('');
   
   const containerRef = useRef(null);
-  const { items: cartItems, addItem, setContext } = useCartStore();
+  const { items: cartItems, addItem, setContext, startSession, isSessionValid, destroySession } = useCartStore();
 
   useEffect(() => {
-    // Default context set via searchParams logic above
-    setLoading(true); // Ensure loading state is reset on re-mount if needed
+    // Auto-destroy expired session
+    if (!isSessionValid() && useCartStore.getState().sessionCreatedAt) {
+      destroySession();
+    }
+
+    setLoading(true);
 
     api.get(`/menu?restaurant=${restaurantSlug}&table=${table}`)
       .then(res => {
         setMenuData(res.data);
+        // Start or refresh session with full context
+        startSession(res.data.restaurant.id, table, restaurantSlug);
         setContext(res.data.restaurant.id, table);
         if (res.data.categories.length > 0) {
           setActiveCategory(res.data.categories[0].id);

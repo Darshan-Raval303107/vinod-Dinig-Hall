@@ -32,13 +32,65 @@ export const useAuthStore = create((set) => {
   };
 })
 
+const SESSION_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+
 export const useCartStore = create(
   persist(
-    (set) => ({
+    (set, get) => ({
+      // Cart items
       items: [],
+      
+      // Session context
       restaurantId: null,
+      restaurantSlug: null,
       tableNumber: null,
-      setContext: (restaurantId, tableNumber) => set({ restaurantId, tableNumber }),
+      activeOrderId: null,
+      sessionCreatedAt: null,
+
+      // Check if current session is still valid (within 6h TTL)
+      isSessionValid: () => {
+        const { sessionCreatedAt, restaurantId } = get();
+        if (!sessionCreatedAt || !restaurantId) return false;
+        return (Date.now() - sessionCreatedAt) < SESSION_TTL_MS;
+      },
+
+      // Start or refresh session on QR scan / menu visit
+      startSession: (restaurantId, tableNumber, restaurantSlug) => {
+        const state = get();
+        // If existing valid session for same table, keep it (don't reset order)
+        if (
+          state.isSessionValid() &&
+          state.restaurantId === restaurantId &&
+          String(state.tableNumber) === String(tableNumber)
+        ) {
+          return; // Session already active for this context
+        }
+        // New session — clear old data
+        set({
+          restaurantId,
+          tableNumber,
+          restaurantSlug: restaurantSlug || state.restaurantSlug,
+          activeOrderId: null,
+          sessionCreatedAt: Date.now(),
+          items: [],
+        });
+      },
+
+      // Legacy alias — used by Menu.jsx
+      setContext: (restaurantId, tableNumber) => {
+        const state = get();
+        if (!state.isSessionValid() || state.restaurantId !== restaurantId || String(state.tableNumber) !== String(tableNumber)) {
+          set({
+            restaurantId,
+            tableNumber,
+            sessionCreatedAt: state.sessionCreatedAt || Date.now(),
+          });
+        }
+      },
+
+      // Link session to an active order after placing
+      setActiveOrder: (orderId) => set({ activeOrderId: orderId }),
+
       addItem: (item) => set((state) => {
         const existing = state.items.find(i => i.id === item.id)
         if (existing) {
@@ -53,7 +105,19 @@ export const useCartStore = create(
         if (quantity <= 0) return { items: state.items.filter(i => i.id !== itemId) }
         return { items: state.items.map(i => i.id === itemId ? { ...i, quantity } : i) }
       }),
-      clearCart: () => set({ items: [], restaurantId: null, tableNumber: null })
+
+      // Clear cart only (keep session)
+      clearCart: () => set({ items: [] }),
+
+      // Full session destroy (after 6h or manual reset)
+      destroySession: () => set({
+        items: [],
+        restaurantId: null,
+        restaurantSlug: null,
+        tableNumber: null,
+        activeOrderId: null,
+        sessionCreatedAt: null,
+      }),
     }),
     {
       name: 'dineflow-cart',
