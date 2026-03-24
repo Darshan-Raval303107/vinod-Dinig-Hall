@@ -117,6 +117,7 @@ def verify_payment():
         razorpay_order_id = data.get("razorpay_order_id")
         razorpay_payment_id = data.get("razorpay_payment_id")
         razorpay_signature = data.get("razorpay_signature")
+        internal_order_id = data.get("order_id")
 
         if not all([razorpay_order_id, razorpay_payment_id, razorpay_signature]):
             return jsonify({
@@ -125,7 +126,7 @@ def verify_payment():
             }), 400
 
         return _respond(process_verify_payment(
-            razorpay_order_id, razorpay_payment_id, razorpay_signature
+            razorpay_order_id, razorpay_payment_id, razorpay_signature, internal_order_id
         ))
         
     except Exception as e:
@@ -140,32 +141,33 @@ def verify_payment():
 
 # ── 3. Verify Callback (Mobile Focus) ──────────────────────────────────────
 
-@payments_bp.route("/payments/verify-callback", methods=["POST"])
-def verify_callback():
-    from flask import redirect
-    try:
-        razorpay_order_id = request.form.get("razorpay_order_id")
-        razorpay_payment_id = request.form.get("razorpay_payment_id")
-        razorpay_signature = request.form.get("razorpay_signature")
-
-        result, status = process_verify_payment(
-            razorpay_order_id,
-            razorpay_payment_id,
-            razorpay_signature
-        )
-        
-        body = result or {}
-        frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:5173")
-        order_id = body.get('order_id')
-        pickup_code = body.get('pickup_code') or ''
-
-        # Absolute redirect to frontend success page
-        logger.info(f"Callback successful. Redirecting to frontend success: {order_id} | Code: {pickup_code}")
-        return redirect(f"{frontend_url}/success?order_id={order_id}&code={pickup_code}")
-
-    except Exception as e:
-        logger.error(f"Callback verification failed: {str(e)}")
-        return "Payment verification failed", 500
+# --- Disabled to prevent dual-trigger conflicts with GPay handler ---
+# @payments_bp.route("/payments/verify-callback", methods=["POST"])
+# def verify_callback():
+#     from flask import redirect
+#     try:
+#         razorpay_order_id = request.form.get("razorpay_order_id")
+#         razorpay_payment_id = request.form.get("razorpay_payment_id")
+#         razorpay_signature = request.form.get("razorpay_signature")
+#
+#         result, status = process_verify_payment(
+#             razorpay_order_id,
+#             razorpay_payment_id,
+#             razorpay_signature
+#         )
+#         
+#         body = result or {}
+#         frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:5173")
+#         order_id = body.get('order_id')
+#         pickup_code = body.get('pickup_code') or ''
+#
+#         # Absolute redirect to frontend success page
+#         logger.info(f"Callback successful. Redirecting to frontend success: {order_id} | Code: {pickup_code}")
+#         return redirect(f"{frontend_url}/success?order_id={order_id}&code={pickup_code}")
+#
+#     except Exception as e:
+#         logger.error(f"Callback verification failed: {str(e)}")
+#         return "Payment verification failed", 500
 
 
 # ── 4. Razorpay Webhook ────────────────────────────────────────────────────

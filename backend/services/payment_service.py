@@ -133,11 +133,16 @@ def process_verify_payment(
     razorpay_order_id: str,
     razorpay_payment_id: str,
     razorpay_signature: str,
+    internal_order_id: str = None
 ):
-    logger.info(f"Verifying payment {razorpay_payment_id} for order {razorpay_order_id}")
+    logger.info(f"Verifying payment {razorpay_payment_id} for order {razorpay_order_id} (Internal: {internal_order_id})")
 
     try:
         payment = Payment.query.filter_by(razorpay_order_id=razorpay_order_id).first()
+        if not payment and internal_order_id:
+            logger.warning(f"Fallback: finding payment by internal order_id {internal_order_id}")
+            payment = Payment.query.filter_by(order_id=internal_order_id).first()
+            
         if not payment:
             logger.warning(f"Payment record missing for razorpay_order_id: {razorpay_order_id}")
             return _err("Payment record not found", 404)
