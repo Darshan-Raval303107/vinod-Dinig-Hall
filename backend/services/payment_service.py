@@ -200,7 +200,7 @@ def process_verify_payment(
         return _ok({
             "message": "Payment verified successfully",
             "order_id": payment.order_id,
-            "pickup_code": pickup_code
+            "pickup_code": linked_order.pickup_code if linked_order else None
         })
 
     except Exception as e:

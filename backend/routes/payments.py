@@ -138,7 +138,33 @@ def verify_payment():
         }), 500
 
 
-# ── 3. Razorpay Webhook ────────────────────────────────────────────────────
+# ── 3. Verify Callback (Mobile Focus) ──────────────────────────────────────
+
+@payments_bp.route("/payments/verify-callback", methods=["POST"])
+def verify_callback():
+    from flask import redirect
+    try:
+        razorpay_order_id = request.form.get("razorpay_order_id")
+        razorpay_payment_id = request.form.get("razorpay_payment_id")
+        razorpay_signature = request.form.get("razorpay_signature")
+
+        result, status = process_verify_payment(
+            razorpay_order_id,
+            razorpay_payment_id,
+            razorpay_signature
+        )
+        
+        body = result or {}
+
+        # Redirect to success page with data
+        return redirect(f"/success?order_id={body.get('order_id')}")
+
+    except Exception as e:
+        logger.error(f"Callback verification failed: {str(e)}")
+        return "Payment verification failed", 500
+
+
+# ── 4. Razorpay Webhook ────────────────────────────────────────────────────
 
 @payments_bp.route("/webhook/razorpay", methods=["POST"])
 def razorpay_webhook():

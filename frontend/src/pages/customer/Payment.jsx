@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import api from '../../api/axios';
+import api, { API_BASE_URL } from '../../api/axios';
 import {
   ShieldCheck,
   CreditCard,
@@ -101,6 +101,7 @@ const Payment = () => {
         name: "Vinnod Dining Hall",
         description: `Premium Dining Receipt #${orderId.slice(-6).toUpperCase()}`,
         order_id: paymentData.razorpay_order_id,
+        callback_url: `${API_BASE_URL}/payments/verify-callback`,
         handler: async function (response) {
           console.log("Razorpay payment success callback triggered:", response);
           try {
