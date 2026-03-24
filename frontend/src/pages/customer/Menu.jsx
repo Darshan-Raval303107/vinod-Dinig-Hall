@@ -11,7 +11,7 @@ gsap.registerPlugin(ScrollTrigger);
 const Menu = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { items: cartItems, addItem, setContext, startSession, isSessionValid, destroySession, tableNumber: sessionTable } = useCartStore();
+  const { items: cartItems, addItem, setContext, startSession, isSessionValid, destroySession, tableNumber: sessionTable, activeOrders = [] } = useCartStore();
   const restaurantSlug = searchParams.get('restaurant') || 'vinnod';
   const table = searchParams.get('table') || sessionTable || '0';
   
@@ -315,6 +315,31 @@ const Menu = () => {
           })()}
         </div>
       </div>
+
+      {/* ACTIVE ORDERS PILLS */}
+      {activeOrders.length > 0 && (
+        <div className={`fixed ${totalCartItems > 0 ? 'bottom-44' : 'bottom-10'} left-0 right-0 px-6 z-[60] flex flex-col items-end gap-3 pointer-events-none`}>
+          {activeOrders.map((orderId) => (
+             <button 
+                key={orderId} 
+                onClick={() => navigate(`/order-status/${orderId}`)}
+                className="pointer-events-auto bg-white border border-zinc-200 text-customer-text px-6 py-4 rounded-3xl shadow-2xl font-black text-[10px] uppercase tracking-widest flex items-center justify-between gap-4 w-full max-w-xs animate-in slide-in-from-right duration-500 hover:scale-[1.02] active:scale-95 transition-all"
+             >
+                <div className="flex items-center gap-3">
+                  <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                  <div className="flex flex-col items-start gap-1">
+                     <span className="leading-none text-[8px] opacity-40 italic">Active Sequence</span>
+                     <span>Order #{orderId.substring(0,6).toUpperCase()}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-1 opacity-40">
+                  <span className="text-[8px] tracking-[0.2em] italic">View</span>
+                  <ChevronRight size={14} />
+                </div>
+             </button>
+          ))}
+        </div>
+      )}
 
       {/* MOBILE STICKY CART ACTION - Matches Cart & Payment style */}
       {totalCartItems > 0 && (

@@ -48,10 +48,18 @@ def create_order():
         db.session.flush() # get ID
 
         new_total = float(order.total_price)
+        items_payload = []
         for item in items:
             menu_item = MenuItem.query.get(item['menu_item_id'])
             if not menu_item:
                 continue
+            
+            items_payload.append({
+                'name': menu_item.name,
+                'quantity': item['quantity'],
+                'price': float(menu_item.price),
+                'is_veg': menu_item.is_veg
+            })
 
             # Check if item already exists in this order to update quantity
             existing_oi = OrderItem.query.filter_by(order_id=order.id, menu_item_id=menu_item.id).first()
@@ -70,15 +78,23 @@ def create_order():
         
         order.total_price = new_total
         db.session.commit()
+        
+        # Ensure created_at is accessible after commit
+        db.session.refresh(order)
 
         # Emit to chef room for this restaurant
         socketio.emit(event_type, {
+            'id': str(order.id),
             'order_id': str(order.id),
             'table_number': order.table_number,
+            'order_type': order.order_type,
             'status': order.status,
             'pickup_code': order.pickup_code,
             'total_price': float(order.total_price),
-            'is_updated': order.is_updated
+            'is_updated': order.is_updated,
+            'payment_status': 'pending',
+            'created_at': order.created_at.isoformat() if order.created_at else None,
+            'items': items_payload
         }, room=str(restaurant_id))
 
         return jsonify({

@@ -183,11 +183,10 @@ def process_verify_payment(
                     linked_order.pickup_code = generate_unique_window_code(db.session)
                     logger.info(f"Verify generated pickup code: {linked_order.pickup_code}")
 
-            # Always mark order as paid after successful payment
-            linked_order.status = "paid"
+            # Always record the successful Razorpay payment hash
             linked_order.razorpay_payment_id = razorpay_payment_id
             
-            logger.info(f"Order {linked_order.id} status updated to paid")
+            logger.info(f"Order {linked_order.id} payment_status updated to success")
 
             # Real-time notification to frontend & owner dashboard
             socketio.emit('payment:success', {
@@ -306,8 +305,8 @@ def process_webhook_event(event_data: dict):
                             'items_count': len(order.items)
                         }, room=str(order.restaurant_id))
                 else:
-                    # For table orders, just mark as paid (they were already confirmed)
-                    order.status = "paid"
+                    # For table orders, payment is recorded dynamically via payment_status
+                    pass
                 order.razorpay_payment_id = rz_payment_id
             elif new_status == "failed" and order.status != "paid":
                 order.status = "failed"

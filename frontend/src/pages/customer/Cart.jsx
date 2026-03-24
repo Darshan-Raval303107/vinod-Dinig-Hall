@@ -6,7 +6,7 @@ import { useState } from 'react';
 
 const Cart = () => {
   const navigate = useNavigate();
-  const { items, restaurantId, restaurantSlug, tableNumber, updateQuantity, clearCart, setActiveOrder } = useCartStore();
+  const { items, restaurantId, restaurantSlug, tableNumber, updateQuantity, clearCart, addActiveOrder } = useCartStore();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
 
@@ -35,7 +35,7 @@ const Cart = () => {
       }
 
       // Link this order to the session
-      setActiveOrder(res.data.order_id);
+      addActiveOrder(res.data.order_id);
       clearCart();
       // Show progress first as requested
       navigate(`/order-status/${res.data.order_id}`);
@@ -54,13 +54,13 @@ const Cart = () => {
         </div>
         <h2 className="font-fraunces text-4xl font-bold mb-3 text-customer-text tracking-tight italic">Cart is empty</h2>
         
-        {useCartStore.getState().isSessionValid() && useCartStore.getState().activeOrderId ? (
+        {useCartStore.getState().isSessionValid() && useCartStore.getState().activeOrders?.length > 0 ? (
           <div className="flex flex-col items-center">
             <p className="text-zinc-400 mb-8 text-center font-bold max-w-xs leading-relaxed uppercase text-[10px] tracking-widest italic">
-              You have an active order in progress.
+              You have {useCartStore.getState().activeOrders.length} active order(s) in progress.
             </p>
             <button 
-              onClick={() => navigate(`/order-status/${useCartStore.getState().activeOrderId}`)}
+              onClick={() => navigate(`/order-status/${useCartStore.getState().activeOrders[0]}`)}
               className="group flex items-center gap-3 px-10 py-5 bg-customer-accent text-white rounded-[2rem] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all mb-4"
             >
               View Active Order <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />

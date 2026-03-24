@@ -19,9 +19,9 @@ export default function Landing() {
   const canvasRef = useRef(null);
   const heroScrollRef = useRef(null);
 
-  const { isSessionValid, activeOrderId, restaurantSlug, tableNumber: sessionTable, destroySession } = useCartStore();
+  const { isSessionValid, activeOrders, restaurantSlug, tableNumber: sessionTable, destroySession } = useCartStore();
   const hasValidSession = isSessionValid();
-  const hasActiveOrder = hasValidSession && !!activeOrderId;
+  const hasActiveOrder = hasValidSession && activeOrders && activeOrders.length > 0;
 
   // Auto-destroy expired sessions on mount
   useEffect(() => {
@@ -193,7 +193,7 @@ export default function Landing() {
                         {/* Primary CTA — session-aware */}
                         {hasActiveOrder ? (
                           <button 
-                            onClick={() => navigate(`/order-status/${activeOrderId}`)} 
+                            onClick={() => navigate(`/order-status/${activeOrders[0]}`)} 
                             className="group flex items-center justify-center gap-6 bg-[#C85C1A] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#1C1917] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95"
                           >
                             Resume Your Order <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />

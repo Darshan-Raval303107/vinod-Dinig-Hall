@@ -44,7 +44,7 @@ export const useCartStore = create(
       restaurantId: null,
       restaurantSlug: null,
       tableNumber: null,
-      activeOrderId: null,
+      activeOrders: [],
       sessionCreatedAt: null,
 
       // Check if current session is still valid (within 6h TTL)
@@ -70,7 +70,7 @@ export const useCartStore = create(
           restaurantId,
           tableNumber,
           restaurantSlug: restaurantSlug || state.restaurantSlug,
-          activeOrderId: null,
+          activeOrders: [],
           sessionCreatedAt: Date.now(),
           items: [],
         });
@@ -89,7 +89,7 @@ export const useCartStore = create(
       },
 
       // Link session to an active order after placing
-      setActiveOrder: (orderId) => set({ activeOrderId: orderId }),
+      addActiveOrder: (orderId) => set(state => ({ activeOrders: [...(state.activeOrders || []), orderId] })),
 
       addItem: (item) => set((state) => {
         const existing = state.items.find(i => i.id === item.id)
@@ -115,7 +115,7 @@ export const useCartStore = create(
         restaurantId: null,
         restaurantSlug: null,
         tableNumber: null,
-        activeOrderId: null,
+        activeOrders: [],
         sessionCreatedAt: null,
       }),
     }),

@@ -53,12 +53,16 @@ const OrderHistoryView = () => {
       socket.on('connect', joinRoom);
       joinRoom();
       
-      socket.on('order:new', () => {
+      socket.on('order:new', (data) => {
         try {
           const audio = new Audio('/notification.mp3'); 
           audio.play().catch(e => console.log('Haptic sound blocked', e));
         } catch (e) {}
-        fetchOrders();
+        if (data) {
+          setOrders(prev => [data, ...prev]);
+        } else {
+          fetchOrders();
+        }
       });
       
       socket.on('order:status_update', (data) => {
@@ -296,7 +300,9 @@ const OrderHistoryView = () => {
                               </div>
                               <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Audit Trail Active</span>
                            </div>
-                           <button className="h-14 px-10 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-4 group">
+                           <button 
+                              onClick={() => window.open(`/bill/${order.id}`, '_blank')}
+                              className="h-14 px-10 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-slate-800 transition-all flex items-center gap-4 group">
                               Download Audit Report
                               <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
                            </button>
