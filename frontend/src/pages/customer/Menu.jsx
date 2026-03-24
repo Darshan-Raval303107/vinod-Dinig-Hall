@@ -11,13 +11,13 @@ gsap.registerPlugin(ScrollTrigger);
 const Menu = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const restaurantSlug = searchParams.get('restaurant') || 'spice-lounge';
+  const restaurantSlug = searchParams.get('restaurant') || 'vinnod';
   const table = searchParams.get('table') || '0';
   
   const [menuData, setMenuData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [vegOnly, setVegOnly] = useState(true);
+  const [vegOnly, setVegOnly] = useState(false);
   const [activeCategory, setActiveCategory] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   

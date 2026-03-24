@@ -78,8 +78,8 @@ const OrderStatus = () => {
           <button
             onClick={() => {
               const path = order.order_type === 'window' 
-                ? '/menu?restaurant=spice-lounge' 
-                : `/menu?restaurant=spice-lounge&table=${order.table_number}`;
+                ? '/menu?restaurant=vinnod' 
+                : `/menu?restaurant=vinnod&table=${order.table_number}`;
               navigate(path);
             }}
             className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-customer-surface/20 text-customer-text/60 shadow-sm active:scale-95 transition-all"

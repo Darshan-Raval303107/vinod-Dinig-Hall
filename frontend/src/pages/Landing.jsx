@@ -13,7 +13,7 @@ export default function Landing() {
   const { tableNumber } = useParams();
   const isTableOrder = !!tableNumber;
   const menuPath = isTableOrder 
-    ? `/menu?restaurant=spice-lounge&table=${tableNumber}` 
+    ? `/menu?restaurant=vinnod&table=${tableNumber}` 
     : '/menu';
   const [isLoginEnabled, setIsLoginEnabled] = useState(true);
   const canvasRef = useRef(null);
@@ -35,7 +35,7 @@ export default function Landing() {
   useEffect(() => {
     const fetchStatus = async () => {
       try {
-        const res = await api.get('/auth/settings/user-login?restaurant=spice-lounge');
+        const res = await api.get('/auth/settings/user-login?restaurant=vinnod');
         setIsLoginEnabled(res.data.enabled !== false);
       } catch (err) {
         setIsLoginEnabled(true);
@@ -199,7 +199,7 @@ export default function Landing() {
                             Resume Your Order <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
                           </button>
                         ) : hasValidSession ? (
-                          <Link to={`/menu?restaurant=${restaurantSlug || 'spice-lounge'}&table=${sessionTable || '0'}`} className="group flex items-center justify-center gap-6 bg-[#1C1917] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95">
+                          <Link to={`/menu?restaurant=${restaurantSlug || 'vinnod'}&table=${sessionTable || '0'}`} className="group flex items-center justify-center gap-6 bg-[#1C1917] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95">
                             Continue to Menu <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
                           </Link>
                         ) : (
