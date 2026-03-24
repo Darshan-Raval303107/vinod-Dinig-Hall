@@ -68,6 +68,7 @@ const OrderStatus = () => {
   );
 
   const currentStepIndex = STATUS_STEPS.findIndex(s => s.id === order.status);
+  const isPaid = order.payment_status === 'success' || order.status === 'paid';
 
   return (
     <div className="theme-customer min-h-screen font-jakarta bg-[#FBF7F0] flex flex-col pt-10 pb-36 px-5 animate-in fade-in duration-1000">
@@ -77,10 +78,7 @@ const OrderStatus = () => {
         {!(order.order_type === 'window' && !order.pickup_code) ? (
           <button
             onClick={() => {
-              const path = order.order_type === 'window' 
-                ? '/menu?restaurant=vinnod' 
-                : `/menu?restaurant=vinnod&table=${order.table_number}`;
-              navigate(path);
+              navigate('/menu');
             }}
             className="w-10 h-10 flex items-center justify-center rounded-xl bg-white border border-customer-surface/20 text-customer-text/60 shadow-sm active:scale-95 transition-all"
           >
@@ -115,7 +113,7 @@ const OrderStatus = () => {
                 <span className="text-xs font-black text-white bg-customer-accent px-6 py-2 rounded-xl shadow-[0_15px_30px_rgba(200,92,26,0.3)] flex items-center gap-2">
                   <Ticket size={14} /> PICKUP CODE: {order.pickup_code}
                 </span>
-                {order.payment_status !== 'paid' && order.payment_status !== 'success' && (
+                {(!isPaid) && (
                   <span className="text-[7px] font-black text-customer-accent uppercase tracking-widest animate-pulse">Verification Pending</span>
                 )}
               </div>
@@ -237,7 +235,7 @@ const OrderStatus = () => {
       {/* Floating Dynamic Bottom Action Bar */}
       <div className="fixed bottom-24 left-0 right-0 px-6 z-[90] animate-in slide-in-from-bottom-10 duration-1000 delay-500">
         <div className="max-w-md mx-auto">
-          {order.status === 'paid' ? (
+          {isPaid ? (
             <button
               onClick={() => navigate(`/bill/${orderId}`)}
               className="w-full h-16 bg-emerald-600/10 border-2 border-emerald-500/20 text-emerald-600 rounded-2xl flex items-center justify-between gap-3 px-6 shadow-2xl backdrop-blur-md active:scale-95 transition-all group"

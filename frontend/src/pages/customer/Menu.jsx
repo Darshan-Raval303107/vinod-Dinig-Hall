@@ -11,8 +11,9 @@ gsap.registerPlugin(ScrollTrigger);
 const Menu = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { items: cartItems, addItem, setContext, startSession, isSessionValid, destroySession, tableNumber: sessionTable } = useCartStore();
   const restaurantSlug = searchParams.get('restaurant') || 'vinnod';
-  const table = searchParams.get('table') || '0';
+  const table = searchParams.get('table') || sessionTable || '0';
   
   const [menuData, setMenuData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -22,7 +23,7 @@ const Menu = () => {
   const [searchQuery, setSearchQuery] = useState('');
   
   const containerRef = useRef(null);
-  const { items: cartItems, addItem, setContext, startSession, isSessionValid, destroySession } = useCartStore();
+
 
   useEffect(() => {
     // Auto-destroy expired session

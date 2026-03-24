@@ -199,7 +199,7 @@ export default function Landing() {
                             Resume Your Order <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
                           </button>
                         ) : hasValidSession ? (
-                          <Link to={`/menu?restaurant=${restaurantSlug || 'vinnod'}&table=${sessionTable || '0'}`} className="group flex items-center justify-center gap-6 bg-[#1C1917] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95">
+                          <Link to={`/menu`} className="group flex items-center justify-center gap-6 bg-[#1C1917] text-[#FBF9F7] px-16 py-6 rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:bg-[#C85C1A] transition-all hover:shadow-[0_20px_40px_rgba(200,92,26,0.3)] active:scale-95">
                             Continue to Menu <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
                           </Link>
                         ) : (

@@ -221,7 +221,7 @@ const Bill = () => {
         <div className="mt-12 space-y-4 receipt-reveal print:hidden">
             <div className="flex gap-4">
                 <button 
-                  onClick={() => navigate('/menu?restaurant=vinnod&table=1')}
+                  onClick={() => navigate('/menu')}
                   className="flex-1 h-16 bg-customer-text text-white rounded-2xl font-black text-[10px] uppercase tracking-widest italic flex items-center justify-center gap-3 active:scale-95 transition-all shadow-xl shadow-customer-text/10"
                 >
                    Return to Menu <ArrowLeft size={14} />
