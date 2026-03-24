@@ -155,9 +155,13 @@ def verify_callback():
         )
         
         body = result or {}
+        frontend_url = current_app.config.get("FRONTEND_URL", "http://localhost:5173")
+        order_id = body.get('order_id')
+        pickup_code = body.get('pickup_code') or ''
 
-        # Redirect to success page with data
-        return redirect(f"/success?order_id={body.get('order_id')}")
+        # Absolute redirect to frontend success page
+        logger.info(f"Callback successful. Redirecting to frontend success: {order_id} | Code: {pickup_code}")
+        return redirect(f"{frontend_url}/success?order_id={order_id}&code={pickup_code}")
 
     except Exception as e:
         logger.error(f"Callback verification failed: {str(e)}")

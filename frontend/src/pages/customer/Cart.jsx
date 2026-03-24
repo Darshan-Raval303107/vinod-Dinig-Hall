@@ -53,15 +53,38 @@ const Cart = () => {
           <div className="absolute inset-0 border-2 border-dashed border-zinc-100 rounded-[3rem] animate-[spin_20s_linear_infinite]"></div>
         </div>
         <h2 className="font-fraunces text-4xl font-bold mb-3 text-customer-text tracking-tight italic">Cart is empty</h2>
-        <p className="text-zinc-400 mb-10 text-center font-bold max-w-xs leading-relaxed uppercase text-[10px] tracking-widest italic">
-          Your cart is empty. Browse the menu to add items.
-        </p>
-        <button 
-          onClick={() => navigate('/menu?restaurant=spice-lounge&table=1')}
-          className="group flex items-center gap-3 px-10 py-5 bg-customer-text text-white rounded-[2rem] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
-        >
-          Explore Menu <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-        </button>
+        
+        {useCartStore.getState().isSessionValid() && useCartStore.getState().activeOrderId ? (
+          <div className="flex flex-col items-center">
+            <p className="text-zinc-400 mb-8 text-center font-bold max-w-xs leading-relaxed uppercase text-[10px] tracking-widest italic">
+              You have an active order in progress.
+            </p>
+            <button 
+              onClick={() => navigate(`/order-status/${useCartStore.getState().activeOrderId}`)}
+              className="group flex items-center gap-3 px-10 py-5 bg-customer-accent text-white rounded-[2rem] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all mb-4"
+            >
+              View Active Order <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+            <button 
+              onClick={() => navigate('/menu')}
+              className="text-[9px] font-black text-zinc-400 uppercase tracking-widest hover:text-customer-text transition-colors"
+            >
+              Back to Menu
+            </button>
+          </div>
+        ) : (
+          <>
+            <p className="text-zinc-400 mb-10 text-center font-bold max-w-xs leading-relaxed uppercase text-[10px] tracking-widest italic">
+              Your cart is empty. Browse the menu to add items.
+            </p>
+            <button 
+              onClick={() => navigate('/menu')}
+              className="group flex items-center gap-3 px-10 py-5 bg-customer-text text-white rounded-[2rem] font-black text-[10px] uppercase tracking-[0.2em] shadow-xl active:scale-95 transition-all"
+            >
+              Explore Menu <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+            </button>
+          </>
+        )}
       </div>
     );
   }

@@ -149,17 +149,8 @@ const Payment = () => {
       console.log("Executing rzp.open()...");
       const rzp = new window.Razorpay(options);
       
-      // Safety timeout for mobile: If stuck in "Processing..." for > 10s without callback, reset
-      setTimeout(() => {
-        setProcessing(current => {
-          if (current) {
-            console.warn("Payment flow safety timeout reached. Redirecting to status as fallback.");
-            window.location.href = `/order-status/${orderId}`;
-            return false;
-          }
-          return current;
-        });
-      }, 15000);
+      // Removed aggressive 15s timeout redirect to prevent "frequent refresh" feel
+      // Users should wait for the payment to complete or fail naturally
 
       rzp.on('payment.failed', function (response) {
         console.error("Razorpay Payment Failed:", response.error);
@@ -216,7 +207,7 @@ const Payment = () => {
           {error}
         </p>
         <button
-          onClick={() => window.location.reload()}
+          onClick={() => { setError(''); setLoading(true); }} // Reset state instead of full reload
           className="mt-12 px-8 py-4 bg-customer-text text-white rounded-2xl text-[10px] font-black uppercase tracking-widest italic"
         >
           Retry Payment
