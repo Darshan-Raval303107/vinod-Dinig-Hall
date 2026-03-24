@@ -8,96 +8,74 @@ app = create_app()
 
 def seed():
     with app.app_context():
-        # Clear existing (safety)
-        # db.drop_all() 
-        # db.create_all()
-
-        if Restaurant.query.first():
-            print("Database already has data. Skipping seed.")
-            return
-
-        print("Seeding database...")
+        print("🌱 Starting Idempotent Seed...")
 
         # 1. Create Restaurant
-        restaurant = Restaurant(
-            name="Vinnod Dining Hall",
-            slug="vinnod",
-            user_login_enabled=True
-        )
-        db.session.add(restaurant)
+        vinnod = Restaurant.query.filter_by(slug="vinnod").first()
+        if not vinnod:
+            vinnod = Restaurant(name="Vinnod Dining Hall", slug="vinnod", user_login_enabled=True)
+            db.session.add(vinnod)
+            print("Created Vinnod Restaurant")
         
-        # Spice Lounge (Alternative)
-        spice = Restaurant(
-            name="Spice Lounge",
-            slug="spice-lounge",
-            user_login_enabled=True
-        )
-        db.session.add(spice)
-        db.session.flush()
+        db.session.commit() # Save to get ID
 
         # 2. Create Tables
-        for i in range(1, 11):
-            table = RestaurantTable(restaurant_id=restaurant.id, table_number=i)
-            db.session.add(table)
-            
-        # Window Table (0)
-        window = RestaurantTable(restaurant_id=restaurant.id, table_number=0)
-        db.session.add(window)
+        existing_tables = RestaurantTable.query.filter_by(restaurant_id=vinnod.id).all()
+        if not existing_tables:
+            for i in range(1, 11):
+                db.session.add(RestaurantTable(restaurant_id=vinnod.id, table_number=i))
+            db.session.add(RestaurantTable(restaurant_id=vinnod.id, table_number=0))
+            print("Created Tables 0-10")
 
         # 3. Create Categories
-        cats = [
-            ("Starters", "🥗"),
-            ("Main Course", "🍛"),
-            ("Desserts", "🍰"),
-            ("Drinks", "🥤")
+        cats_to_create = [
+            ("Starters", "🥗"), ("Main Course", "🍛"), ("Desserts", "🍰"), ("Drinks", "🥤")
         ]
         
-        for name, icon in cats:
-            cat = MenuCategory(restaurant_id=restaurant.id, name=name, icon=icon)
-            db.session.add(cat)
-            db.session.flush()
-            
+        for name, icon in cats_to_create:
+            cat = MenuCategory.query.filter_by(restaurant_id=vinnod.id, name=name).first()
+            if not cat:
+                cat = MenuCategory(restaurant_id=vinnod.id, name=name, icon=icon)
+                db.session.add(cat)
+                db.session.commit()
+                print(f"Created Category: {name}")
+
             # 4. Create Menu Items
             if name == "Starters":
-                items = [
-                    ("Paneer Tikka", "Grilled cottage cheese", 240, True),
-                    ("Veg Crispy", "Crispy mixed vegetables", 180, True)
-                ]
+                items = [("Paneer Tikka", "Grilled cottage cheese", 240, True), ("Veg Crispy", "Crispy mixed vegetables", 180, True)]
             elif name == "Main Course":
-                items = [
-                    ("Butter Chicken", "Rich creamy tomato gravy with chicken", 350, False),
-                    ("Dal Tadka", "Tempered yellow lentils", 210, True),
-                    ("Veg Biryani", "Fragrant basmati rice with veggies", 280, True)
-                ]
+                items = [("Butter Chicken", "Rich creamy tomato gravy with chicken", 350, False), ("Dal Tadka", "Tempered yellow lentils", 210, True)]
             else:
-                items = [
-                    ("Gulab Jamun", "Sweet milk solids in syrup", 90, True),
-                    ("Fresh Lime Soda", "Refreshing citrus drink", 60, True)
-                ]
+                items = [("Gulab Jamun", "Sweet milk solids in syrup", 90, True), ("Fresh Lime Soda", "Refreshing citrus drink", 60, True)]
 
             for i_name, desc, price, is_veg in items:
-                item = MenuItem(
-                    category_id=cat.id,
-                    name=i_name,
-                    description=desc,
-                    price=Decimal(str(price)),
-                    is_veg=is_veg,
-                    is_available=True
-                )
-                db.session.add(item)
+                item = MenuItem.query.filter_by(category_id=cat.id, name=i_name).first()
+                if not item:
+                    db.session.add(MenuItem(
+                        category_id=cat.id, name=i_name, description=desc, 
+                        price=Decimal(str(price)), is_veg=is_veg, is_available=True
+                    ))
+                    print(f"  - Created Item: {i_name}")
 
-        # 5. Create Admin User
-        admin = User(
-            name="Admin User",
-            email="admin@vinnod.com",
-            password_hash=generate_password_hash("admin123"),
-            role="admin",
-            restaurant_id=restaurant.id
-        )
-        db.session.add(admin)
+        # 5. Create Staff Users
+        staff = [
+            ("Super Admin", "admin@vinnod.com", "admin123", "admin"),
+            ("Chef Vinod", "chef@vinnod.core", "chef123", "chef"),
+            ("Owner Vinod", "owner@vinnod.core", "owner123", "owner")
+        ]
+
+        for s_name, s_email, s_pass, s_role in staff:
+            u = User.query.filter_by(email=s_email).first()
+            if not u:
+                db.session.add(User(
+                    name=s_name, email=s_email, 
+                    password_hash=generate_password_hash(s_pass), 
+                    role=s_role, restaurant_id=vinnod.id
+                ))
+                print(f"Created User: {s_email} ({s_role})")
 
         db.session.commit()
-        print("✅ Database seeded successfully!")
+        print("✅ Database seeding complete!")
 
 if __name__ == "__main__":
     seed()

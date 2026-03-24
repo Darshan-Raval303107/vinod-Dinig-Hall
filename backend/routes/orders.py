@@ -93,27 +93,46 @@ def create_order():
 
 @orders_bp.route('/orders/<order_id>/status', methods=['GET'])
 def get_order_status(order_id):
-    order = Order.query.get(order_id)
-    if not order:
-        return jsonify(msg="Order not found"), 404
-    
-    items_data = []
-    for item in order.items:
-        items_data.append({
-            'name': item.menu_item.name,
-            'quantity': item.quantity,
-            'is_veg': item.menu_item.is_veg,
-            'unit_price': float(item.unit_price)
-        })
-    
-    return jsonify({
-        'order_id': order.id,
-        'status': order.status,
-        'table_number': order.table_number,
-        'order_type': order.order_type,
-        'pickup_code': order.pickup_code,
-        'payment_status': order.payment.status if order.payment else 'pending',
-        'total_price': float(order.total_price),
-        'created_at': order.created_at.isoformat() if order.created_at else None,
-        'items': items_data
-    }), 200
+    try:
+        order = Order.query.get(order_id)
+        if not order:
+            return jsonify({
+                "success": False,
+                "msg": "Order not found",
+                "error": "The requested order ID does not exist in the current database."
+            }), 404
+        
+        items_data = []
+        for item in order.items:
+            # Safely handle missing menu items (orphaned records)
+            mi_name = item.menu_item.name if item.menu_item else "Unknown Item"
+            mi_veg = item.menu_item.is_veg if item.menu_item else True
+            
+            items_data.append({
+                'name': mi_name,
+                'quantity': item.quantity,
+                'is_veg': mi_veg,
+                'unit_price': float(item.unit_price)
+            })
+        
+        return jsonify({
+            'success': True,
+            'order_id': order.id,
+            'status': order.status,
+            'table_number': order.table_number,
+            'order_type': order.order_type,
+            'pickup_code': order.pickup_code,
+            'payment_status': order.payment.status if order.payment else 'pending',
+            'total_price': float(order.total_price),
+            'created_at': order.created_at.isoformat() if order.created_at else None,
+            'items': items_data
+        }), 200
+    except Exception as e:
+        import traceback
+        current_app = __import__('flask').current_app
+        current_app.logger.error(f"Error in get_order_status: {str(e)}\n{traceback.format_exc()}")
+        return jsonify({
+            "success": False,
+            "error": str(e),
+            "msg": "Internal server error while fetching order status"
+        }), 500
