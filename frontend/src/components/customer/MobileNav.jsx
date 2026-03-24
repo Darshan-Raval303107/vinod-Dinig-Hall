@@ -8,7 +8,7 @@ const MobileNav = () => {
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
 
   const isWindowUser = !tableNumber || tableNumber === '0' || tableNumber === 0;
-  const menuLink = isWindowUser ? '/menu' : `/menu?table=${tableNumber}`;
+  const menuLink = '/menu';
   const homeLink = isWindowUser ? '/window' : `/table/${tableNumber}`;
 
   // Only show on customer pages

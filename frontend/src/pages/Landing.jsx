@@ -12,16 +12,21 @@ export default function Landing() {
   const navigate = useNavigate();
   const { tableNumber } = useParams();
   const isTableOrder = !!tableNumber;
-  const menuPath = isTableOrder 
-    ? `/menu?restaurant=vinnod&table=${tableNumber}` 
-    : '/menu';
+  const menuPath = '/menu';
   const [isLoginEnabled, setIsLoginEnabled] = useState(true);
   const canvasRef = useRef(null);
   const heroScrollRef = useRef(null);
 
-  const { isSessionValid, activeOrders, restaurantSlug, tableNumber: sessionTable, destroySession } = useCartStore();
+  const { isSessionValid, activeOrders, restaurantSlug, tableNumber: sessionTable, destroySession, setContext } = useCartStore();
   const hasValidSession = isSessionValid();
   const hasActiveOrder = hasValidSession && activeOrders && activeOrders.length > 0;
+
+  // Pre-populate session with table number if arriving from QR
+  useEffect(() => {
+    if (tableNumber) {
+      setContext(null, tableNumber);
+    }
+  }, [tableNumber, setContext]);
 
   // Auto-destroy expired sessions on mount
   useEffect(() => {
