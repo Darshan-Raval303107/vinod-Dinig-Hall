@@ -318,7 +318,7 @@ const Menu = () => {
 
       {/* ACTIVE ORDERS PILLS */}
       {activeOrders.length > 0 && (
-        <div className={`fixed ${totalCartItems > 0 ? 'bottom-44' : 'bottom-10'} left-0 right-0 px-6 z-[60] flex flex-col items-end gap-3 pointer-events-none`}>
+        <div className={`fixed ${totalCartItems > 0 ? 'bottom-52' : 'bottom-32'} left-0 right-0 px-6 z-[60] flex flex-col items-end gap-3 pointer-events-none`}>
           {activeOrders.map((orderId) => (
              <button 
                 key={orderId} 
@@ -343,7 +343,7 @@ const Menu = () => {
 
       {/* MOBILE STICKY CART ACTION - Matches Cart & Payment style */}
       {totalCartItems > 0 && (
-        <div className="fixed bottom-24 left-0 right-0 px-6 z-[70] animate-in slide-in-from-bottom-10 duration-700">
+        <div className="fixed bottom-32 left-0 right-0 px-6 z-[70] animate-in slide-in-from-bottom-10 duration-700">
           <div className="max-w-md mx-auto">
             <button 
               onClick={() => navigate('/cart')}

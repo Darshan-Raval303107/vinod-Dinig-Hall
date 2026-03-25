@@ -128,13 +128,19 @@ const OrderStatus = () => {
       <div className="bg-white rounded-[2.5rem] p-6 shadow-[0_40px_100px_-30px_rgba(0,0,0,0.06)] border border-customer-surface/20 relative mb-8 flex flex-col gap-6 md:gap-10 overflow-hidden">
         {/* Glowing track line */}
         <div className="absolute left-12 md:left-14 top-14 bottom-14 w-0.5 bg-customer-surface/20 -z-0">
-          <div className="absolute top-0 left-0 w-full bg-customer-accent transition-all duration-[2000ms] shadow-[0_0_15px_rgba(200,92,26,0.3)]" style={{ height: `${(currentStepIndex / (STATUS_STEPS.length - 1)) * 100}%` }}></div>
+          <div className="absolute top-0 left-0 w-full bg-customer-accent transition-all duration-[2000ms] shadow-[0_0_15px_rgba(200,92,26,0.3)]" style={{ height: `${((isPaid && currentStepIndex === 4 ? 5 : currentStepIndex) / (STATUS_STEPS.length - 1)) * 100}%` }}></div>
         </div>
 
         {STATUS_STEPS.map((step, index) => {
-          const isCompleted = currentStepIndex >= index;
-          const isActive = currentStepIndex === index;
-          const isFuture = currentStepIndex < index;
+          let isCompleted = currentStepIndex >= index;
+          let isActive = currentStepIndex === index;
+          let isFuture = currentStepIndex < index;
+
+          if (step.id === 'paid' && isPaid) {
+            isCompleted = true;
+            isActive = false;
+            isFuture = false;
+          }
           const Icon = step.icon;
 
           return (
@@ -233,7 +239,7 @@ const OrderStatus = () => {
       </div>
 
       {/* Floating Dynamic Bottom Action Bar */}
-      <div className="fixed bottom-24 left-0 right-0 px-6 z-[90] animate-in slide-in-from-bottom-10 duration-1000 delay-500">
+      <div className="fixed bottom-32 left-0 right-0 px-6 z-[90] animate-in slide-in-from-bottom-10 duration-1000 delay-500">
         <div className="max-w-md mx-auto">
           {isPaid ? (
             <button
