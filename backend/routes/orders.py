@@ -125,6 +125,7 @@ def get_order_status(order_id):
             mi_veg = item.menu_item.is_veg if item.menu_item else True
             
             items_data.append({
+                'menu_item_id': item.menu_item_id,
                 'name': mi_name,
                 'quantity': item.quantity,
                 'is_veg': mi_veg,
@@ -152,3 +153,157 @@ def get_order_status(order_id):
             "error": str(e),
             "msg": "Internal server error while fetching order status"
         }), 500
+
+
+# ── DELETE an item from a pending order (table or window) ──────────────
+@orders_bp.route('/orders/<order_id>/items/<menu_item_id>', methods=['DELETE'])
+def remove_order_item(order_id, menu_item_id):
+    try:
+        order = Order.query.get(order_id)
+        if not order:
+            return jsonify({"success": False, "msg": "Order not found"}), 404
+
+        # Only allow removal when the order is still pending
+        if order.status not in ('pending',):
+            return jsonify({
+                "success": False,
+                "msg": f"Cannot modify order – status is '{order.status}'. Items can only be removed while the order is pending."
+            }), 400
+
+        # Find the specific OrderItem
+        order_item = OrderItem.query.filter_by(
+            order_id=order.id,
+            menu_item_id=menu_item_id
+        ).first()
+
+        if not order_item:
+            return jsonify({"success": False, "msg": "Item not found in this order"}), 404
+
+        # Subtract cost from total
+        item_cost = float(order_item.unit_price) * order_item.quantity
+        order.total_price = max(0, float(order.total_price) - item_cost)
+
+        db.session.delete(order_item)
+
+        # If no items remain, cancel the order
+        remaining_items = OrderItem.query.filter_by(order_id=order.id).filter(
+            OrderItem.menu_item_id != menu_item_id
+        ).count()
+
+        if remaining_items == 0:
+            order.status = 'cancelled'
+
+        order.is_updated = True
+        db.session.commit()
+
+        # Notify chef dashboard
+        socketio.emit('order:updated', {
+            'order_id': str(order.id),
+            'id': str(order.id),
+            'table_number': order.table_number,
+            'order_type': order.order_type,
+            'status': order.status,
+            'pickup_code': order.pickup_code,
+            'total_price': float(order.total_price),
+            'is_updated': True,
+        }, room=str(order.restaurant_id))
+
+        return jsonify({
+            "success": True,
+            "msg": "Item removed successfully",
+            "order_status": order.status,
+            "new_total": float(order.total_price)
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "msg": str(e)}), 500
+
+
+# ── ADD more items to an existing order (table or window) ──────────────
+@orders_bp.route('/orders/<order_id>/items', methods=['PUT'])
+def add_items_to_order(order_id):
+    try:
+        order = Order.query.get(order_id)
+        if not order:
+            return jsonify({"success": False, "msg": "Order not found"}), 404
+
+        # Only allow adding items when order is still in kitchen pipeline
+        if order.status not in ('pending', 'accepted', 'cooking'):
+            return jsonify({
+                "success": False,
+                "msg": f"Cannot add items – order status is '{order.status}'."
+            }), 400
+
+        data = request.json or {}
+        items = data.get('items', [])
+        if not items:
+            return jsonify({"success": False, "msg": "No items provided"}), 400
+
+        added_total = 0.0
+        items_payload = []
+
+        for item in items:
+            mid = item.get('menu_item_id')
+            qty = item.get('quantity', 1)
+            menu_item = MenuItem.query.get(mid)
+            if not menu_item:
+                continue
+
+            items_payload.append({
+                'name': menu_item.name,
+                'quantity': qty,
+                'price': float(menu_item.price),
+                'is_veg': menu_item.is_veg
+            })
+
+            # Merge with existing item or create new
+            existing_oi = OrderItem.query.filter_by(
+                order_id=order.id,
+                menu_item_id=menu_item.id
+            ).first()
+
+            if existing_oi:
+                existing_oi.quantity += qty
+            else:
+                new_oi = OrderItem(
+                    order_id=order.id,
+                    menu_item_id=menu_item.id,
+                    quantity=qty,
+                    unit_price=menu_item.price
+                )
+                db.session.add(new_oi)
+
+            added_total += float(menu_item.price) * qty
+
+        order.total_price = float(order.total_price) + added_total
+        order.is_updated = True
+        db.session.commit()
+
+        # Notify chef
+        socketio.emit('order:updated', {
+            'order_id': str(order.id),
+            'id': str(order.id),
+            'table_number': order.table_number,
+            'order_type': order.order_type,
+            'status': order.status,
+            'pickup_code': order.pickup_code,
+            'total_price': float(order.total_price),
+            'is_updated': True,
+            'items': items_payload
+        }, room=str(order.restaurant_id))
+
+        return jsonify({
+            "success": True,
+            "msg": "Items added to order",
+            "order_id": order.id,
+            "new_total": float(order.total_price)
+        }), 200
+
+    except Exception as e:
+        db.session.rollback()
+        import traceback
+        traceback.print_exc()
+        return jsonify({"success": False, "msg": str(e)}), 500

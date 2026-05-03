@@ -179,7 +179,7 @@ const OrderStatus = () => {
                   <span className="font-fraunces italic font-bold text-customer-accent">{item.quantity}</span>
                 </div>
                 
-                {order.status === 'pending' && order.order_type === 'table' && (
+                {order.status === 'pending' && (
                   <button 
                     onClick={() => {
                       if(confirm(`Remove ${item.name}?`)) {
