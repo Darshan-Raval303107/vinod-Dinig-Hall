@@ -292,12 +292,6 @@ export default function Landing() {
               ))}
             </div>
 
-            <div className="mt-24 md:mt-32 flex justify-center">
-               <Link to="/window" className="group flex flex-col items-center gap-4 text-[10px] font-black uppercase tracking-[0.5em] text-[#1C1917] hover:text-[#C85C1A] transition-all">
-                  <span className="border-b border-transparent group-hover:border-[#C85C1A] transition-all pb-2">Explore Menu</span>
-                  <ArrowRight size={18} className="group-hover:translate-x-2 transition-transform" />
-               </Link>
-            </div>
           </div>
         </section>
 
