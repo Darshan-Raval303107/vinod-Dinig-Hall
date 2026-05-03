@@ -8,10 +8,27 @@ logging.basicConfig(level=logging.INFO)
 from config import Config
 from extensions import db, migrate, jwt, socketio, limiter
 import os
+import socket
+from urllib.parse import urlparse
 from dotenv import load_dotenv  # ← ADD THIS if not already
 
 # Load .env file early (very important for keys)
 load_dotenv()  # ← ADD THIS (place at top of file or here)
+
+def _redis_is_usable(redis_url):
+    if not redis_url:
+        return False, "REDIS_URL is empty or USE_REDIS is disabled."
+    try:
+        parsed = urlparse(redis_url)
+        host = parsed.hostname
+        port = parsed.port or 6379
+        if not host:
+            return False, "REDIS_URL is missing a hostname."
+        socket.getaddrinfo(host, port)
+        return True, ""
+    except Exception as exc:
+        return False, str(exc)
+
 
 def create_app(config_class=Config):
     app = Flask(__name__, static_folder='static', static_url_path='/static')
@@ -45,7 +62,16 @@ def create_app(config_class=Config):
     }}, supports_credentials=True)
     
     # Ratelimiter – using Redis from config
-    app.config['RATELIMIT_STORAGE_URI'] = app.config.get('REDIS_URL')
+    redis_url = app.config.get('REDIS_URL')
+    redis_enabled, redis_reason = _redis_is_usable(redis_url)
+    app.config['REDIS_ENABLED'] = redis_enabled
+
+    # Keep auth/login available even if Redis is unavailable.
+    app.config['RATELIMIT_STORAGE_URI'] = redis_url if redis_enabled else "memory://"
+    if redis_enabled:
+        app.logger.info("Redis enabled for rate limiting and SocketIO queue.")
+    else:
+        app.logger.warning(f"Redis disabled. Using in-memory fallbacks. Reason: {redis_reason}")
     limiter.init_app(app)
 
     db.init_app(app)
@@ -78,12 +104,13 @@ def create_app(config_class=Config):
         except Exception as e:
             app.logger.error(f"❌ Database auto-migration failed: {e}")
 
-    socketio.init_app(
-        app, 
-        async_mode="gevent", 
-        cors_allowed_origins=allowed_origins, 
-        message_queue=app.config.get('REDIS_URL')
-    )
+    socketio_kwargs = {
+        "async_mode": "gevent",
+        "cors_allowed_origins": allowed_origins,
+    }
+    if redis_enabled:
+        socketio_kwargs["message_queue"] = redis_url
+    socketio.init_app(app, **socketio_kwargs)
 
     # ── SocketIO Room Handlers ───────────────────────────────────────────
     from flask_socketio import join_room
@@ -143,6 +170,8 @@ def create_app(config_class=Config):
     # ── Redis Test Routes ────────────────────────────────────────────────
     @app.route('/redis/set')
     def redis_set():
+        if not app.config.get('REDIS_ENABLED'):
+            return jsonify(error="Redis is disabled for this environment."), 503
         try:
             import redis
             r = redis.from_url(app.config['REDIS_URL'], decode_responses=True)
@@ -153,6 +182,8 @@ def create_app(config_class=Config):
 
     @app.route('/redis/get')
     def redis_get():
+        if not app.config.get('REDIS_ENABLED'):
+            return jsonify(error="Redis is disabled for this environment."), 503
         try:
             import redis
             r = redis.from_url(app.config['REDIS_URL'], decode_responses=True)
