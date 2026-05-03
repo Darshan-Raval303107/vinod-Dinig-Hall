@@ -92,10 +92,10 @@ const OrderHistoryView = () => {
           o.id === data.order_id 
             ? { 
                 ...o, 
-                items: data.items, 
-                total_price: data.total_price, 
-                is_updated: data.is_updated,
-                status: data.status 
+                items: data.items ?? o.items, 
+                total_price: data.total_price ?? o.total_price, 
+                is_updated: data.is_updated ?? o.is_updated,
+                status: data.status ?? o.status 
               } 
             : o
         ));
@@ -231,7 +231,7 @@ const OrderHistoryView = () => {
                      <div className="flex items-center justify-between md:justify-end gap-6 md:gap-14 mt-8 md:mt-0 pt-6 md:pt-0 border-t md:border-t-0 border-white/10">
                         <div className="flex flex-col text-left md:text-right">
                            <span className={`text-[9px] font-black uppercase tracking-widest ${expandedOrders.has(order.id) ? 'text-white/40' : 'text-zinc-300'}`}>Total Billing</span>
-                           <span className="font-fraunces font-black text-2xl md:text-xl italic tracking-tighter">₹{order.total_price.toFixed(0)}</span>
+                           <span className="font-fraunces font-black text-2xl md:text-xl italic tracking-tighter">₹{(order.total_price || 0).toFixed(0)}</span>
                         </div>
                         
                         <div className="flex items-center gap-4">
@@ -299,17 +299,17 @@ const OrderHistoryView = () => {
                            ))}
 
                            <div className="pt-8 mt-8 border-t border-dashed border-zinc-200 flex flex-col items-end gap-2">
-                              <div className="flex items-center justify-between w-full md:w-64 opacity-40">
+                               <div className="flex items-center justify-between w-full md:w-64 opacity-40">
                                  <span className="text-[10px] font-black uppercase">Subtotal</span>
-                                 <span className="font-fraunces font-black">₹{(order.total_price * 0.95).toFixed(0)}</span>
+                                 <span className="font-fraunces font-black">₹{((order.total_price || 0) * 0.95).toFixed(0)}</span>
                               </div>
                               <div className="flex items-center justify-between w-full md:w-64 opacity-40">
                                  <span className="text-[10px] font-black uppercase">Tax (GST)</span>
-                                 <span className="font-fraunces font-black">₹{(order.total_price * 0.05).toFixed(0)}</span>
+                                 <span className="font-fraunces font-black">₹{((order.total_price || 0) * 0.05).toFixed(0)}</span>
                               </div>
                               <div className="flex items-center justify-between w-full md:w-64 mt-4 pt-4 border-t border-zinc-200">
                                  <span className="text-xs font-black uppercase text-slate-400">Total Settlement</span>
-                                 <span className="font-fraunces font-black text-3xl italic text-indigo-600">₹{order.total_price.toFixed(0)}</span>
+                                 <span className="font-fraunces font-black text-3xl italic text-indigo-600">₹{(order.total_price || 0).toFixed(0)}</span>
                               </div>
                            </div>
                         </div>

@@ -85,11 +85,22 @@ def update_order_status(order_id):
         'is_updated': False
     }, room=str(restaurant_id))
     
-    # Also notify owner dashboard
+    # Also notify owner dashboard with full details to keep it in sync
+    items_payload = []
+    for oi in order.items:
+        items_payload.append({
+            'name': oi.menu_item.name if oi.menu_item else "Unknown",
+            'quantity': oi.quantity,
+            'price': float(oi.unit_price),
+            'is_veg': oi.menu_item.is_veg if oi.menu_item else True
+        })
+
     socketio.emit('order:updated', {
         'order_id': str(order.id),
         'status': order.status,
-        'is_updated': False
+        'is_updated': False,
+        'total_price': float(order.total_price),
+        'items': items_payload
     }, room=f"owner_{restaurant_id}")
 
     # Reset is_updated flag when chef takes action
