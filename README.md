@@ -24,5 +24,3 @@ Then open `http://localhost:5173` in your browser.
 
 - **Frame settings**: `main.js` (`FRAME_COUNT`, `FRAME_PATH`, `SMOOTHING`)
 - **Hero scroll length**: `styles.css` (`.hero__scroll { height: 320vh; }`)
-
-

@@ -1,0 +1,9 @@
+Project: Vinod Dining Hall Platform
+
+Designed and developed a comprehensive Full-Stack Dining Hall application focused on seamless user experience and strict operational efficiency. The project features a visually striking 3D-scroll landing page (Tailwind CSS), a secure session-based multi-order tracking system, and a robust backend integrated with a custom UPI payment workflow. By migrating the core infrastructure to Neon PostgreSQL and Neo4j, I ensured reliable real-time updates for the owner dashboard, persistent payment state management, and an overall production-grade architecture.
+
+---
+Key Technologies:
+Frontend: HTML/CSS/JavaScript, Tailwind CSS, 3D Scroll Animations, Responsive Design
+Backend & Database: REST API, Session Management, Neon PostgreSQL, Neo4j
+Features: Custom UPI Payment Gateway (QR & UTR verification), Multi-Order Tracking, Real-time Dashboard
