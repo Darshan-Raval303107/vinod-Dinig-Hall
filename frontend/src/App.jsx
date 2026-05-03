@@ -13,36 +13,6 @@ import QRPreview from './pages/customer/QRPreview';
 import { useCartStore } from './store';
 import { useEffect } from 'react';
 
-const PathTracker = () => {
-  const location = useLocation();
-  const navigate = useNavigate(); // we need to import useNavigate at top level or extract it from react-router-dom
-  const { isSessionValid } = useCartStore();
-
-  // Save active customer paths
-  useEffect(() => {
-    const p = location.pathname;
-    // Only track customer facing internal routes as "savable"
-    if (p.startsWith('/menu') || p.startsWith('/cart') || p.startsWith('/order-status')) {
-      localStorage.setItem('dineflow_last_path', p + location.search);
-    }
-  }, [location]);
-
-  // Restore on entry
-  useEffect(() => {
-    const p = location.pathname;
-    if (p === '/' || p === '/window' || p.startsWith('/table/')) {
-      if (isSessionValid()) {
-        const lastPath = localStorage.getItem('dineflow_last_path');
-        if (lastPath) {
-          navigate(lastPath, { replace: true });
-        }
-      }
-    }
-  }, [location, isSessionValid, navigate]);
-
-  return null;
-};
-
 import Login from './pages/auth/Login';
 import Unauthorized from './pages/auth/Unauthorized';
 import ChefDashboard from './pages/chef/Dashboard';
@@ -51,7 +21,6 @@ import OwnerDashboard from './pages/owner/Dashboard';
 function App() {
   return (
     <BrowserRouter>
-      <PathTracker />
       <div className="flex flex-col min-h-screen">
         <div className="flex-1">
           <Routes>
