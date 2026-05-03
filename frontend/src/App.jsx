@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './components/ProtectedRoute';
 import MobileNav from './components/customer/MobileNav';
 
@@ -10,8 +10,6 @@ import Payment from './pages/customer/Payment';
 import Success from './pages/customer/Success';
 import Bill from './pages/customer/Bill';
 import QRPreview from './pages/customer/QRPreview';
-import { useCartStore } from './store';
-import { useEffect } from 'react';
 
 import Login from './pages/auth/Login';
 import Unauthorized from './pages/auth/Unauthorized';

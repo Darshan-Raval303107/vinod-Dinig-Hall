@@ -10,7 +10,6 @@ const Success = () => {
   const code = searchParams.get('code');
 
   useEffect(() => {
-    // Entrance Animation
     const tl = gsap.timeline();
     
     tl.fromTo(".success-icon", 
@@ -24,7 +23,6 @@ const Success = () => {
       "-=0.5"
     );
 
-    // Auto-redirect to tracking page after 5 seconds
     const timeout = setTimeout(() => {
       window.location.replace(`/order-status/${orderId}`);
     }, 6000);
@@ -33,83 +31,83 @@ const Success = () => {
   }, [orderId]);
 
   return (
-    <div className="theme-customer min-h-screen bg-[#FBF9F7] font-jakarta flex flex-col items-center justify-center p-6 text-center overflow-hidden">
+    <div className="theme-customer min-h-screen bg-[#FBF9F7] font-jakarta flex flex-col items-center justify-center p-5 text-center overflow-hidden">
       
-      {/* Decorative Background Elements */}
+      {/* Background Elements */}
       <div className="fixed top-0 left-0 w-full h-full pointer-events-none opacity-20">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-customer-accent/10 rounded-full blur-[100px]"></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/10 rounded-full blur-[100px]"></div>
       </div>
 
-      <div className="max-w-md w-full success-content relative z-10">
+      <div className="max-w-sm w-full success-content relative z-10">
         
-        {/* Animated Icon */}
-        <div className="success-icon w-20 h-20 bg-emerald-500 rounded-3xl flex items-center justify-center text-white shadow-[0_20px_50px_rgba(16,185,129,0.3)] mx-auto mb-8 relative">
-          <CheckCircle2 size={40} strokeWidth={2.5} />
-          <div className="absolute inset-0 rounded-3xl border-4 border-emerald-400/30 animate-ping"></div>
+        {/* Icon */}
+        <div className="success-icon w-16 h-16 md:w-20 md:h-20 bg-emerald-500 rounded-2xl flex items-center justify-center text-white shadow-[0_16px_40px_rgba(16,185,129,0.3)] mx-auto mb-6 relative">
+          <CheckCircle2 size={32} strokeWidth={2.5} />
+          <div className="absolute inset-0 rounded-2xl border-4 border-emerald-400/30 animate-ping"></div>
         </div>
 
-        <h1 className="font-fraunces text-4xl font-black italic text-customer-text tracking-tighter mb-4 uppercase">
+        <h1 className="font-fraunces text-3xl md:text-4xl font-black italic text-customer-text tracking-tighter mb-3 uppercase">
           Order <span className="text-emerald-500">Confirmed</span>
         </h1>
         
-        <p className="text-[10px] font-black text-zinc-400 uppercase tracking-[0.3em] mb-12">
+        <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest mb-8 md:mb-12">
           Your culinary journey has begun
         </p>
 
-        {/* Pickup Code Card (If applicable) */}
+        {/* Pickup Code Card */}
         {code && (
-          <div className="bg-white border border-zinc-100 rounded-[2.5rem] p-8 shadow-2xl shadow-zinc-200/50 mb-8 relative group overflow-hidden">
+          <div className="bg-white border border-zinc-100 rounded-2xl p-6 shadow-xl shadow-zinc-200/50 mb-6 relative group overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-br from-customer-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
             
             <div className="relative z-10">
-              <span className="text-[9px] font-black text-customer-accent uppercase tracking-[0.4em] mb-4 block">Store Pickup Code</span>
-              <div className="flex items-center justify-center gap-3">
+              <span className="text-[8px] font-black text-customer-accent uppercase tracking-widest mb-3 block">Pickup Code</span>
+              <div className="flex items-center justify-center gap-2">
                 {code.split('').map((char, i) => (
-                  <div key={i} className="w-12 h-16 bg-zinc-50 border border-zinc-100 rounded-xl flex items-center justify-center font-fraunces text-3xl font-black italic text-customer-text shadow-inner">
+                  <div key={i} className="w-10 h-12 md:w-12 md:h-16 bg-zinc-50 border border-zinc-100 rounded-lg md:rounded-xl flex items-center justify-center font-fraunces text-2xl md:text-3xl font-black italic text-customer-text shadow-inner">
                     {char}
                   </div>
                 ))}
               </div>
-              <p className="mt-6 text-[9px] font-bold text-zinc-300 uppercase tracking-widest italic">
-                Show this code at the counter
+              <p className="mt-4 text-[8px] font-bold text-zinc-300 uppercase tracking-widest italic">
+                Show this at the counter
               </p>
             </div>
           </div>
         )}
 
         {/* Info Grid */}
-        <div className="grid grid-cols-2 gap-3 mb-10">
-            <div className="bg-white/50 backdrop-blur-sm border border-white p-5 rounded-2xl flex flex-col items-center gap-2">
-                <Smartphone size={14} className="text-zinc-300" />
-                <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Order ID</span>
-                <span className="font-mono text-[9px] font-bold text-customer-text">#{orderId?.slice(-6).toUpperCase()}</span>
-            </div>
-            <div className="bg-white/50 backdrop-blur-sm border border-white p-5 rounded-2xl flex flex-col items-center gap-2">
-                <Utensils size={14} className="text-zinc-300" />
-                <span className="text-[8px] font-black text-zinc-400 uppercase tracking-widest">Restaurant</span>
-                <span className="text-[9px] font-bold text-customer-text">Vinod Dining Hall</span>
-            </div>
+        <div className="grid grid-cols-2 gap-2.5 mb-8">
+          <div className="bg-white/50 backdrop-blur-sm border border-white p-4 rounded-xl flex flex-col items-center gap-1.5">
+            <Smartphone size={12} className="text-zinc-300" />
+            <span className="text-[7px] font-black text-zinc-400 uppercase tracking-widest">Order ID</span>
+            <span className="font-mono text-[8px] font-bold text-customer-text">#{orderId?.slice(-6).toUpperCase()}</span>
+          </div>
+          <div className="bg-white/50 backdrop-blur-sm border border-white p-4 rounded-xl flex flex-col items-center gap-1.5">
+            <Utensils size={12} className="text-zinc-300" />
+            <span className="text-[7px] font-black text-zinc-400 uppercase tracking-widest">Restaurant</span>
+            <span className="text-[8px] font-bold text-customer-text">Vinod Dining</span>
+          </div>
         </div>
 
         {/* Action Button */}
         <button 
           onClick={() => window.location.replace(`/order-status/${orderId}`)}
-          className="group relative w-full h-16 bg-customer-text text-white rounded-2xl shadow-2xl flex items-center justify-between px-2 overflow-hidden transition-all active:scale-[0.98]"
+          className="group relative w-full h-14 bg-customer-text text-white rounded-2xl shadow-xl flex items-center justify-between px-2 overflow-hidden transition-all active:scale-[0.98]"
         >
-          <div className="h-12 bg-emerald-500 rounded-xl px-6 flex items-center gap-3 shadow-lg shadow-emerald-500/20">
-            <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center animate-pulse">
-                <ArrowRight size={12} />
+          <div className="h-10 bg-emerald-500 rounded-xl px-5 flex items-center gap-2 shadow-lg shadow-emerald-500/20">
+            <div className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center animate-pulse">
+              <ArrowRight size={10} />
             </div>
-            <span className="text-[11px] font-black uppercase tracking-[0.2em]">Track Live</span>
+            <span className="text-[10px] font-black uppercase tracking-wider">Track Live</span>
           </div>
 
-          <div className="flex items-center gap-2 font-fraunces italic text-lg pr-4 transition-all group-hover:translate-x-1">
-            CONTINUE <ArrowRight size={20} className="text-customer-accent" />
+          <div className="flex items-center gap-1.5 font-fraunces italic text-base pr-3 transition-all group-hover:translate-x-1">
+            CONTINUE <ArrowRight size={18} className="text-customer-accent" />
           </div>
         </button>
 
-        <p className="mt-8 text-[8px] font-black text-zinc-300 uppercase tracking-[0.4em] animate-pulse">
+        <p className="mt-6 text-[7px] font-black text-zinc-300 uppercase tracking-widest animate-pulse">
           Redirecting to live tracking in 5s...
         </p>
 

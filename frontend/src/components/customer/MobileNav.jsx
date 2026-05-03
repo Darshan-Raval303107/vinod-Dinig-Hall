@@ -1,10 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
-import { Home, ShoppingBag, Receipt, User } from 'lucide-react';
+import { Home, UtensilsCrossed, ShoppingBag, User } from 'lucide-react';
 import { useCartStore } from '../../store';
 
 const MobileNav = () => {
   const location = useLocation();
-  const { items, restaurantId, tableNumber } = useCartStore();
+  const { items, tableNumber } = useCartStore();
   const totalItems = items.reduce((acc, item) => acc + item.quantity, 0);
 
   const isWindowUser = !tableNumber || tableNumber === '0' || tableNumber === 0;
@@ -19,66 +19,48 @@ const MobileNav = () => {
 
   const isActive = (path) => location.pathname === path || location.pathname.startsWith(path + '/');
 
-  const getLinkClass = (path) => {
-    const active = isActive(path);
-    return `flex flex-col items-center justify-center w-full h-full gap-1 transition-all duration-300 ${
-      active ? 'text-customer-accent scale-110' : 'text-customer-text/40 hover:text-customer-text'
-    }`;
-  };
-
   return (
-    <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] px-4 pt-2 pointer-events-none" 
-         style={{ paddingBottom: 'calc(var(--safe-bottom) + 1.5rem)' }}>
-      <nav className="glass-panel rounded-[2.2rem] h-20 w-full flex items-center justify-around px-4 pointer-events-auto shadow-[0_25px_50px_-12px_rgba(0,0,0,0.25)] border-white/40 bg-white/90 backdrop-blur-xl">
+    <div className="md:hidden fixed bottom-0 left-0 right-0 z-[100] px-3 pointer-events-none" 
+         style={{ paddingBottom: 'max(env(safe-area-inset-bottom), 0.5rem)' }}>
+      <nav className="rounded-2xl h-16 w-full flex items-center justify-around pointer-events-auto shadow-[0_-4px_30px_rgba(0,0,0,0.08)] bg-white/95 backdrop-blur-xl border border-zinc-100/50">
 
-        <Link to={homeLink} className={getLinkClass(homeLink)}>
-          <Home size={22} strokeWidth={isActive(homeLink) ? 2.5 : 2} />
-          <span className="text-[10px] font-black uppercase tracking-widest">Home</span>
+        <Link to={homeLink} className={`flex flex-col items-center justify-center w-full h-full gap-0.5 transition-all duration-300 ${
+          isActive(homeLink) ? 'text-customer-accent' : 'text-zinc-400'
+        }`}>
+          <Home size={20} strokeWidth={isActive(homeLink) ? 2.5 : 1.8} />
+          <span className="text-[9px] font-bold uppercase tracking-wider">Home</span>
         </Link>
         
-        <Link to={menuLink} className={getLinkClass('/menu')}>
-          <div className="relative">
-            <User size={22} strokeWidth={isActive('/menu') ? 2.5 : 2} />
-          </div>
-          <span className="text-[10px] font-black uppercase tracking-widest">Menu</span>
+        <Link to={menuLink} className={`flex flex-col items-center justify-center w-full h-full gap-0.5 transition-all duration-300 ${
+          isActive('/menu') ? 'text-customer-accent' : 'text-zinc-400'
+        }`}>
+          <UtensilsCrossed size={20} strokeWidth={isActive('/menu') ? 2.5 : 1.8} />
+          <span className="text-[9px] font-bold uppercase tracking-wider">Menu</span>
         </Link>
 
-        <Link to="/cart" className={getLinkClass('/cart')}>
+        <Link to="/cart" className={`flex flex-col items-center justify-center w-full h-full gap-0.5 transition-all duration-300 ${
+          isActive('/cart') ? 'text-customer-accent' : 'text-zinc-400'
+        }`}>
           <div className="relative">
-            <ShoppingBag size={22} strokeWidth={isActive('/cart') ? 2.5 : 2} />
+            <ShoppingBag size={20} strokeWidth={isActive('/cart') ? 2.5 : 1.8} />
             {totalItems > 0 && (
-              <span className="absolute -top-1.5 -right-2.5 bg-customer-accent text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg animate-in zoom-in-0 duration-300">
+              <span className="absolute -top-1 -right-2 bg-customer-accent text-white text-[8px] font-black w-4 h-4 flex items-center justify-center rounded-full border-2 border-white shadow-sm">
                 {totalItems}
               </span>
             )}
           </div>
-          <span className="text-[10px] font-black uppercase tracking-widest">Cart</span>
+          <span className="text-[9px] font-bold uppercase tracking-wider">Cart</span>
         </Link>
 
-        <Link to="/login" className={getLinkClass('/login')}>
-          <Receipt size={22} strokeWidth={isActive('/login') ? 2.5 : 2} />
-          <span className="text-[10px] font-black uppercase tracking-widest">Account</span>
+        <Link to="/login" className={`flex flex-col items-center justify-center w-full h-full gap-0.5 transition-all duration-300 ${
+          isActive('/login') ? 'text-customer-accent' : 'text-zinc-400'
+        }`}>
+          <User size={20} strokeWidth={isActive('/login') ? 2.5 : 1.8} />
+          <span className="text-[9px] font-bold uppercase tracking-wider">Account</span>
         </Link>
       </nav>
     </div>
   );
 };
-
-// Redefining helper for exportable logic if needed
-const NavItem = ({ to, icon: Icon, label, isActive, totalItems }) => (
-  <Link to={to} className={`flex flex-col items-center justify-center w-full h-full gap-1 transition-all duration-300 ${
-    isActive ? 'text-customer-accent scale-110' : 'text-customer-text/40 hover:text-customer-text'
-  }`}>
-    <div className="relative">
-      <Icon size={22} strokeWidth={isActive ? 2.5 : 2} />
-      {label === 'Cart' && totalItems > 0 && (
-        <span className="absolute -top-1.5 -right-2.5 bg-customer-accent text-white text-[9px] font-black w-5 h-5 flex items-center justify-center rounded-full border-2 border-white shadow-lg">
-          {totalItems}
-        </span>
-      )}
-    </div>
-    <span className="text-[10px] font-black uppercase tracking-widest">{label}</span>
-  </Link>
-);
 
 export default MobileNav;
