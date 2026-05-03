@@ -75,7 +75,7 @@ const OrderCard = ({ order, onUpdateStatus }) => {
 
         {/* Updated Order Warning */}
         {order.is_updated && (
-          <div className="mb-4 p-3 bg-red-600 rounded-2xl animate-pulse shadow-lg shadow-red-600/20 border border-red-500">
+          <div className="mb-4 p-3 bg-indigo-600 rounded-2xl animate-pulse shadow-lg shadow-indigo-600/20 border border-indigo-400">
             <p className="text-[10px] font-black text-white uppercase tracking-[0.2em] flex items-center justify-center gap-2 italic">
               <AlertCircle size={14} className="animate-bounce" /> ORDER UPDATED BY CUSTOMER
             </p>

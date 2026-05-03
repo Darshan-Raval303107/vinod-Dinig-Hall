@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/axios';
 import { socket } from '../../api/socket';
-import { CheckCircle2, Clock, ChefHat, CheckSquare, CreditCard, ChevronRight, Activity, Bell, Info, ArrowLeft, Trash2, Ticket } from 'lucide-react';
+import { CheckCircle2, Clock, ChefHat, CheckSquare, CreditCard, ChevronRight, Activity, Bell, Info, ArrowLeft, Trash2, Ticket, Plus } from 'lucide-react';
 
 const STATUS_STEPS = [
   { id: 'pending', label: 'Order Received', icon: Clock, desc: 'Kitchen has received your order' },
@@ -39,7 +39,7 @@ const OrderStatus = () => {
 
     socket.on('order:status_update', (data) => {
       if (data.orderId === orderId) {
-        setOrder(prev => ({ ...prev, status: data.status }));
+        setOrder(prev => ({ ...prev, status: data.status, is_updated: data.is_updated ?? prev.is_updated }));
       }
     });
 
@@ -197,6 +197,17 @@ const OrderStatus = () => {
             </div>
           ))}
         </div>
+
+        {/* Add More Items Trigger */}
+        {['pending', 'accepted', 'cooking'].includes(order.status) && (
+          <button 
+            onClick={() => navigate('/menu')}
+            className="mt-4 w-full py-4 border-2 border-dashed border-customer-accent/20 rounded-2xl flex items-center justify-center gap-3 text-customer-accent hover:bg-customer-accent/5 transition-all group"
+          >
+            <Plus size={16} className="group-hover:rotate-90 transition-transform" />
+            <span className="text-[10px] font-black uppercase tracking-widest">Add More Items</span>
+          </button>
+        )}
       </div>
 
       {/* Info Card */}

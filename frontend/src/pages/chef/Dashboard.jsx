@@ -57,7 +57,7 @@ const ChefDashboard = () => {
     });
     
     socket.on('order:status_update_chef', (data) => {
-      setOrders(prev => prev.map(o => o.order_id === data.orderId ? { ...o, status: data.status } : o));
+      setOrders(prev => prev.map(o => o.order_id === data.orderId ? { ...o, status: data.status, is_updated: data.is_updated } : o));
     });
 
     return () => {

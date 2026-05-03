@@ -74,14 +74,23 @@ def update_order_status(order_id):
     # Emit to customer tracking room
     socketio.emit('order:status_update', {
         'orderId': str(order.id),
-        'status': order.status
+        'status': order.status,
+        'is_updated': False
     }, room=f"order_{order.id}")
     
     # Emit to chef dashboard room to update across multiple chef screens
     socketio.emit('order:status_update_chef', {
         'orderId': str(order.id),
-        'status': order.status
+        'status': order.status,
+        'is_updated': False
     }, room=str(restaurant_id))
+    
+    # Also notify owner dashboard
+    socketio.emit('order:updated', {
+        'order_id': str(order.id),
+        'status': order.status,
+        'is_updated': False
+    }, room=f"owner_{restaurant_id}")
 
     # Reset is_updated flag when chef takes action
     if order.is_updated:

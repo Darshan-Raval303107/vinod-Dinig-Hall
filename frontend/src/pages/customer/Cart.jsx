@@ -19,22 +19,52 @@ const Cart = () => {
 
     try {
       const isWindow = String(tableNumber).toLowerCase() === 'window' || parseInt(tableNumber, 10) === 0 || !tableNumber;
-
-      const payload = {
-        restaurant_id: restaurantId,
-        table_number: isWindow ? 0 : parseInt(tableNumber, 10),
-        total: totalAmount,
-        items: items.map(i => ({ menu_item_id: i.id, quantity: i.quantity, price: i.price }))
-      };
-
-      const endpoint = isWindow ? '/window/order' : '/orders';
-      const res = await api.post(endpoint, payload);
+      
+      // Check for existing active order to update
+      const activeOrders = useCartStore.getState().activeOrders;
+      const latestOrderId = activeOrders && activeOrders.length > 0 ? activeOrders[activeOrders.length - 1] : null;
+      
+      let res;
+      if (latestOrderId) {
+        // Try to update existing order
+        try {
+          res = await api.put(`/orders/${latestOrderId}/items`, {
+            items: items.map(i => ({ menu_item_id: i.id, quantity: i.quantity }))
+          });
+          // If successful, we stay with the same order_id
+          res.data.order_id = latestOrderId;
+        } catch (err) {
+          // If update fails (e.g. order already ready/served), fallback to new order
+          const payload = {
+            restaurant_id: restaurantId,
+            table_number: isWindow ? 0 : parseInt(tableNumber, 10),
+            total: totalAmount,
+            items: items.map(i => ({ menu_item_id: i.id, quantity: i.quantity, price: i.price }))
+          };
+          const endpoint = isWindow ? '/window/order' : '/orders';
+          res = await api.post(endpoint, payload);
+        }
+      } else {
+        // No active order, create new
+        const payload = {
+          restaurant_id: restaurantId,
+          table_number: isWindow ? 0 : parseInt(tableNumber, 10),
+          total: totalAmount,
+          items: items.map(i => ({ menu_item_id: i.id, quantity: i.quantity, price: i.price }))
+        };
+        const endpoint = isWindow ? '/window/order' : '/orders';
+        res = await api.post(endpoint, payload);
+      }
       
       if (isWindow && res.data.pickup_code) {
         alert(res.data.message);
       }
 
-      addActiveOrder(res.data.order_id);
+      // Only add to active orders if it's a new ID
+      if (!activeOrders.includes(res.data.order_id)) {
+        addActiveOrder(res.data.order_id);
+      }
+      
       clearCart();
       navigate(`/order-status/${res.data.order_id}`);
     } catch (err) {

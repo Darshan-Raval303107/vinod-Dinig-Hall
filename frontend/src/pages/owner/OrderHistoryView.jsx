@@ -66,10 +66,10 @@ const OrderHistoryView = () => {
       });
       
       socket.on('order:status_update', (data) => {
-        setOrders(prev => prev.map(o => o.id === data.orderId ? { ...o, status: data.status } : o));
+        setOrders(prev => prev.map(o => o.id === data.orderId ? { ...o, status: data.status, is_updated: data.is_updated ?? o.is_updated } : o));
       });
       socket.on('order:status_update_chef', (data) => {
-        setOrders(prev => prev.map(o => o.id === data.orderId ? { ...o, status: data.status } : o));
+        setOrders(prev => prev.map(o => o.id === data.orderId ? { ...o, status: data.status, is_updated: data.is_updated ?? o.is_updated } : o));
       });
       
       // Live payment status update
@@ -81,12 +81,28 @@ const OrderHistoryView = () => {
         ));
       });
 
+      // Live order content update (items/price)
+      socket.on('order:updated', (data) => {
+        setOrders(prev => prev.map(o => 
+          o.id === data.order_id 
+            ? { 
+                ...o, 
+                items: data.items, 
+                total_price: data.total_price, 
+                is_updated: data.is_updated,
+                status: data.status 
+              } 
+            : o
+        ));
+      });
+
       return () => {
         socket.off('connect', joinRoom);
         socket.off('order:new');
         socket.off('order:status_update');
         socket.off('order:status_update_chef');
         socket.off('payment:success');
+        socket.off('order:updated');
       };
     }
   }, [user]);

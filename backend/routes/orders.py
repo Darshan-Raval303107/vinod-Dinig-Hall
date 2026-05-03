@@ -45,21 +45,12 @@ def create_order():
             msg = "Order created"
             event_type = 'order:new'
 
-        db.session.flush() # get ID
-
+        # 1. Update/Add items to DB
         new_total = float(order.total_price)
-        items_payload = []
         for item in items:
             menu_item = MenuItem.query.get(item['menu_item_id'])
             if not menu_item:
                 continue
-            
-            items_payload.append({
-                'name': menu_item.name,
-                'quantity': item['quantity'],
-                'price': float(menu_item.price),
-                'is_veg': menu_item.is_veg
-            })
 
             # Check if item already exists in this order to update quantity
             existing_oi = OrderItem.query.filter_by(order_id=order.id, menu_item_id=menu_item.id).first()
@@ -78,12 +69,20 @@ def create_order():
         
         order.total_price = new_total
         db.session.commit()
-        
-        # Ensure created_at is accessible after commit
         db.session.refresh(order)
 
-        # Emit to chef room for this restaurant
-        socketio.emit(event_type, {
+        # 2. Prepare full items list for socket emission
+        full_items_payload = []
+        for oi in order.items:
+            full_items_payload.append({
+                'name': oi.menu_item.name if oi.menu_item else "Unknown",
+                'quantity': oi.quantity,
+                'price': float(oi.unit_price),
+                'is_veg': oi.menu_item.is_veg if oi.menu_item else True
+            })
+
+        # 3. Emit to chef and owner rooms
+        socket_payload = {
             'id': str(order.id),
             'order_id': str(order.id),
             'table_number': order.table_number,
@@ -92,10 +91,13 @@ def create_order():
             'pickup_code': order.pickup_code,
             'total_price': float(order.total_price),
             'is_updated': order.is_updated,
-            'payment_status': 'pending',
+            'payment_status': order.payment.status if order.payment else 'pending',
             'created_at': order.created_at.isoformat() if order.created_at else None,
-            'items': items_payload
-        }, room=str(restaurant_id))
+            'items': full_items_payload
+        }
+        
+        socketio.emit(event_type, socket_payload, room=str(restaurant_id))
+        socketio.emit(event_type, socket_payload, room=f"owner_{restaurant_id}") # Explicit owner room
 
         return jsonify({
             'msg': msg,
@@ -239,25 +241,14 @@ def add_items_to_order(order_id):
 
         data = request.json or {}
         items = data.get('items', [])
-        if not items:
-            return jsonify({"success": False, "msg": "No items provided"}), 400
-
+        # 1. Update items in DB
         added_total = 0.0
-        items_payload = []
-
         for item in items:
             mid = item.get('menu_item_id')
             qty = item.get('quantity', 1)
             menu_item = MenuItem.query.get(mid)
             if not menu_item:
                 continue
-
-            items_payload.append({
-                'name': menu_item.name,
-                'quantity': qty,
-                'price': float(menu_item.price),
-                'is_veg': menu_item.is_veg
-            })
 
             # Merge with existing item or create new
             existing_oi = OrderItem.query.filter_by(
@@ -281,9 +272,19 @@ def add_items_to_order(order_id):
         order.total_price = float(order.total_price) + added_total
         order.is_updated = True
         db.session.commit()
+        db.session.refresh(order)
 
-        # Notify chef
-        socketio.emit('order:updated', {
+        # 2. Prepare full items list for socket emission
+        full_items_payload = []
+        for oi in order.items:
+            full_items_payload.append({
+                'name': oi.menu_item.name if oi.menu_item else "Unknown",
+                'quantity': oi.quantity,
+                'price': float(oi.unit_price),
+                'is_veg': oi.menu_item.is_veg if oi.menu_item else True
+            })
+
+        socket_payload = {
             'order_id': str(order.id),
             'id': str(order.id),
             'table_number': order.table_number,
@@ -292,8 +293,14 @@ def add_items_to_order(order_id):
             'pickup_code': order.pickup_code,
             'total_price': float(order.total_price),
             'is_updated': True,
-            'items': items_payload
-        }, room=str(order.restaurant_id))
+            'payment_status': order.payment.status if order.payment else 'pending',
+            'created_at': order.created_at.isoformat() if order.created_at else None,
+            'items': full_items_payload
+        }
+
+        # 3. Notify chef and owner
+        socketio.emit('order:updated', socket_payload, room=str(order.restaurant_id))
+        socketio.emit('order:updated', socket_payload, room=f"owner_{order.restaurant_id}")
 
         return jsonify({
             "success": True,
