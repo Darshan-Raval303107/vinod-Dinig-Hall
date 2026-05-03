@@ -133,8 +133,8 @@ def create_app(config_class=Config):
     def on_owner_join(data):
         restaurant_id = data.get('restaurantId')
         if restaurant_id:
-            join_room(str(restaurant_id))
-            app.logger.info(f"💎 Owner joined room: {restaurant_id}")
+            join_room(f"owner_{restaurant_id}")
+            app.logger.info(f"💎 Owner joined room: owner_{restaurant_id}")
 
     @socketio.on('disconnect')
     def on_disconnect():

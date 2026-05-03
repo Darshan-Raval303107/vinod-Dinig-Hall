@@ -217,7 +217,7 @@ export default function Landing() {
                         {hasValidSession && (
                           <button 
                             onClick={() => { destroySession(); navigate(menuPath); }}
-                            className="group flex items-center justify-center gap-4 bg-transparent border-2 border-[#1C1917]/10 text-[#1C1917]/50 px-10 py-5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:border-[#C85C1A]/30 hover:text-[#C85C1A] transition-all active:scale-95"
+                            className="group flex items-center justify-center gap-4 bg-[#C85C1A] text-[#FBF9F7] border-2 border-[#1C1917]/10 text-[#1C1917]/50 px-10 py-5 rounded-full text-[10px] font-black uppercase tracking-[0.3em] hover:border-[#C85C1A]/30 hover:text-[#C85C1A] transition-all active:scale-95"
                           >
                             <RotateCcw size={14} /> New Session
                           </button>

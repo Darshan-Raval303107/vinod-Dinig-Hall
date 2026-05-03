@@ -48,17 +48,33 @@ def create_window_order():
         # Commit everything
         db.session.commit()
 
-        # 🔥 IMMEDIATE NOTIFICATION: Inform chef as soon as "Proceed" is clicked
+        # 🔥 IMMEDIATE NOTIFICATION: Inform chef and owner as soon as "Proceed" is clicked
         from extensions import socketio
-        socketio.emit('order:new', {
+        
+        full_items_payload = []
+        for oi in new_order.items:
+            full_items_payload.append({
+                'name': oi.menu_item.name if oi.menu_item else "Unknown",
+                'quantity': oi.quantity,
+                'price': float(oi.unit_price),
+                'is_veg': oi.menu_item.is_veg if oi.menu_item else True
+            })
+
+        socket_payload = {
+            'id': str(new_order.id),
             'order_id': str(new_order.id),
             'table_number': 0,
             'status': new_order.status,
             'order_type': 'window',
             'pickup_code': new_order.pickup_code,
             'total_price': float(new_order.total_price),
-            'items_count': len(new_order.items)
-        }, room=str(new_order.restaurant_id))
+            'created_at': new_order.created_at.isoformat() if new_order.created_at else None,
+            'items': full_items_payload,
+            'payment_status': 'pending'
+        }
+
+        socketio.emit('order:new', socket_payload, room=str(new_order.restaurant_id))
+        socketio.emit('order:new', socket_payload, room=f"owner_{new_order.restaurant_id}")
             
         return jsonify({
             "success": True,

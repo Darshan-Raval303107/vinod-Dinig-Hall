@@ -58,8 +58,13 @@ const OrderHistoryView = () => {
           const audio = new Audio('/notification.mp3'); 
           audio.play().catch(e => console.log('Haptic sound blocked', e));
         } catch (e) {}
-        if (data) {
-          setOrders(prev => [data, ...prev]);
+        
+        if (data && data.id) {
+          setOrders(prev => {
+            // Check if order already exists to avoid duplicates
+            if (prev.find(o => o.id === data.id)) return prev;
+            return [data, ...prev];
+          });
         } else {
           fetchOrders();
         }
