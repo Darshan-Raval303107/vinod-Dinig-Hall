@@ -1,14 +1,45 @@
 import axios from 'axios';
 import { useAuthStore } from '../store';
 
-export const API_BASE_URL = import.meta.env.VITE_API_URL;
+const rawApiBase = (import.meta.env.VITE_API_URL || '').trim();
+const rawApiOrigin = (import.meta.env.VITE_API_ORIGIN || '').trim();
+const DEFAULT_REMOTE_ORIGIN = 'https://vinod-dinig-hall.onrender.com';
+
+const resolveApiBaseUrl = () => {
+  if (rawApiBase) return rawApiBase;
+  return 'https://vinod-dinig-hall.onrender.com/api';
+};
+
+export const API_BASE_URL = resolveApiBaseUrl();
 export const API_ORIGIN = (() => {
+  if (rawApiOrigin) return rawApiOrigin;
+
   try {
-    return new URL(API_BASE_URL).origin;
-  } catch {
-    return 'https://vinod-dinig-hall.onrender.com';
+    if (/^https?:\/\//i.test(API_BASE_URL)) {
+      return new URL(API_BASE_URL).origin;
+    }
+  } catch {}
+
+  if (typeof window !== 'undefined') {
+    const host = window.location.hostname;
+    if (host === 'localhost' || host === '127.0.0.1') {
+      return window.location.origin;
+    }
   }
+
+  return DEFAULT_REMOTE_ORIGIN;
 })();
+
+export const resolveAssetUrl = (path) => {
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path)) return path;
+
+  try {
+    return new URL(path, API_ORIGIN).toString();
+  } catch {
+    return path;
+  }
+};
 
 const api = axios.create({
   baseURL: API_BASE_URL,

@@ -163,7 +163,7 @@ def get_owner_menu():
     
     res = []
     for cat in categories:
-        items = MenuItem.query.filter_by(category_id=cat.id).all()
+        items = MenuItem.query.filter_by(category_id=cat.id, is_deleted=False).all()
         res.append({
             "id": str(cat.id),
             "name": cat.name,
@@ -272,7 +272,12 @@ def update_menu_item(item_id):
             return jsonify(msg="Item deleted"), 200
         except IntegrityError:
             db.session.rollback()
-            return jsonify(msg="Item is locked by transaction history. Please HALT the item instead of deleting."), 400
+            # Keep history intact while removing the item from active menu management.
+            item = MenuItem.query.get_or_404(item_id)
+            item.is_deleted = True
+            item.is_available = False
+            db.session.commit()
+            return jsonify(msg="Item archived from menu (history preserved)."), 200
         
     # Support both JSON updates (toggle availability) and multipart updates (full edit + photo)
     if request.content_type and request.content_type.startswith("multipart/form-data"):

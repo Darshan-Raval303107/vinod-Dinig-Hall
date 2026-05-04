@@ -28,11 +28,16 @@ def get_menu():
     }
 
     for category in categories:
-        items = MenuItem.query.filter_by(category_id=category.id, is_available=True).all()
+        items = MenuItem.query.filter_by(
+            category_id=category.id,
+            is_available=True,
+            is_deleted=False,
+        ).all()
         items_data = [{
             'id': item.id,
             'name': item.name,
             'description': item.description,
+            'image_url': item.image_url,
             'price': float(item.price),
             'is_veg': item.is_veg,
             'prep_time': item.prep_time
