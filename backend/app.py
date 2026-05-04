@@ -90,6 +90,13 @@ def create_app(config_class=Config):
                 app.logger.info("✅ Manually migrated is_active column.")
             except Exception:
                 db.session.rollback()
+
+            try:
+                db.session.execute(text("ALTER TABLE menu_items ADD COLUMN is_deleted BOOLEAN DEFAULT FALSE;"))
+                db.session.commit()
+                app.logger.info("✅ Manually migrated is_deleted column.")
+            except Exception:
+                db.session.rollback()
                 
             try:
                 upgrade()

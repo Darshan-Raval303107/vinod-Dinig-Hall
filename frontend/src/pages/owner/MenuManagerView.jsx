@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import api, { API_ORIGIN } from '../../api/axios';
+import api, { resolveAssetUrl } from '../../api/axios';
 import { Plus, Edit2, Trash2, Search, X, Image as ImageIcon, Check, Ban, Clock, ChefHat, Filter, ArrowRight } from 'lucide-react';
 
 const emptyForm = {
@@ -202,7 +202,7 @@ const MenuManagerView = () => {
              <div className="flex justify-between items-start mb-6">
                 <div className="w-16 h-16 rounded-[1.5rem] bg-zinc-50 border border-zinc-100 overflow-hidden shrink-0 shadow-inner relative group/img">
                   {item.image_url ? (
-                    <img src={item.image_url.startsWith('http') ? item.image_url : `${API_ORIGIN}${item.image_url}`} alt={item.name} className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500" />
+                    <img src={resolveAssetUrl(item.image_url)} alt={item.name} className="w-full h-full object-cover group-hover/img:scale-110 transition-transform duration-500" />
                   ) : <div className="w-full h-full flex items-center justify-center text-zinc-200 font-black italic">!</div>}
                   <div className={`absolute bottom-1 right-1 w-3 h-3 rounded-full border-2 border-white ${item.is_available ? 'bg-emerald-500' : 'bg-red-500'}`}></div>
                 </div>

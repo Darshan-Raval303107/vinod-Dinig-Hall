@@ -56,6 +56,7 @@ class MenuItem(db.Model):
     image_url = db.Column(db.Text, nullable=True)
     price = db.Column(db.Numeric(10, 2), nullable=False)
     is_available = db.Column(db.Boolean, default=True)
+    is_deleted = db.Column(db.Boolean, nullable=False, default=False)
     is_veg = db.Column(db.Boolean, nullable=False)
     prep_time = db.Column(db.Integer, nullable=True) # minutes
 

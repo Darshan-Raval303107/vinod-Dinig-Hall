@@ -1,7 +1,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useCartStore } from '../../store';
-import api from '../../api/axios';
+import api, { resolveAssetUrl } from '../../api/axios';
 import { ShoppingBag, ChevronRight, Leaf, Info, Star, Plus, Search, Minus, X } from 'lucide-react';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -277,7 +277,7 @@ const Menu = () => {
                             <div className="w-20 h-20 md:w-28 md:h-28 flex-shrink-0 rounded-xl bg-zinc-50 overflow-hidden relative border border-zinc-50 group/media">
                               {item.image_url ? (
                                 <img 
-                                    src={item.image_url.startsWith('http') ? item.image_url : `${api.defaults.baseURL.replace('/api', '')}${item.image_url}`} 
+                                    src={resolveAssetUrl(item.image_url)} 
                                     alt={item.name} 
                                     className="w-full h-full object-cover group-hover/media:scale-110 transition-transform duration-700" 
                                     loading="lazy"
